@@ -2,6 +2,12 @@
 
 **Does your computer-use agent pass twice?**
 
+> **Status: work in progress, building in public.** `prepare`, `probe`, `run`
+> and `report` all run end to end on Solari today with the OpenAI agent. The
+> Claude agent loop is written but not yet exercised against a live key. Next
+> up: a designed report page, a two-model comparison on one snapshot, and a
+> third task on the office template.
+
 `passk` forks one Solari desktop snapshot *k* times, runs the same task on every
 fork with the same agent, and tells you two things a single demo never will:
 
@@ -92,8 +98,3 @@ run       fork ×k from snapshot ──▶ agent loop on each ──▶ checks �
   sandbox-flavoured route accepts `fromSnapshot`.
 - **Clipboard readback is empty** (`xclip -o` exits 1) even after a real copy.
   Verify results through the filesystem instead.
-
-## Status
-
-Runs end to end on Solari with the OpenAI agent. Claude loop is written but
-untested (no working Anthropic key yet).
