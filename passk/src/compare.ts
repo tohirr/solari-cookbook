@@ -60,6 +60,7 @@ function side(dir: string, b: BenchResult): Side {
 }
 
 export function compareBenches(dirA: string, dirB: string): Comparison {
+  dirA = path.resolve(dirA); dirB = path.resolve(dirB);
   const A = side(dirA, loadBench(dirA)), B = side(dirB, loadBench(dirB));
   const heldFixed: string[] = [], changed: string[] = [], warnings: string[] = [];
   const cmp = (label: string, x: unknown, y: unknown) => (x === y ? heldFixed : changed).push(label);

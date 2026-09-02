@@ -13,7 +13,8 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { compareBenches, formatComparison } from "./compare.js";
+import { compareBenches, formatComparison, loadBench } from "./compare.js";
+import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
 import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
@@ -66,9 +67,11 @@ async function main() {
       if (!dirB) { console.error("compare needs two bench directories"); process.exit(1); }
       const c = compareBenches(must(target), dirB);
       console.log(formatComparison(c));
-      const out = path.join(config.runsDir, `compare-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
-      fs.writeFileSync(out, JSON.stringify(c, null, 2));
-      console.log(`\nsaved: ${out}`);
+      const outDir = path.join(config.runsDir, `compare-${new Date().toISOString().replace(/[:.]/g, "-")}`);
+      fs.mkdirSync(outDir, { recursive: true });
+      fs.writeFileSync(path.join(outDir, "compare.json"), JSON.stringify(c, null, 2));
+      fs.writeFileSync(path.join(outDir, "compare.html"), renderCompare(c, loadBench(c.a.dir), loadBench(c.b.dir), outDir));
+      console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
       return;
     }
     case "gate": {

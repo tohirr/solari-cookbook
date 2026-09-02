@@ -1,80 +1,104 @@
 /**
- * Static HTML report for one bench. Self-contained: data is embedded, no
- * network. Screenshots are referenced relatively so the folder is portable.
- *
- * This is the scaffold renderer — the design pass comes later.
+ * Single-bench report. Reads top to bottom as an argument: the verdict in one
+ * sentence, the outcome of every run as a dot, the pass rate with its
+ * uncertainty, how the runs spread in effort, then each run with its
+ * screenshots and (for failures) a hypothesis. Provenance closes it.
  */
-import type { BenchResult } from "../types.js";
+import type { BenchResult, RunResult } from "../types.js";
+import { CSS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, usd } from "./theme.js";
 
-const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
-const pct = (x: number) => `${Math.round(x * 100)}%`;
+const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
+
+/** One sentence a reader can repeat. Written from the numbers, never from the agent's own claims. */
+export function verdict(b: BenchResult): string {
+  const m = b.metrics;
+  const spread = m.maxSteps > 0 && m.maxSteps >= m.minSteps * 2;
+  if (m.n === 0) return "No run reached the agent; every fork was lost to infrastructure.";
+  const head = `<b>${m.passed} of ${m.n} passed</b>${m.errored ? `, ${m.errored} lost to infrastructure` : ""}.`;
+  if (m.passed === m.n && spread) return `${head} Same outcome every time, but the effort varied from ${m.minSteps} to ${m.maxSteps} steps: the pass rate hides how differently each run got there.`;
+  if (m.passed === m.n) return `${head} Consistent in outcome and in effort (${m.minSteps}–${m.maxSteps} steps). With ${m.n} runs the pass rate is at least ${pct(m.passAt1Lower)} at 95% confidence.`;
+  if (m.passed === 0) return `${head} The task never succeeded under these conditions; the failures below are hypotheses, not verdicts, because there is no passing run to compare against.`;
+  return `${head} Observed pass rate ${pct(m.passAt1)} (95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}); the chance that ${Math.min(5, m.n)} runs in a row all pass is about ${pct(m.passPowK[Math.min(5, m.n)] ?? 0)}.`;
+}
+
+function runCard(b: BenchResult, r: RunResult): string {
+  const f = b.failures.find((x) => x.runIndex === r.runIndex);
+  const shots = r.steps.filter((s) => s.screenshot);
+  const film = [
+    ...shots.map((s) => `<a href="${runDir(r.runIndex)}/${s.screenshot}" target="_blank" class="${f && f.divergenceStep !== null && s.index >= f.divergenceStep && s.index <= (f.divergenceStep + 1) ? "diverge" : ""}"><img loading="lazy" src="${runDir(r.runIndex)}/${s.screenshot}" alt="step ${s.index}"><em>${s.index}</em></a>`),
+    r.finalScreenshot ? `<a href="${runDir(r.runIndex)}/${r.finalScreenshot}" target="_blank" class="final"><img loading="lazy" src="${runDir(r.runIndex)}/${r.finalScreenshot}" alt="final"><em>final</em></a>` : "",
+  ].join("");
+  const stopped = r.stoppedBy && r.stoppedBy !== "end_turn" ? `<span class="pill neutral">${r.stoppedBy === "max_steps" ? "hit step cap" : r.stoppedBy}</span>` : "";
+  return `<div class="card run">
+    <div class="id"><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stopped}<div style="margin-top:8px">${r.steps.length} steps · ${secs(r.durationMs)}${r.usage.costUsd !== undefined ? ` · ${usd(r.usage.costUsd)}` : ""}</div></div>
+    <div>
+      <div class="checks">${r.checks.map((c) => `<div><span class="${c.passed ? "ok" : "bad"}">${c.passed ? "✓" : "✗"}</span> ${esc(c.check.type)} ${esc("path" in c.check ? c.check.path : "cmd" in c.check ? `${c.check.cmd} ${(c.check.args ?? []).join(" ")}`.slice(0, 90) : "")}${c.detail ? `<div class="detail">${esc(c.detail.slice(0, 500))}</div>` : ""}</div>`).join("")}${r.error ? `<div class="bad">${esc(r.error)}</div>` : ""}</div>
+      ${film ? `<div class="film">${film}</div>` : ""}
+      ${f ? `<div class="hyp"><b>Hypothesis: ${esc(f.cause.replace(/_/g, " "))}</b> · ${esc(f.confidence)} confidence${f.divergenceStep !== null ? ` · diverges from the passing reference at step ${f.divergenceStep}` : f.referencePassed ? "" : " · no passing run to compare against"}<div style="margin-top:4px">${esc(f.explanation)}</div></div>` : ""}
+      ${r.finalMessage ? `<div class="note">Agent's own claim: “${esc(r.finalMessage.slice(0, 200))}” — not used for grading.</div>` : ""}
+      <details><summary>trace (${r.steps.length} actions)</summary><pre>${esc(r.steps.map((s) => `${String(s.index).padStart(2)}  ${s.name.padEnd(16)} ${JSON.stringify(s.input)}${s.error ? "   !! " + s.error : ""}`).join("\n"))}</pre></details>
+    </div>
+  </div>`;
+}
 
 export function renderReport(b: BenchResult): string {
   const m = b.metrics;
-  const ks = Object.keys(m.passPowK).map(Number);
-  const kShow = Math.min(5, m.n);
   const p = b.provenance ?? {
     passkVersion: "pre-0.1", gitCommit: null, provider: "?", model: b.model, effort: "?", concurrency: 0, node: "?",
     packages: {}, taskHash: "unknown (bench predates provenance capture)", budgetUsd: null,
     task: { id: b.taskId, name: b.taskName, prompt: b.prompt, checks: [] },
   };
-  const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
+  const attempted = b.runs.filter((r) => !(r.status === "errored" && r.steps.length === 0));
+  const kShow = Math.min(5, m.n);
+  const stepMin = Math.min(...attempted.map((r) => r.steps.length), 0);
+  const stepMax = Math.max(...attempted.map((r) => r.steps.length), 1);
+  const secMax = Math.max(...attempted.map((r) => r.durationMs / 1000), 1);
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · ${esc(b.taskName)}</title>
-<style>
-  :root{--bg:#0b0c0f;--fg:#e8e8ec;--mut:#8a8f9c;--ok:#39d98a;--bad:#ff5c5c;--card:#15171c;--line:#23262e}
-  body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif}
-  main{max-width:1100px;margin:0 auto;padding:40px 24px}
-  h1{font-size:28px;margin:0 0 4px}.sub{color:var(--mut);margin-bottom:28px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:28px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
-  .stat b{display:block;font-size:26px;font-weight:600}.stat span{color:var(--mut);font-size:12px}
-  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  th,td{padding:10px 12px;text-align:left;border-top:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-weight:500;border-top:0}
-  .ok{color:var(--ok)}.bad{color:var(--bad)}
-  .bars{display:flex;gap:6px;align-items:flex-end;height:80px;margin:8px 0 24px}
-  .bar{flex:1;height:100%;background:#2a2e3a;border-radius:4px 4px 0 0;position:relative}.bar i{position:absolute;bottom:0;left:0;right:0;background:var(--ok);opacity:.45;border-radius:4px 4px 0 0}.bar em{position:absolute;bottom:0;left:0;right:0;background:var(--ok);border-radius:4px 4px 0 0}
-  .bar small{position:absolute;top:-18px;left:0;right:0;text-align:center;color:var(--mut);font-size:11px}
-  .shots{display:flex;gap:6px;overflow-x:auto;padding:6px 0}.shots img{height:90px;border-radius:6px;border:1px solid var(--line)}
-  details{margin-top:6px}summary{cursor:pointer;color:var(--mut)}
-  pre{white-space:pre-wrap;font-size:12px;color:var(--mut)}
-  .cause{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:#2a2e3a}
-</style></head><body><main>
+<title>passk · ${esc(b.taskName)}</title><style>${CSS}</style></head><body><main>
+<div class="brand"><b>passk</b> reliability bench · outcomes verified inside the VM</div>
 <h1>${esc(b.taskName)}</h1>
-<div class="sub">${esc(b.model)} · k=${b.k} · snapshot ${esc(b.snapshotId)} · ${esc(b.startedAt)}${m.errored ? ` · <span class="bad">${m.errored} run${m.errored > 1 ? "s" : ""} lost to infrastructure, not scored</span>` : ""}</div>
-<blockquote style="color:var(--mut);border-left:3px solid var(--line);margin:0 0 24px;padding:4px 12px">${esc(b.prompt)}</blockquote>
+<div class="meta"><code>${esc(b.model)}</code> · k=${b.k} · snapshot <code>${esc(b.snapshotId)}</code> · ${esc(b.startedAt.slice(0, 16).replace("T", " "))} UTC</div>
+<blockquote class="prompt">${esc(b.prompt.trim())}</blockquote>
+<p class="verdict">${verdict(b)}</p>
 
-<div class="grid">
-  <div class="stat"><b>${m.passed}/${m.n}</b><span>observed passes · pass@1 ${pct(m.passAt1)}, 95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}</span></div>
-  <div class="stat"><b>${pct(m.passPowK[kShow] ?? 0)}</b><span>pass^${kShow} estimated · lower bound ${pct(m.passPowKLower[kShow] ?? 0)}</span></div>
-  <div class="stat"><b>${m.passed}/${m.requested}</b><span>end-to-end · ${m.errored} infra error${m.errored === 1 ? "" : "s"}${m.skipped ? `, ${m.skipped} skipped for budget` : ""}</span></div>
-  <div class="stat"><b>${m.medianSteps}</b><span>median steps · p95 ${m.p95Steps} · range ${m.minSteps}–${m.maxSteps}</span></div>
-  <div class="stat"><b>${(m.medianDurationMs / 1000).toFixed(0)}s</b><span>median duration · p95 ${(m.p95DurationMs / 1000).toFixed(0)}s</span></div>
-  <div class="stat"><b>$${m.totalCostUsd.toFixed(2)}</b><span>model spend${m.costPerSuccessUsd !== null ? ` · $${m.costPerSuccessUsd.toFixed(3)} per success` : ""}</span></div>
+<div class="card">
+  ${dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length })), m.skipped)}
+  <div class="legend"><span><i style="background:var(--good)"></i>passed</span><span><i style="background:var(--crit)"></i>failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>infrastructure, not scored</span>${m.skipped ? `<span><i style="border:2px solid var(--line-2);width:6px;height:6px"></i>skipped for budget</span>` : ""}</div>
+  <div class="range" data-tip="observed ${pct(m.passAt1)}, 95% Wilson interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}"><i style="left:${m.passAt1Lower * 100}%;right:${100 - m.passAt1Upper * 100}%"></i><b style="left:${m.passAt1 * 100}%"></b></div>
+  <div class="range-labels"><span>0%</span><span>pass rate: observed ${pct(m.passAt1)}, plausible range ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}</span><span>100%</span></div>
 </div>
 
-<h3>pass^k — estimated probability every one of k runs passes <span style="color:var(--mut);font-weight:400">(green: point estimate from ${m.n} runs, dim: 95% lower bound)</span></h3>
-<div class="bars">${ks.map((k) => `<div class="bar" title="pass^${k} = ${pct(m.passPowK[k])}, lower bound ${pct(m.passPowKLower[k])}"><small>k=${k}</small><i style="height:${Math.round(m.passPowK[k] * 100)}%"></i><em style="height:${Math.round(m.passPowKLower[k] * 100)}%"></em></div>`).join("")}</div>
+<h2>Numbers</h2>
+<div class="kpis">
+  <div class="card kpi"><b>${m.passed}/${m.n}</b><span>observed passes</span><span class="sub">pass@1 ${pct(m.passAt1)} · interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}</span></div>
+  <div class="card kpi"><b>${pct(m.passPowK[kShow] ?? 0)}</b><span>pass^${kShow} · all ${kShow} in a row</span><span class="sub">lower bound ${pct(m.passPowKLower[kShow] ?? 0)}</span></div>
+  <div class="card kpi"><b>${m.passed}/${m.requested}</b><span>end-to-end</span><span class="sub">${m.errored} infra error${m.errored === 1 ? "" : "s"}${m.skipped ? `, ${m.skipped} skipped` : ""}</span></div>
+  <div class="card kpi"><b>${m.medianSteps}</b><span>median steps</span><span class="sub">p95 ${m.p95Steps} · range ${m.minSteps}–${m.maxSteps}</span></div>
+  <div class="card kpi"><b>${secs(m.medianDurationMs)}</b><span>median duration</span><span class="sub">p95 ${secs(m.p95DurationMs)}</span></div>
+  <div class="card kpi"><b>${usd(m.costPerSuccessUsd)}</b><span>per successful run</span><span class="sub">${usd(m.totalCostUsd, 2)} total model spend</span></div>
+</div>
 
-<h3>Runs</h3>
-<div style="overflow-x:auto"><table><tr><th>#</th><th>Result</th><th>Steps</th><th>Time</th><th>Checks (verified inside the VM)</th><th>Hypothesis</th></tr>
-${b.runs.map((r) => {
-  const f = b.failures.find((x) => x.runIndex === r.runIndex);
-  return `<tr><td>${r.runIndex}</td><td class="${r.status === "passed" ? "ok" : "bad"}">${r.status}${r.stoppedBy && r.stoppedBy !== "end_turn" ? `<div style="color:var(--mut);font-size:11px">${esc(r.stoppedBy === "max_steps" ? "hit step cap" : r.stoppedBy)}</div>` : ""}</td><td>${r.steps.length}</td><td>${(r.durationMs / 1000).toFixed(0)}s</td>
-  <td>${r.checks.map((c) => `<div class="${c.passed ? "ok" : "bad"}">${c.passed ? "✓" : "✗"} ${esc(c.check.type)}${c.detail ? ` <span style="color:var(--mut)">— ${esc(c.detail)}</span>` : ""}</div>`).join("")}${r.error ? `<div class="bad">${esc(r.error)}</div>` : ""}</td>
-  <td>${f ? `<span class="cause">${esc(f.cause)}</span> <span style="color:var(--mut);font-size:12px">${esc(f.confidence)} confidence${f.divergenceStep !== null ? `, diverges @ step ${f.divergenceStep}` : ""}${f.referencePassed ? "" : ", no passing reference"}</span><div style="color:var(--mut);font-size:12px;margin-top:4px">${esc(f.explanation)}</div>` : ""}</td></tr>
-  <tr><td></td><td colspan="5"><div class="shots">${r.steps.filter((s) => s.screenshot).map((s) => `<a href="${runDir(r.runIndex)}/${s.screenshot}" target="_blank"><img loading="lazy" src="${runDir(r.runIndex)}/${s.screenshot}" title="step ${s.index}"></a>`).join("")}${r.finalScreenshot ? `<a href="${runDir(r.runIndex)}/${r.finalScreenshot}" target="_blank"><img loading="lazy" src="${runDir(r.runIndex)}/${r.finalScreenshot}" title="final" style="border-color:var(--ok)"></a>` : ""}</div>
-  <details><summary>trace</summary><pre>${esc(r.steps.map((s) => `${s.index}. ${s.name} ${JSON.stringify(s.input)}${s.error ? "  !! " + s.error : ""}`).join("\n"))}\n\nfinal: ${esc(r.finalMessage)}</pre></details></td></tr>`;
-}).join("")}
-</table></div>
-<h3>Provenance</h3>
-<pre>${esc(`${p.provider} · ${p.model} · effort ${p.effort} · concurrency ${p.concurrency} · passk ${p.passkVersion}${p.gitCommit ? ` @ ${p.gitCommit}` : ""} · node ${p.node}
-packages: ${Object.entries(p.packages).map(([k, v]) => `${k}@${v}`).join(", ")}
-task hash: ${p.taskHash}${p.budgetUsd !== null ? ` · budget $${p.budgetUsd}` : ""}
-checks as run:
-${p.task.checks.length ? p.task.checks.map((c) => "  " + JSON.stringify(c)).join("\n") : "  (not recorded)"}`)}</pre>
+<h2>Effort per run</h2>
+<div class="card">
+  <div style="color:var(--ink-3);font-size:12px">steps</div>
+  ${stripHtml(attempted.map((r) => ({ v: r.steps.length, cls: r.status, tip: `run ${r.runIndex}: ${r.steps.length} steps, ${r.status}` })), m.medianSteps, stepMin, stepMax, "")}
+  <div style="color:var(--ink-3);font-size:12px;margin-top:16px">seconds</div>
+  ${stripHtml(attempted.map((r) => ({ v: Math.round(r.durationMs / 1000), cls: r.status, tip: `run ${r.runIndex}: ${secs(r.durationMs)}, ${r.status}` })), Math.round(m.medianDurationMs / 1000), 0, Math.ceil(secMax), "s")}
+  <div class="note">Every point is one run from the same snapshot. A wide spread on a task that always passes is behavior variability: same result, different routes, different cost.</div>
+</div>
+
+<h2>Runs</h2>
+<div class="runs">${b.runs.map((r) => runCard(b, r)).join("")}</div>
+
+<div class="foot">
+  <div>Grading: a run passes only if every check passes when evaluated inside the desktop after the agent stops. The agent's own report of success is shown but never counted.</div>
+  <div style="margin-top:8px">${esc(p.provider)} · ${esc(p.model)} · effort ${esc(p.effort)} · concurrency ${p.concurrency} · passk ${esc(p.passkVersion)}${p.gitCommit ? ` @ ${esc(p.gitCommit)}` : ""} · node ${esc(p.node)} · ${Object.entries(p.packages).map(([k, v]) => `${k}@${v}`).join(", ") || "packages not recorded"}</div>
+  <div style="margin-top:4px">task hash <code>${esc(p.taskHash)}</code>${p.budgetUsd !== null ? ` · budget $${p.budgetUsd}` : ""}</div>
+  <details><summary>checks as run</summary><pre>${esc(p.task.checks.length ? p.task.checks.map((c) => JSON.stringify(c)).join("\n") : "(not recorded)")}</pre></details>
+</div>
 <script type="application/json" id="bench">${JSON.stringify(b).replace(/</g, "\\u003c")}</script>
+${TIP_JS}
 </main></body></html>`;
 }
