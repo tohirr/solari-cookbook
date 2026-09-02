@@ -90,6 +90,18 @@ export function percentile(sorted: number[], p: number): number {
   return Math.round((sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo)) * 100) / 100;
 }
 
+/**
+ * Re-derive pass/fail from the stored checks. Applied whenever a saved bench is
+ * loaded, so a change in the grading rule (like no longer requiring the agent
+ * to declare completion) applies uniformly to old results.
+ */
+export function regrade(runs: RunResult[]): void {
+  for (const r of runs) {
+    if (r.status === "errored") continue;
+    r.status = r.checks.length > 0 && r.checks.every((c) => c.passed) ? "passed" : "failed";
+  }
+}
+
 /** Benches recorded before per-run cost capture get it backfilled from their token counts. */
 export function backfillCosts(runs: RunResult[], model: string): void {
   for (const r of runs) {

@@ -83,14 +83,17 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     const finalPng = await desktop.screenshot({ format: "png" });
     fs.writeFileSync(path.join(outDir, "final.png"), finalPng);
     const checks = await runChecks(desktop, task.checks, finalPng);
-    const passed = checks.every((c) => c.passed) && agent.stoppedBy === "end_turn";
+    // Outcome is judged by the checks alone. Whether the agent stopped on its
+    // own, hit the cap, or crashed is recorded separately: it is a behavior
+    // signal, not a verdict.
+    const passed = checks.every((c) => c.passed);
     const status = agent.stoppedBy === "error" ? "errored" : passed ? "passed" : "failed";
     console.log(`${tag} ${status.toUpperCase()} in ${agent.steps.length} steps (${agent.stoppedBy})`);
 
     const result: RunResult = {
       runIndex, sessionId: desktop.id, status, startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: agent.steps, checks,
-      finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error,
+      finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error, stoppedBy: agent.stoppedBy,
       usage: { ...agent.usage, costUsd: estimateCostUsd(config.model, agent.usage.inputTokens, agent.usage.outputTokens) },
     };
     fs.writeFileSync(path.join(outDir, "run.json"), JSON.stringify(result, null, 2));

@@ -7,13 +7,15 @@
  *   passk run     tasks/notes.yaml --k 5      fork ×5, run, check, report
  *   passk report  runs/<dir>                  re-render report.html from bench.json
  *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold
+ *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
 import fs from "node:fs";
 import path from "node:path";
-import { loadTask, readSnapshots } from "./config.js";
-import { backfillCosts, computeMetrics } from "./metrics.js";
+import { compareBenches, formatComparison } from "./compare.js";
+import { config, loadTask, readSnapshots } from "./config.js";
+import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
 import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
@@ -43,21 +45,35 @@ async function main() {
     case "run": {
       const task = loadTask(must(target));
       const k = Number(flag("k", "5"));
-      if (has("prepare") || !readSnapshots()[task.id]) await prepareTask(task);
+      if (!flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
       const { bench, dir } = await runBench({
         task, k,
         concurrency: flag("concurrency") ? Number(flag("concurrency")) : undefined,
         // PASSK_CLASSIFY=0 turns the LLM failure classification off without the flag.
         noClassify: has("no-classify") || process.env.PASSK_CLASSIFY === "0",
         budgetUsd: flag("budget") ? Number(flag("budget")) : undefined,
+        // Fork a specific snapshot instead of the task's own. This is how a paired
+        // experiment holds the environment fixed while the prompt changes.
+        snapshotId: flag("snapshot"),
       });
       printSummary(bench, k);
       console.log(`\nreport: ${path.join(dir, "report.html")}`);
       process.exitCode = enforce(bench);
       return;
     }
+    case "compare": {
+      const dirB = process.argv[4];
+      if (!dirB) { console.error("compare needs two bench directories"); process.exit(1); }
+      const c = compareBenches(must(target), dirB);
+      console.log(formatComparison(c));
+      const out = path.join(config.runsDir, `compare-${new Date().toISOString().replace(/[:.]/g, "-")}.json`);
+      fs.writeFileSync(out, JSON.stringify(c, null, 2));
+      console.log(`\nsaved: ${out}`);
+      return;
+    }
     case "gate": {
       const bench = JSON.parse(fs.readFileSync(path.join(must(target), "bench.json"), "utf8")) as BenchResult;
+      regrade(bench.runs);
       backfillCosts(bench.runs, bench.model);
       bench.metrics = computeMetrics(bench.runs, bench.k);
       printSummary(bench, bench.k);
@@ -68,6 +84,7 @@ async function main() {
       const dir = must(target);
       const bench = JSON.parse(fs.readFileSync(path.join(dir, "bench.json"), "utf8")) as BenchResult;
       // Metrics are cheap and their definition may have improved since the bench ran; recompute.
+      regrade(bench.runs);
       backfillCosts(bench.runs, bench.model);
       bench.metrics = computeMetrics(bench.runs, bench.k);
       fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
@@ -80,9 +97,10 @@ async function main() {
   passk prepare <task.yaml>
   passk probe   <task.yaml>
   passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
-                            [--budget 1.00] [--require 0.9] [--require-lower 0.7]
+                            [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
+  passk compare <runs/A> <runs/B>
 
   --budget N         stop launching new runs once estimated model spend reaches $N
   --require P        exit 2 unless observed pass@1 >= P

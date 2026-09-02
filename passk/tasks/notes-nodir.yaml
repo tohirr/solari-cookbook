@@ -1,0 +1,21 @@
+# Environment twin of notes: identical prompt and checks, but the Documents
+# folder does NOT exist where the (root-owned) editor will look for it. Only
+# the environment changes between this and notes.yaml.
+id: notes-nodir
+name: Save a note in Mousepad (no Documents folder)
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "rm -rf /root/Documents; mkdir -p /home/desktop/Documents"]
+  - open: mousepad
+  - wait: 4
+prompt: >
+  A text editor is open. Type the line "standup 10am, bring the Q3 numbers" into it
+  and save the file as notes.txt inside the Documents folder.
+checks:
+  - type: exec
+    cmd: sh
+    args: ["-c", "cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null"]
+    stdout_contains: "standup 10am, bring the Q3 numbers"
+max_steps: 30

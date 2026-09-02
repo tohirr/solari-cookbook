@@ -1,0 +1,28 @@
+# The clarified twin of rename-invoices. Same setup, same checks, same snapshot
+# (run it with --snapshot <the rename-invoices snapshot>). Only the prompt
+# changes: it answers the questions the probe raised.
+id: rename-invoices-clarified
+name: Archive the oldest invoices (clarified prompt)
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/Documents/invoices && cd /root/Documents/invoices && for d in 2024-11-03 2025-01-15 2025-03-02 2025-06-20 2025-08-09; do printf 'INVOICE %s\n' $d > invoice-$d.txt; done"]
+  - open: thunar
+    args: ["/root/Documents/invoices"]
+  - wait: 4
+prompt: >
+  The invoices folder is open in the file manager. Create a new folder named
+  exactly "archive" inside it, then move the two invoices with the earliest
+  dates in their filenames (invoice-2024-11-03.txt and invoice-2025-01-15.txt)
+  into that archive folder. Move them, don't copy.
+checks:
+  - type: exec
+    cmd: sh
+    args: ["-c", "ls /root/Documents/invoices/archive | grep -c invoice"]
+    stdout_contains: "2"
+  - type: file_exists
+    path: /root/Documents/invoices/archive/invoice-2024-11-03.txt
+  - type: file_exists
+    path: /root/Documents/invoices/archive/invoice-2025-01-15.txt
+max_steps: 40

@@ -49,6 +49,23 @@ npm run passk run tasks/notes.yaml -- --k 10 --require 0.9     # exit 2 unless o
 npm run passk gate runs/notes-*/ -- --require-lower 0.7        # same gate on a saved bench, for CI
 ```
 
+## Change one thing, measure again
+
+The bench is the instrument; the experiment is the point. Fork the same
+snapshot under two conditions, then compare:
+
+```bash
+npm run passk run tasks/rename-invoices.yaml -- --k 5                       # ambiguous prompt
+npm run passk run tasks/rename-invoices-clarified.yaml -- --k 5 --snapshot snap_…   # clarified prompt, same snapshot
+npm run passk compare runs/rename-invoices-*/ runs/rename-invoices-clarified-*/
+```
+
+`compare` says what was held fixed (snapshot, checks, model), what changed
+(prompt, environment), the observed delta in passes, steps, time and cost per
+success, and Fisher's exact p-value for the pass/fail split. It refuses to
+attribute a difference when more than one thing changed. Note how little
+small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
+
 ## Reading the numbers honestly
 
 Ten passes out of ten is an observation, not a proof of 100% reliability. Every
@@ -116,5 +133,11 @@ run       fork ×k from snapshot ──▶ agent loop on each ──▶ checks �
   `xdotool click 4|5|6|7`, which the default template ships.
 - **`sandboxes.createDesktop`, not `desktops.create`, for forks.** Only the
   sandbox-flavoured route accepts `fromSnapshot`.
+- **Verify the verifier.** An `exec` check that ran `cat` on two candidate
+  paths failed with exit 1 whenever the first path was missing, even though the
+  second printed the right text. Two real passes were scored as failures until
+  the forensics in the report showed the file sitting exactly where it should
+  be. `exec` checks with `stdout_contains` now judge output only unless an
+  `exit_code` is given.
 - **Clipboard readback is empty** (`xclip -o` exits 1) even after a real copy.
   Verify results through the filesystem instead.

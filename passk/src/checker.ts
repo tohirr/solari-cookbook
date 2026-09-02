@@ -44,9 +44,13 @@ async function runCheck(desktop: Desktop, check: Check, finalScreenshot?: Uint8A
     }
     case "exec": {
       const r = await desktop.exec(check.cmd, { args: check.args ?? [] });
-      const codeOk = r.exitCode === (check.exit_code ?? 0);
+      // An explicit exit_code is always enforced. Otherwise, when the check is
+      // about the output, the exit code is ignored: `cat a b` exits 1 when `a`
+      // is missing even though `b` printed exactly what we wanted. That exact
+      // case produced two false failures before this rule existed.
+      const codeOk = check.exit_code !== undefined ? r.exitCode === check.exit_code : check.stdout_contains !== undefined ? true : r.exitCode === 0;
       const outOk = check.stdout_contains ? r.stdout.includes(check.stdout_contains) : true;
-      return { check, passed: codeOk && outOk, detail: codeOk && outOk ? undefined : `exit ${r.exitCode}, stdout ${JSON.stringify(r.stdout.slice(0, 200))}` };
+      return { check, passed: codeOk && outOk, detail: codeOk && outOk ? undefined : `exit ${r.exitCode}, stdout ${JSON.stringify(r.stdout.slice(0, 400))}` };
     }
     case "screenshot_judge": {
       const png = finalScreenshot ?? (await desktop.screenshot({ format: "png" }));

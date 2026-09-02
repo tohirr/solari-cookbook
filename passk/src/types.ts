@@ -10,6 +10,7 @@ export type Check =
   | { type: "file_exists"; path: string }
   | { type: "file_contains"; path: string; text: string }
   | { type: "file_equals"; path: string; text: string }
+  /** Run a command. With `stdout_contains` and no `exit_code`, only the output is judged; otherwise exit 0 (or `exit_code`) is required. */
   | { type: "exec"; cmd: string; args?: string[]; stdout_contains?: string; exit_code?: number }
   /** Ask Claude to judge the final screenshot against a rubric. */
   | { type: "screenshot_judge"; rubric: string };
@@ -59,10 +60,18 @@ export interface CheckResult {
 
 export type RunStatus = "passed" | "failed" | "errored";
 
+/**
+ * How the agent loop ended. Independent of pass/fail: a run can hit the step
+ * cap with the task already done, or declare success with nothing saved.
+ */
+export type StoppedBy = "end_turn" | "max_steps" | "refusal" | "error";
+
 export interface RunResult {
   runIndex: number;
   sessionId: string;
+  /** passed = every check passed, judged inside the VM. Nothing the agent said counts. */
   status: RunStatus;
+  stoppedBy?: StoppedBy;
   startedAt: string;
   finishedAt: string;
   durationMs: number;
