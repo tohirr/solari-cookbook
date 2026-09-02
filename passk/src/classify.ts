@@ -21,20 +21,30 @@ import type { FailureAnalysis, RunResult, Task, TraceStep } from "./types.js";
 
 const Analysis = z.object({
   cause: z.enum(["stochastic_execution", "task_ambiguity", "behavior_variability", "unknown"]),
-  explanation: z.string().describe("Two or three sentences a developer can act on."),
+  confidence: z.enum(["low", "medium", "high"]).describe("How well the evidence supports this single cause over the others."),
+  explanation: z.string().describe("Two or three sentences a developer can act on. Say what is uncertain."),
 });
 
-/** Coarse signature of an action so tiny coordinate jitter doesn't count as divergence. */
-function sig(step: TraceStep): string {
-  const i = step.input as { coordinate?: [number, number]; text?: string } | undefined;
-  const coord = i?.coordinate ? `@${Math.round(i.coordinate[0] / 40)},${Math.round(i.coordinate[1] / 40)}` : "";
-  const text = typeof i?.text === "string" ? `:${i.text.slice(0, 24)}` : "";
-  return `${step.name}${coord}${text}`;
+/** Coordinates this close are the same click as far as divergence is concerned. */
+const JITTER_PX = 40;
+
+interface Loose { coordinate?: [number, number]; x?: number; y?: number; text?: string; keys?: string[] }
+
+/** Same action, allowing for click jitter. Text and key chords must match exactly. */
+function sameStep(a: TraceStep, b: TraceStep): boolean {
+  if (a.name !== b.name) return false;
+  const ia = (a.input ?? {}) as Loose, ib = (b.input ?? {}) as Loose;
+  const ta = ia.text ?? (ia.keys ?? []).join("+"), tb = ib.text ?? (ib.keys ?? []).join("+");
+  if (ta.slice(0, 24) !== tb.slice(0, 24)) return false;
+  const ca = ia.coordinate ?? (ia.x !== undefined ? [ia.x, ia.y ?? 0] : undefined);
+  const cb = ib.coordinate ?? (ib.x !== undefined ? [ib.x, ib.y ?? 0] : undefined);
+  if (!ca || !cb) return ca === cb;
+  return Math.hypot(ca[0] - cb[0], ca[1] - cb[1]) <= JITTER_PX;
 }
 
 export function divergencePoint(a: TraceStep[], b: TraceStep[]): number | null {
   const n = Math.min(a.length, b.length);
-  for (let i = 0; i < n; i++) if (sig(a[i]) !== sig(b[i])) return i;
+  for (let i = 0; i < n; i++) if (!sameStep(a[i], b[i])) return i;
   return a.length === b.length ? null : n;
 }
 
@@ -42,21 +52,26 @@ export async function classifyFailures(task: Task, runs: RunResult[], benchDir: 
   const passing = runs.filter((r) => r.status === "passed");
   const failing = runs.filter((r) => r.status !== "passed");
   if (!failing.length) return [];
-  // Shortest passing run is the cleanest reference; if nothing passed, compare against the median failure.
-  const ref = (passing.length ? passing : failing).slice().sort((x, y) => x.steps.length - y.steps.length)[0];
+  // Shortest passing run is the cleanest reference. With no passing run there is
+  // nothing to diverge from: the shortest failure stands in for trace context
+  // only, and every hypothesis is capped at low confidence.
+  const referencePassed = passing.length > 0;
+  const ref = (referencePassed ? passing : failing).slice().sort((x, y) => x.steps.length - y.steps.length)[0];
 
   const out: FailureAnalysis[] = [];
   for (const run of failing) {
     if (run.status === "errored" && !run.steps.length) {
-      out.push({ runIndex: run.runIndex, divergenceStep: null, cause: "stochastic_execution", explanation: `Infrastructure error before the agent acted: ${run.error}` });
+      out.push({ runIndex: run.runIndex, divergenceStep: null, referencePassed, cause: "unknown", confidence: "high",
+        explanation: `Infrastructure error before the agent acted (${run.error}). Not an agent failure; excluded from pass estimates.` });
       continue;
     }
-    const d = run === ref ? null : divergencePoint(ref.steps, run.steps);
+    const d = referencePassed && run !== ref ? divergencePoint(ref.steps, run.steps) : null;
     try {
-      const verdict = await judge(task, ref, run, d, benchDir);
-      out.push({ runIndex: run.runIndex, divergenceStep: d, cause: verdict.cause, explanation: verdict.explanation });
+      const verdict = await judge(task, ref, run, d, benchDir, referencePassed);
+      const confidence = referencePassed ? verdict.confidence : "low";
+      out.push({ runIndex: run.runIndex, divergenceStep: d, referencePassed, cause: verdict.cause, confidence, explanation: verdict.explanation });
     } catch (err) {
-      out.push({ runIndex: run.runIndex, divergenceStep: d, cause: "unknown", explanation: `classifier errored: ${(err as Error).message}` });
+      out.push({ runIndex: run.runIndex, divergenceStep: d, referencePassed, cause: "unknown", confidence: "low", explanation: `classifier errored: ${(err as Error).message}` });
     }
   }
   return out;
@@ -76,8 +91,7 @@ function screenshotAt(run: RunResult, benchDir: string, around: number | null): 
   return fs.readFileSync(p);
 }
 
-async function judge(task: Task, ref: RunResult, run: RunResult, d: number | null, benchDir: string) {
-  const refPassed = ref.status === "passed";
+async function judge(task: Task, ref: RunResult, run: RunResult, d: number | null, benchDir: string, refPassed: boolean) {
   const prompt = `Task given to the agent:
 """${task.prompt}"""
 
@@ -88,8 +102,9 @@ The FAILING run did this (stopped by: ${run.error ? "error " + run.error : run.f
 ${traceText(run)}
 
 Checks: ${run.checks.map((c) => `${c.passed ? "✓" : "✗"} ${JSON.stringify(c.check)} ${c.detail ?? ""}`).join("; ")}
-First divergence from the reference: ${d === null ? (run === ref ? "this IS the reference run" : "none (same actions, different outcome)") : `step ${d}`}.
+First divergence from the reference: ${!refPassed ? "not applicable (no passing run to diverge from)" : d === null ? "none (same actions, different outcome)" : `step ${d}`}.
 Checks are evaluated inside the VM after the agent stops; the agent's own claim of success carries no weight.
+This is a hypothesis, not a verdict: the first differing action is where traces part ways, which need not be the action that caused the failure. If the evidence does not single out one cause, answer "unknown" with low confidence rather than guessing.
 
 Classify the failure into exactly one cause:
 - stochastic_execution: the agent's plan matched the reference but the environment or timing produced a different outcome (mis-registered click, window not ready, race). Also use this when the traces are identical yet the result differs.
@@ -99,5 +114,5 @@ The images above are the screenshots near the divergence: the reference run firs
   const images = [screenshotAt(ref, benchDir, d), screenshotAt(run, benchDir, d)].filter((x): x is Uint8Array => !!x);
 
   const verdict = await structured({ name: "failure_analysis", schema: Analysis, prompt, images, maxTokens: 3000 });
-  return verdict ?? { cause: "unknown" as const, explanation: "classifier returned no output" };
+  return verdict ?? { cause: "unknown" as const, confidence: "low" as const, explanation: "classifier returned no output" };
 }

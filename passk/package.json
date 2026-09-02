@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "description": "Reliability bench for computer-use agents: fork one Solari desktop snapshot k times, run the same task on every fork, measure pass^k, and classify why runs diverge.",
-  "bin": { "passk": "./src/cli.ts" },
+  "bin": {
+    "passk": "./src/cli.ts"
+  },
   "scripts": {
     "passk": "tsx src/cli.ts",
     "prepare-task": "tsx src/cli.ts prepare",
     "run-task": "tsx src/cli.ts run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",

@@ -39,6 +39,12 @@ async function runSetupStep(desktop: Desktop, step: SetupStep): Promise<void> {
   } else if ("write" in step) {
     await desktop.fs.write(step.write, step.content);
     console.log(`  write ${step.write} (${step.content.length} bytes)`);
+  } else if ("press" in step) {
+    await desktop.keyboard.press(step.press);
+    console.log(`  press ${step.press}`);
+  } else if ("click" in step) {
+    await desktop.mouse.click(step.click[0], step.click[1]);
+    console.log(`  click ${step.click.join(",")}`);
   } else if ("wait" in step) {
     await sleep(step.wait * 1000);
   }

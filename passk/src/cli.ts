@@ -6,11 +6,14 @@
  *   passk probe   tasks/notes.yaml            find ambiguities before benching
  *   passk run     tasks/notes.yaml --k 5      fork ×5, run, check, report
  *   passk report  runs/<dir>                  re-render report.html from bench.json
+ *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold
+ *
+ * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { loadTask, readSnapshots } from "./config.js";
-import { computeMetrics } from "./metrics.js";
+import { backfillCosts, computeMetrics } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
 import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
@@ -46,19 +49,27 @@ async function main() {
         concurrency: flag("concurrency") ? Number(flag("concurrency")) : undefined,
         // PASSK_CLASSIFY=0 turns the LLM failure classification off without the flag.
         noClassify: has("no-classify") || process.env.PASSK_CLASSIFY === "0",
+        budgetUsd: flag("budget") ? Number(flag("budget")) : undefined,
       });
-      const m = bench.metrics;
-      const kk = Math.min(k, m.n);
-      console.log(`\npass@1 ${(m.passAt1 * 100).toFixed(0)}%  pass^${kk} ${((m.passPowK[kk] ?? 0) * 100).toFixed(0)}%  (${m.passed}/${m.n}${m.errored ? `, ${m.errored} infra error${m.errored > 1 ? "s" : ""} unscored` : ""})`);
-      for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause}${f.divergenceStep !== null ? ` @${f.divergenceStep}` : ""} — ${f.explanation}`);
+      printSummary(bench, k);
       console.log(`\nreport: ${path.join(dir, "report.html")}`);
+      process.exitCode = enforce(bench);
+      return;
+    }
+    case "gate": {
+      const bench = JSON.parse(fs.readFileSync(path.join(must(target), "bench.json"), "utf8")) as BenchResult;
+      backfillCosts(bench.runs, bench.model);
+      bench.metrics = computeMetrics(bench.runs, bench.k);
+      printSummary(bench, bench.k);
+      process.exitCode = enforce(bench);
       return;
     }
     case "report": {
       const dir = must(target);
       const bench = JSON.parse(fs.readFileSync(path.join(dir, "bench.json"), "utf8")) as BenchResult;
       // Metrics are cheap and their definition may have improved since the bench ran; recompute.
-      bench.metrics = computeMetrics(bench.runs);
+      backfillCosts(bench.runs, bench.model);
+      bench.metrics = computeMetrics(bench.runs, bench.k);
       fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
       fs.writeFileSync(path.join(dir, "report.html"), renderReport(bench));
       console.log(`report: ${path.join(dir, "report.html")}`);
@@ -69,9 +80,37 @@ async function main() {
   passk prepare <task.yaml>
   passk probe   <task.yaml>
   passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
-  passk report  <runs/dir>`);
+                            [--budget 1.00] [--require 0.9] [--require-lower 0.7]
+  passk report  <runs/dir>
+  passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
+
+  --budget N         stop launching new runs once estimated model spend reaches $N
+  --require P        exit 2 unless observed pass@1 >= P
+  --require-lower P  exit 2 unless the 95% lower bound on pass@1 >= P (the stricter gate)`);
       process.exit(cmd ? 1 : 0);
   }
+}
+
+function printSummary(bench: BenchResult, k: number): void {
+  const m = bench.metrics;
+  const pct = (x: number) => `${(x * 100).toFixed(0)}%`;
+  const kk = Math.min(k, m.n);
+  console.log(`\nobserved  ${m.passed}/${m.n} passed  (pass@1 ${pct(m.passAt1)}, 95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)})`);
+  console.log(`pass^${kk}    ${pct(m.passPowK[kk] ?? 0)} estimated, lower bound ${pct(m.passPowKLower[kk] ?? 0)}`);
+  if (m.errored || m.skipped) console.log(`end-to-end ${m.passed}/${m.requested} (${m.errored} infra error${m.errored === 1 ? "" : "s"}, ${m.skipped} skipped for budget)`);
+  console.log(`steps     median ${m.medianSteps}, p95 ${m.p95Steps}, range ${m.minSteps}–${m.maxSteps}`);
+  console.log(`cost      $${m.totalCostUsd.toFixed(2)} total${m.costPerSuccessUsd !== null ? `, $${m.costPerSuccessUsd.toFixed(3)} per success` : ""}`);
+  for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause} (${f.confidence} confidence${f.divergenceStep !== null ? `, diverges @${f.divergenceStep}` : ""}) — ${f.explanation}`);
+}
+
+/** Threshold gate. Returns the process exit code. */
+function enforce(bench: BenchResult): number {
+  const m = bench.metrics;
+  const req = flag("require"), reqLower = flag("require-lower");
+  let code = 0;
+  if (req !== undefined && m.passAt1 < Number(req)) { console.error(`\nFAIL: observed pass@1 ${(m.passAt1 * 100).toFixed(0)}% < required ${Number(req) * 100}%`); code = 2; }
+  if (reqLower !== undefined && m.passAt1Lower < Number(reqLower)) { console.error(`\nFAIL: pass@1 lower bound ${(m.passAt1Lower * 100).toFixed(0)}% < required ${Number(reqLower) * 100}%`); code = 2; }
+  return code;
 }
 
 function must(v: string | undefined): string {

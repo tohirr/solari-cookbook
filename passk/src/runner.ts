@@ -10,7 +10,8 @@ import { runChecks } from "./checker.js";
 import { classifyFailures } from "./classify.js";
 import { config, readSnapshots } from "./config.js";
 import { destroyDesktop, forkDesktop } from "./desktop.js";
-import { computeMetrics } from "./metrics.js";
+import { computeMetrics, estimateCostUsd } from "./metrics.js";
+import { collectProvenance } from "./provenance.js";
 import { renderReport } from "./report/html.js";
 import type { BenchResult, RunResult, Task } from "./types.js";
 
@@ -21,6 +22,8 @@ export interface RunBenchOptions {
   snapshotId?: string;
   /** Skip the LLM failure classification (faster, cheaper). */
   noClassify?: boolean;
+  /** Stop launching new runs once estimated model spend reaches this many dollars. */
+  budgetUsd?: number;
 }
 
 export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchResult; dir: string }> {
@@ -34,15 +37,27 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   const startedAt = new Date().toISOString();
   console.log(`bench ${task.id}: k=${k} concurrency=${opts.concurrency ?? config.concurrency} snapshot=${snapshotId}\n→ ${dir}`);
 
-  const runs = await mapLimit(range(k), opts.concurrency ?? config.concurrency, (i) => runOne(task, snapshotId, i, dir));
-  runs.sort((a, b) => a.runIndex - b.runIndex);
+  const concurrency = opts.concurrency ?? config.concurrency;
+  const provenance = collectProvenance(task, concurrency, opts.budgetUsd ?? null);
 
-  const metrics = computeMetrics(runs);
-  const failures = opts.noClassify ? [] : await classifyFailures(task, runs, dir);
+  // Budget cap: a shared tally the workers consult before forking. Runs already
+  // in flight finish; nothing new starts once the cap is reached.
+  let spentUsd = 0;
+  const budgetLeft = () => opts.budgetUsd === undefined || spentUsd < opts.budgetUsd;
+  const runs = await mapLimit(range(k), concurrency, async (i) => {
+    if (!budgetLeft()) { console.log(`[run ${i}] skipped: budget of $${opts.budgetUsd} reached ($${spentUsd.toFixed(2)} spent)`); return null; }
+    const r = await runOne(task, snapshotId, i, dir);
+    spentUsd += r.usage.costUsd ?? 0;
+    return r;
+  });
+  const completed = runs.filter((r): r is RunResult => r !== null).sort((a, b) => a.runIndex - b.runIndex);
+
+  const metrics = computeMetrics(completed, k);
+  const failures = opts.noClassify ? [] : await classifyFailures(task, completed, dir);
 
   const bench: BenchResult = {
     taskId: task.id, taskName: task.name, prompt: task.prompt, model: config.model,
-    snapshotId, k, startedAt, finishedAt: new Date().toISOString(), runs, metrics, failures,
+    snapshotId, k, startedAt, finishedAt: new Date().toISOString(), runs: completed, metrics, failures, provenance,
   };
   fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
   fs.writeFileSync(path.join(dir, "report.html"), renderReport(bench));
@@ -75,7 +90,8 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     const result: RunResult = {
       runIndex, sessionId: desktop.id, status, startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: agent.steps, checks,
-      finalScreenshot: "final.png", finalMessage: agent.finalMessage, usage: agent.usage, error: agent.error,
+      finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error,
+      usage: { ...agent.usage, costUsd: estimateCostUsd(config.model, agent.usage.inputTokens, agent.usage.outputTokens) },
     };
     fs.writeFileSync(path.join(outDir, "run.json"), JSON.stringify(result, null, 2));
     return result;
@@ -85,21 +101,32 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     return {
       runIndex, sessionId: desktop?.id ?? "", status: "errored", startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: [], checks: [],
-      usage: { inputTokens: 0, outputTokens: 0 }, error: message,
+      usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 }, error: message,
     };
   } finally {
     await destroyDesktop(desktop);
   }
 }
 
-/** A fork that never reports ready is a host hiccup; try once more before giving up on the run. */
+/**
+ * Fork with retries. Two transient failures are expected in the wild: a fork
+ * that boots but never reports ready (host hiccup), and "Too many concurrent
+ * sessions" while a just-killed sibling is still releasing its slot. Both are
+ * worth a short wait and another try before the run is written off.
+ */
 async function forkWithRetry(snapshotId: string, task: Task, runIndex: number, tag: string): Promise<Desktop> {
   const opts = { resolution: task.resolution, metadata: { task: task.id, run: String(runIndex) } };
-  try {
-    return await forkDesktop(snapshotId, opts);
-  } catch (err) {
-    console.warn(`${tag} fork failed (${(err as Error).message}); retrying once`);
-    return forkDesktop(snapshotId, opts);
+  const attempts = 4;
+  for (let i = 1; ; i++) {
+    try {
+      return await forkDesktop(snapshotId, opts);
+    } catch (err) {
+      const msg = (err as Error).message;
+      if (i >= attempts) throw err;
+      const wait = /concurrent/i.test(msg) ? 30_000 : 5_000;
+      console.warn(`${tag} fork failed (${msg}); retry ${i}/${attempts - 1} in ${wait / 1000}s`);
+      await new Promise((r) => setTimeout(r, wait));
+    }
   }
 }
 

@@ -43,6 +43,26 @@ open runs/notes-*/report.html
 Concurrency defaults to 2 (the Starter plan's sandbox limit). Professional
 allows 10: `PASSK_CONCURRENCY=10`.
 
+```bash
+npm run passk run tasks/notes.yaml -- --k 10 --budget 0.50     # stop launching runs at $0.50 of model spend
+npm run passk run tasks/notes.yaml -- --k 10 --require 0.9     # exit 2 unless observed pass@1 ≥ 90%
+npm run passk gate runs/notes-*/ -- --require-lower 0.7        # same gate on a saved bench, for CI
+```
+
+## Reading the numbers honestly
+
+Ten passes out of ten is an observation, not a proof of 100% reliability. Every
+bench reports the observed count, a 95% Wilson interval on the pass rate (10/10
+puts the lower bound near 72%), and pass^k both as a point estimate and as that
+lower bound raised to the k. Two denominators are kept: **pass@1** is passes
+over runs the agent actually attempted, and **end-to-end** is passes over the
+runs you asked for, so a fork that never booted counts against the
+infrastructure but not against the agent. Failure causes are labelled as
+hypotheses with a confidence, and when no run passed there is nothing to
+diverge from, so they are capped at low confidence. Every `bench.json` carries
+the full task definition, a hash of it, and the model, package and commit
+versions that produced it.
+
 ## Writing a task
 
 ```yaml

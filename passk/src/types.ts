@@ -19,6 +19,9 @@ export type SetupStep =
   | { exec: string; args?: string[] }
   | { open: string; args?: string[] }
   | { write: string; content: string }
+  /** Press a key or "+"-joined chord, e.g. "Return" or "ctrl+s". */
+  | { press: string }
+  | { click: [number, number] }
   | { wait: number };
 
 export interface Task {
@@ -68,7 +71,7 @@ export interface RunResult {
   finalScreenshot?: string;
   /** The agent's final text message. */
   finalMessage?: string;
-  usage: { inputTokens: number; outputTokens: number };
+  usage: { inputTokens: number; outputTokens: number; costUsd?: number };
   error?: string;
 }
 
@@ -78,12 +81,38 @@ export type FailureCause =
   | "behavior_variability"
   | "unknown";
 
+/**
+ * A hypothesis about why a run failed, not a verdict. The first divergent
+ * action is where the traces part ways, which is not necessarily the action
+ * that caused the failure; and without a passing reference there is nothing
+ * to diverge from, so confidence is "low" and the cause is left "unknown".
+ */
 export interface FailureAnalysis {
   runIndex: number;
-  /** Step index where this run's action sequence first diverges from the reference passing run. */
+  /** Step index where this run's action sequence first diverges from the reference run, if there was one. */
   divergenceStep: number | null;
+  /** Whether the reference this run was compared against actually passed. */
+  referencePassed: boolean;
   cause: FailureCause;
+  confidence: "low" | "medium" | "high";
   explanation: string;
+}
+
+/** Everything needed to reproduce or audit a bench, captured at run time. */
+export interface Provenance {
+  passkVersion: string;
+  gitCommit: string | null;
+  provider: string;
+  model: string;
+  effort: string;
+  concurrency: number;
+  node: string;
+  packages: Record<string, string>;
+  /** sha256 of the canonical task JSON, so two benches can be compared only when the task was identical. */
+  taskHash: string;
+  /** The full task definition as run, so the checks that produced this result are never in doubt. */
+  task: Task;
+  budgetUsd: number | null;
 }
 
 export interface BenchResult {
@@ -98,23 +127,43 @@ export interface BenchResult {
   runs: RunResult[];
   metrics: BenchMetrics;
   failures: FailureAnalysis[];
+  provenance: Provenance;
 }
 
 export interface BenchMetrics {
+  /** Runs the user asked for. */
+  requested: number;
   /** Runs the agent actually attempted (infra errors excluded). */
   n: number;
   passed: number;
-  /** Runs lost to infrastructure before the agent acted. Reported, not scored. */
+  /** Runs lost to infrastructure before the agent acted. Reported, not scored against the agent. */
   errored: number;
-  /** Probability one run passes. */
+  /** Runs never started because the budget cap was reached. */
+  skipped: number;
+  /** Observed pass rate given a ready desktop: passed / n. A point estimate from a small sample. */
   passAt1: number;
-  /** Probability that ALL of k independent runs pass: the number a user actually feels. */
+  /** 95% Wilson interval on passAt1. 10/10 gives a lower bound near 72%, not 100%. */
+  passAt1Lower: number;
+  passAt1Upper: number;
+  /** What the user actually got: passed / requested. Infrastructure losses count here. */
+  endToEnd: number;
+  /** Estimated probability that ALL of k independent runs pass: the number a user actually feels. */
   passPowK: Record<number, number>;
-  /** Probability at least one of k runs passes. */
+  /** Lower bound of passPowK, from the Wilson lower bound raised to the k. */
+  passPowKLower: Record<number, number>;
+  /** Estimated probability at least one of k runs passes. */
   passAtK: Record<number, number>;
   meanSteps: number;
+  medianSteps: number;
+  p95Steps: number;
   /** Spread of step counts across runs: a wide range is behavior variability even when everything passes. */
   minSteps: number;
   maxSteps: number;
   meanDurationMs: number;
+  medianDurationMs: number;
+  p95DurationMs: number;
+  /** Model spend across all runs, from recorded token usage and a price table. Undefined prices count as zero. */
+  totalCostUsd: number;
+  /** Mean model spend per passing run, the number that turns reliability into a budget line. */
+  costPerSuccessUsd: number | null;
 }

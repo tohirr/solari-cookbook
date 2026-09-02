@@ -1,0 +1,38 @@
+# Spreadsheet work on the office template. The "Keep current format?" dialog
+# that LibreOffice throws when saving a CSV is a classic place for agents to
+# fall over, and "save" is quietly ambiguous about format.
+id: q3-total
+name: Total a sales sheet in LibreOffice Calc
+template: office
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/Documents && printf 'Region,Amount\nLagos,1200\nAbuja,850\nKano,430\nIbadan,2100\nPort Harcourt,675\n' > /root/Documents/q3-sales.csv"]
+  - open: libreoffice
+    args: ["--calc", "/root/Documents/q3-sales.csv"]
+  - wait: 12
+  # Calc opens a CSV behind a Text Import dialog; accept the defaults so the sheet is really open.
+  - press: Return
+  - wait: 4
+prompt: >
+  A sales spreadsheet is open. Add a row at the bottom labelled "Total" with the
+  sum of the Amount column, then save the file, keeping it as CSV.
+checks:
+  # "Passed" must mean the sheet survived intact, not just that a total appeared somewhere.
+  - type: exec
+    cmd: sh
+    args: ["-c", "head -1 /root/Documents/q3-sales.csv"]
+    stdout_contains: "Region,Amount"
+  - type: exec
+    cmd: sh
+    args: ["-c", "grep -c . /root/Documents/q3-sales.csv"]
+    stdout_contains: "7"
+  - type: exec
+    cmd: sh
+    args: ["-c", "grep -E '^Port Harcourt,675$' /root/Documents/q3-sales.csv"]
+    stdout_contains: "Port Harcourt,675"
+  - type: exec
+    cmd: sh
+    args: ["-c", "tail -1 /root/Documents/q3-sales.csv"]
+    stdout_contains: "Total,5255"
+max_steps: 40

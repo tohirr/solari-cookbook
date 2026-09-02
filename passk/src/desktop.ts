@@ -36,8 +36,14 @@ export async function bootDesktop(opts: BootOptions): Promise<Desktop> {
     metadata: { app: "passk", ...opts.metadata },
     record: opts.record,
   });
-  await desktop.connect();
-  await waitReady(desktop);
+  try {
+    await desktop.connect();
+    await waitReady(desktop);
+  } catch (err) {
+    // The VM exists even though we can't use it; destroy it or it bills until idle timeout.
+    await destroyDesktop(desktop);
+    throw err;
+  }
   return desktop;
 }
 
