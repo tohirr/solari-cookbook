@@ -1,0 +1,21 @@
+# The smallest real task: open the editor, write a line, save it somewhere specific.
+# Trivial for a human. Watch how often "save as" goes sideways for an agent.
+id: notes
+name: Save a note in Mousepad
+template: default
+resolution: 1280x720
+setup:
+  # GUI apps in the default template run as root, so the save dialog opens in /root.
+  - exec: sh
+    args: ["-c", "mkdir -p /root/Documents /home/desktop/Documents"]
+  - open: mousepad
+  - wait: 4
+prompt: >
+  A text editor is open. Type the line "standup 10am, bring the Q3 numbers" into it
+  and save the file as notes.txt inside the Documents folder.
+checks:
+  - type: exec
+    cmd: sh
+    args: ["-c", "cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null"]
+    stdout_contains: "standup 10am, bring the Q3 numbers"
+max_steps: 30

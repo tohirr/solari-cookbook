@@ -1,0 +1,26 @@
+{
+  "name": "passk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reliability bench for computer-use agents: fork one Solari desktop snapshot k times, run the same task on every fork, measure pass^k, and classify why runs diverge.",
+  "bin": { "passk": "./src/cli.ts" },
+  "scripts": {
+    "passk": "tsx src/cli.ts",
+    "prepare-task": "tsx src/cli.ts prepare",
+    "run-task": "tsx src/cli.ts run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.123.0",
+    "@solarisdk/sdk": "^0.1.2",
+    "openai": "^7.9.0",
+    "yaml": "^2.8.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

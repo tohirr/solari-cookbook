@@ -1,0 +1,25 @@
+# Ambiguity on purpose: "oldest" could mean by filename date or by file mtime,
+# and "archive" could mean a folder or a .zip. The probe should catch both.
+id: rename-invoices
+name: Archive the oldest invoices
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/Documents/invoices && cd /root/Documents/invoices && for d in 2024-11-03 2025-01-15 2025-03-02 2025-06-20 2025-08-09; do printf 'INVOICE %s\n' $d > invoice-$d.txt; done"]
+  - open: thunar
+    args: ["/root/Documents/invoices"]
+  - wait: 4
+prompt: >
+  The invoices folder is open in the file manager. Move the two oldest invoices
+  into an archive folder next to them.
+checks:
+  - type: exec
+    cmd: sh
+    args: ["-c", "ls /root/Documents/invoices/archive | grep -c invoice"]
+    stdout_contains: "2"
+  - type: file_exists
+    path: /root/Documents/invoices/archive/invoice-2024-11-03.txt
+  - type: file_exists
+    path: /root/Documents/invoices/archive/invoice-2025-01-15.txt
+max_steps: 40
