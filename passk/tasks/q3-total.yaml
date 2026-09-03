@@ -18,6 +18,9 @@ setup:
 prompt: >
   A sales spreadsheet is open. Add a row at the bottom labelled "Total" with the
   sum of the Amount column, then save the file, keeping it as CSV.
+golden:
+  - exec: sh
+    args: ["-c", "printf 'Region,Amount\nLagos,1200\nAbuja,850\nKano,430\nIbadan,2100\nPort Harcourt,675\nTotal,5255\n' > /root/Documents/q3-sales.csv"]
 checks:
   # "Passed" must mean the sheet survived intact, not just that a total appeared somewhere.
   - type: exec

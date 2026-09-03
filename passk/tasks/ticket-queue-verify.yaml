@@ -31,6 +31,9 @@ prompt: >
   to Dana, and set the ticket about the login outage to urgent priority. Save each
   row you change. After saving, take a screenshot and confirm each changed row
   shows the new values before you finish.
+golden:
+  - exec: sh
+    args: ["-c", "curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\",\"priority\":\"urgent\"}' http://127.0.0.1:8080/api/tickets/101 && curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\"}' http://127.0.0.1:8080/api/tickets/102"]
 checks:
   - type: exec
     cmd: python3

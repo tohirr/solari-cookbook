@@ -4,6 +4,9 @@
 id: fake
 name: Scripted harness test
 prompt: Write the magic word to the target file.
+golden:
+  - write: /tmp/target.txt
+    content: "magic\n"
 checks:
   - type: file_contains
     path: /tmp/target.txt

@@ -41,6 +41,14 @@ export interface Task {
   checks: Check[];
   /** Hard cap on agent steps (tool calls) per run. */
   max_steps?: number;
+  /**
+   * Steps that produce the correct end state WITHOUT an agent, e.g. a curl to
+   * the local app or writing the expected file. `passk validate` runs them on
+   * a fork to prove the checks can pass, after proving they fail on the
+   * untouched snapshot. A task whose checks pass before anyone acts, or
+   * cannot pass at all, is a broken test, not a hard one.
+   */
+  golden?: SetupStep[];
 }
 
 export interface TraceStep {

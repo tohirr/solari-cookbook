@@ -32,6 +32,9 @@ prompt: >
   row you change. When you are done, reload the page and confirm that each changed
   row still shows the new values after the reload; if a row reverted, fix it and
   save again.
+golden:
+  - exec: sh
+    args: ["-c", "curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\",\"priority\":\"urgent\"}' http://127.0.0.1:8080/api/tickets/101 && curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\"}' http://127.0.0.1:8080/api/tickets/102"]
 checks:
   - type: exec
     cmd: python3

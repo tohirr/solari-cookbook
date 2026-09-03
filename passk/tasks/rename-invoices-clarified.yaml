@@ -17,6 +17,9 @@ prompt: >
   exactly "archive" inside it, then move the two invoices with the earliest
   dates in their filenames (invoice-2024-11-03.txt and invoice-2025-01-15.txt)
   into that archive folder. Move them, don't copy.
+golden:
+  - exec: sh
+    args: ["-c", "cd /root/Documents/invoices && mkdir -p archive && mv invoice-2024-11-03.txt invoice-2025-01-15.txt archive/"]
 checks:
   - type: exec
     cmd: sh

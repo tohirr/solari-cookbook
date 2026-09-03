@@ -58,7 +58,7 @@ export function renderReport(b: BenchResult): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>passk · ${esc(b.taskName)}</title><style>${CSS}</style></head><body><main>
-<div class="brand"><b>passk</b> reliability bench · outcomes verified inside the VM</div>
+<div class="brand"><b>passk</b> reliability test · outcomes verified inside the VM</div>
 <h1>${esc(b.taskName)}</h1>
 <div class="meta"><code>${esc(b.model)}</code> · k=${b.k} · snapshot <code>${esc(b.snapshotId)}</code> · ${esc(b.startedAt.slice(0, 16).replace("T", " "))} UTC</div>
 <blockquote class="prompt">${esc(b.prompt.trim())}</blockquote>

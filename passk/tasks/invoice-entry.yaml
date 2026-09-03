@@ -44,6 +44,9 @@ prompt: >
   folder: enter it into LedgerDesk (open in the browser), attach the PDF, and save
   it with status Pending review. Do not approve or pay anything. Check it is not
   already entered before you create it.
+golden:
+  - exec: sh
+    args: ["-c", "curl -s -o /dev/null -F vendor_id=V-104 -F invoice_number=NOS-1047 -F invoice_date=2026-08-28 -F subtotal=1240.00 -F tax=93.00 -F total=1333.00 -F currency=USD -F 'terms=Net 30' -F status=pending_review -F attachment=@/home/desktop/Documents/Incoming/northstar-NOS-1047.pdf http://127.0.0.1:8081/api/invoices"]
 checks:
   - type: exec
     cmd: python3

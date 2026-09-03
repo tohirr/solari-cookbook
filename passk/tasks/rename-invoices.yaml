@@ -14,6 +14,9 @@ setup:
 prompt: >
   The invoices folder is open in the file manager. Move the two oldest invoices
   into an archive folder next to them.
+golden:
+  - exec: sh
+    args: ["-c", "cd /root/Documents/invoices && mkdir -p archive && mv invoice-2024-11-03.txt invoice-2025-01-15.txt archive/"]
 checks:
   - type: exec
     cmd: sh

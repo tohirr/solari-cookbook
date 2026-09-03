@@ -29,7 +29,7 @@ export async function prepareTask(task: Task): Promise<string> {
   }
 }
 
-async function runSetupStep(desktop: Desktop, step: SetupStep): Promise<void> {
+export async function runSetupStep(desktop: Desktop, step: SetupStep): Promise<void> {
   if ("exec" in step) {
     const r = await desktop.exec(step.exec, { args: step.args ?? [] });
     console.log(`  exec ${step.exec} ${(step.args ?? []).join(" ")} → exit ${r.exitCode}`);

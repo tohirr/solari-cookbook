@@ -35,7 +35,7 @@ past. Copy one into your project and change the parts you care about.
 
 ## passk — does your computer-use agent pass twice?
 
-[`passk/`](passk/) is a reliability bench for computer-use agents, built on
+[`passk/`](passk/) is reliability regression testing for computer-use agents, built on
 the desktop snapshot and fork APIs in this repo. It snapshots one desktop,
 forks it *k* times, runs the same agent on every fork, verifies the outcome
 inside the VM, and reports pass@k and pass^k with honest intervals. A

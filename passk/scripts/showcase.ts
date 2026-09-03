@@ -26,7 +26,7 @@ const A = env.a.metrics, B = env.b.metrics, R0 = reload.a.metrics, R1 = reload.b
 
 const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · does your computer-use agent pass twice?</title>
+<title>passk · reliability regression testing for computer-use agents</title>
 <meta name="description" content="A reliability bench for computer-use agents on Solari desktops: fork one snapshot k times, verify every outcome inside the VM, and find out why runs diverge.">
 <style>${CSS}
 .hero{margin:10px 0 34px}.hero h1{font-size:40px;line-height:1.1;max-width:760px}
@@ -43,7 +43,7 @@ const html = `<!doctype html>
 .steps div:before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:12px;margin-bottom:8px}
 .steps b{display:block;color:var(--ink);margin-bottom:2px}
 </style></head><body><main>
-<div class="brand"><b>passk</b> reliability bench for computer-use agents · built on Solari · outcomes verified inside the VM</div>
+<div class="brand"><b>passk</b> reliability regression testing for computer-use agents · built on Solari · outcomes verified inside the VM</div>
 <div class="hero">
   <h1>Your agent passed once. Will it pass again?</h1>
   <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. Everything below was run on the cheapest model available, for under $4.</p>

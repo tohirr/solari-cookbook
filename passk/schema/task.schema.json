@@ -29,6 +29,11 @@
         ]
       }
     },
+    "golden": {
+      "type": "array",
+      "description": "Steps that produce the correct end state without an agent. `passk validate` proves the checks fail before them and pass after them.",
+      "items": { "$ref": "#/properties/setup/items" }
+    },
     "checks": {
       "type": "array",
       "minItems": 1,

@@ -14,6 +14,9 @@ setup:
 prompt: >
   A text editor is open. Type the line "standup 10am, bring the Q3 numbers" into it
   and save the file as notes.txt inside the Documents folder.
+golden:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/Documents && printf '%s\n' 'standup 10am, bring the Q3 numbers' > /root/Documents/notes.txt"]
 checks:
   - type: exec
     cmd: sh

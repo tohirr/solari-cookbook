@@ -1,6 +1,6 @@
 # passk
 
-**Does your computer-use agent pass twice?**
+**Reliability regression testing for computer-use agents.** Does yours pass twice?
 
 > **Status: built in public, evidence published.** Nine tasks across three
 > Solari templates, 250+ verified runs, one controlled three-way experiment,
@@ -112,13 +112,20 @@ stdout), `screenshot_judge` (the model grades the final screen against a rubric)
 
 ## Tasks that ship
 
-| Task | Template | What it exercises |
-|---|---|---|
-| `notes` / `notes-nodir` | default | Save-dialog handling; an environment pair (folder present vs missing) |
-| `rename-invoices` / `-clarified` | default | File manager; a prompt pair (ambiguous vs spelled out) |
-| `q3-total` | office | LibreOffice Calc, formulas, the CSV "keep format" dialog |
-| `ticket-queue` / `-verify` / `-reload` | default | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. Three prompt conditions on one snapshot. |
-| `invoice-entry` | office | Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment's sha256. |
+Every task carries a `golden` block, the recipe for a correct outcome with
+no agent involved, so `passk validate` can prove its checks fail before and
+pass after. Status is one of **validated** (live runs published in
+`evidence/`), **ready** (validated verifier, no published runs), or
+**illustrative** (a sketch). An unrun task is never presented as evidence.
+
+| Task | Template | Status | What it exercises |
+|---|---|---|---|
+| `notes` / `notes-nodir` | default | validated, 5 + 5 runs | Save-dialog handling; an environment pair (folder present vs missing) |
+| `rename-invoices` / `-clarified` | default | validated, 5 + 5 runs | File manager; a prompt pair (ambiguous vs spelled out) |
+| `q3-total` | office | validated, 10 runs | LibreOffice Calc, formulas, the CSV "keep format" dialog |
+| `ticket-queue` / `-verify` / `-reload` | default | validated, 50 + 50 + 50 runs | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. Three prompt conditions on one snapshot. |
+| `invoice-entry` | office | validated, 30 runs | Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment's sha256. |
+| `fake` | none | harness test | Runs on the scripted provider; exercises the pipeline with no VM or model |
 
 LedgerDesk and the ticket queue are mocks on purpose. A mock lets the bench
 own the state, plant a trap, and verify exactly. What they keep from the real
@@ -146,7 +153,15 @@ scripted agent in `src/agent/scripted.ts` is the smallest example.
 
 ```bash
 npm run passk doctor
+npm run passk validate tasks/notes.yaml
 ```
+
+`validate` forks the task's snapshot and proves the verifier is sound: the
+checks fail on the untouched state, agree with themselves when run twice,
+and pass after the task's `golden` steps. One desktop boot, no model calls.
+Run it on every new task before spending a cent on an agent; it is the
+command that would have caught both verifier bugs found during this work.
+`doctor`
 
 checks the keys, reaches Solari, boots and kills one desktop, sends the
 model a one-token request, and prints what a run would use: provider, model,
@@ -193,6 +208,18 @@ hypotheses with a confidence, and when no run passed there is nothing to
 diverge from, so they are capped at low confidence. Every `bench.json` carries
 the full task definition, a hash of it, and the model, package and commit
 versions that produced it.
+
+## Not a model benchmark
+
+A benchmark asks which model is best across a fixed public task set and ends
+in a score. passk asks whether *your* agent is dependable enough on *your*
+workflow, and whether your latest change helped, and ends in a decision.
+Every comparison in [`evidence/`](evidence/) holds the model fixed and
+changes something else: a folder, a sentence, a verification instruction.
+The tasks that ship are examples of the format, not a canonical suite, and
+there is no leaderboard. passk can compare two models on one snapshot the
+way a test suite can compare two compilers; that is incidental, not the
+point.
 
 ## Who gets blamed for what
 

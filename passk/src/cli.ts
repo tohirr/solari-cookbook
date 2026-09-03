@@ -10,6 +10,7 @@
  *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *   passk export  runs/<dir> evidence/<name>  copy a bench with only the screenshots that carry proof
+ *   passk validate tasks/notes.yaml           prove the checks fail before and pass after the task's golden steps
  *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
  *
@@ -21,6 +22,7 @@ import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
 import { doctor } from "./doctor.js";
 import { exportBench } from "./export.js";
+import { validateTask } from "./validate.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
 import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
@@ -91,6 +93,16 @@ async function main() {
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
       return;
     }
+    case "validate": {
+      const task = loadTask(must(target));
+      if (!readSnapshots()[task.id] && !flag("snapshot")) await prepareTask(task);
+      const v = await validateTask(task, flag("snapshot"));
+      for (const n of v.notes) console.log(`  · ${n}`);
+      for (const p of v.problems) console.log(`  ✗ ${p}`);
+      console.log(v.ok ? `\n${task.id}: the verifier is sound` : `\n${task.id}: ${v.problems.length} problem${v.problems.length === 1 ? "" : "s"}`);
+      process.exitCode = v.ok ? 0 : 2;
+      return;
+    }
     case "doctor": {
       process.exitCode = (await doctor()) ? 0 : 1;
       return;
@@ -155,6 +167,7 @@ async function main() {
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B> [--out dir]
   passk export  <runs/dir> <evidence/dir>
+  passk validate <task.yaml> [--snapshot snap_…]
   passk doctor
   passk sweep
   passk classify <runs/dir>
