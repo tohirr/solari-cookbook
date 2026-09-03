@@ -129,6 +129,8 @@ export interface Provenance {
 }
 
 export interface BenchResult {
+  /** "running" while runs are still being added (or the process died); "complete" after finalize. */
+  status: "running" | "complete";
   taskId: string;
   taskName: string;
   prompt: string;

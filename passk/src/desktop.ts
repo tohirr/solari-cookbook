@@ -9,6 +9,7 @@
  */
 import { SolariClient, type Desktop } from "@solarisdk/sdk";
 import { config } from "./config.js";
+import { FakeDesktop } from "./fake/desktop.js";
 
 let client: SolariClient | undefined;
 export function solari(): SolariClient {
@@ -26,6 +27,11 @@ export interface BootOptions {
 
 /** Create a desktop, open its control channel, and wait for X11 + VNC. */
 export async function bootDesktop(opts: BootOptions): Promise<Desktop> {
+  if (config.fake) {
+    const fake = new FakeDesktop();
+    await fake.connect();
+    return fake.asDesktop();
+  }
   const desktop = await solari().sandboxes.createDesktop({
     template: opts.fromSnapshot ? undefined : (opts.template ?? "default"),
     fromSnapshot: opts.fromSnapshot,
@@ -65,6 +71,9 @@ export async function waitReady(desktop: Desktop, timeoutMs = 60_000): Promise<v
 export async function snapshotDesktop(desktop: Desktop, name: string): Promise<string> {
   return desktop.snapshot(name);
 }
+
+/** Fake desktops are never listed by Solari; sweeps and leak checks skip them. */
+export const isFake = () => config.fake;
 
 /** Boot an independent copy of a snapshot. Every fork starts byte-identical. */
 export function forkDesktop(snapshotId: string, opts: Omit<BootOptions, "fromSnapshot" | "template"> = {}): Promise<Desktop> {

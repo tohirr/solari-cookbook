@@ -30,6 +30,15 @@ export interface StructuredRequest<S extends z.ZodTypeAny> {
 /** One vision + structured-output call, on whichever provider is configured. */
 export async function structured<S extends z.ZodTypeAny>(req: StructuredRequest<S>): Promise<z.infer<S> | null> {
   const images = req.images ?? [];
+  if (config.provider === "scripted") {
+    // A canned answer shaped to whichever schema asked. Enough to exercise the plumbing.
+    const canned: Record<string, unknown> = {
+      judgement: { passed: false, reason: "scripted judge" },
+      failure_analysis: { cause: "behavior_variability", confidence: "low", explanation: "scripted classifier: no model was consulted" },
+      probe: { interpretation: "scripted", ambiguities: [], risk: "low" },
+    };
+    return (canned[req.name] as z.infer<S>) ?? null;
+  }
   if (config.provider === "openai") {
     const res = await openai().responses.parse({
       model: config.model,

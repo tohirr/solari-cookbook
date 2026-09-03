@@ -6,7 +6,7 @@
  */
 import type { Desktop } from "@solarisdk/sdk";
 import { config } from "../config.js";
-import type { TraceStep } from "../types.js";
+import type { Check, TraceStep } from "../types.js";
 
 export interface AgentRunOptions {
   desktop: Desktop;
@@ -18,6 +18,9 @@ export interface AgentRunOptions {
   /** How many recent screenshots stay in context. Older ones are replaced with a stub. */
   keepImages?: number;
   onStep?: (step: TraceStep) => void;
+  /** The task's checks, so a scripted agent knows what "pass" means. Real agents never see these. */
+  checks?: Check[];
+  runIndex?: number;
 }
 
 export interface AgentRunOutput {
@@ -34,6 +37,10 @@ When the task is complete, stop and reply with one short sentence describing the
 Never ask the user questions — make a reasonable choice and continue.`;
 
 export async function runAgent(opts: AgentRunOptions): Promise<AgentRunOutput> {
+  if (config.provider === "scripted") {
+    const { runScriptedAgent } = await import("./scripted.js");
+    return runScriptedAgent(opts);
+  }
   if (config.provider === "openai") {
     const { runOpenAIAgent } = await import("./openai.js");
     return runOpenAIAgent(opts);

@@ -20,15 +20,15 @@ function need(name: string): string {
   return process.env[name]!;
 }
 
-function detectProvider(): "anthropic" | "openai" {
+function detectProvider(): "anthropic" | "openai" | "scripted" {
   const explicit = process.env.PASSK_PROVIDER;
-  if (explicit === "anthropic" || explicit === "openai") return explicit;
+  if (explicit === "anthropic" || explicit === "openai" || explicit === "scripted") return explicit;
   if (isSet("ANTHROPIC_API_KEY")) return "anthropic";
   if (isSet("OPENAI_API_KEY")) return "openai";
   throw new Error("Set ANTHROPIC_API_KEY or OPENAI_API_KEY in .env (or PASSK_PROVIDER to pick one).");
 }
 
-const DEFAULT_MODEL = { anthropic: "claude-opus-5", openai: "gpt-5.6" } as const;
+const DEFAULT_MODEL = { anthropic: "claude-opus-5", openai: "gpt-5.6", scripted: "scripted" } as const;
 
 export const config = {
   version: "0.1.0",
@@ -36,13 +36,15 @@ export const config = {
   get anthropicApiKey() { return need("ANTHROPIC_API_KEY"); },
   get openaiApiKey() { return need("OPENAI_API_KEY"); },
   get provider() { return detectProvider(); },
+  /** No Solari, no model: in-memory desktops and the scripted agent. For testing the harness itself. */
+  get fake() { return process.env.PASSK_FAKE === "1" || detectProvider() === "scripted"; },
   get model() { return process.env.PASSK_MODEL ?? DEFAULT_MODEL[detectProvider()]; },
   effort: (process.env.PASSK_EFFORT ?? "high") as "low" | "medium" | "high" | "xhigh" | "max",
   concurrency: Number(process.env.PASSK_CONCURRENCY ?? 2),
   /** Rolling idle window for a desktop. Resets on every action. */
   desktopTimeoutMs: 15 * 60_000,
-  runsDir: path.resolve("runs"),
-  stateDir: path.resolve(".passk"),
+  get runsDir() { return path.resolve(process.env.PASSK_RUNS_DIR ?? "runs"); },
+  get stateDir() { return path.resolve(process.env.PASSK_STATE_DIR ?? ".passk"); },
 };
 
 export function loadTask(file: string): Task {

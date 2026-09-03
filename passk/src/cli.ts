@@ -24,7 +24,7 @@ import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
 import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
-import { runBench } from "./runner.js";
+import { findResumable, runBench } from "./runner.js";
 import type { BenchResult } from "./types.js";
 
 function flag(name: string, fallback?: string): string | undefined {
@@ -50,9 +50,17 @@ async function main() {
     case "run": {
       const task = loadTask(must(target));
       const k = Number(flag("k", "5"));
-      if (!flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
+      // --resume [dir]: continue a bench left in status "running". Without a dir, the newest such bench for this task.
+      let resumeDir: string | undefined;
+      if (has("resume")) {
+        const given = flag("resume");
+        resumeDir = given && !given.startsWith("--") && fs.existsSync(path.join(given, "bench.json")) ? given : findResumable(task.id);
+        if (!resumeDir) { console.error(`nothing to resume for "${task.id}"`); process.exit(1); }
+      }
+      if (!resumeDir && !flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
       const { bench, dir } = await runBench({
-        task, k,
+        task, k, resumeDir,
+        abortAfter: process.env.PASSK_ABORT_AFTER ? Number(process.env.PASSK_ABORT_AFTER) : undefined,
         concurrency: flag("concurrency") ? Number(flag("concurrency")) : undefined,
         // PASSK_CLASSIFY=0 turns the LLM failure classification off without the flag.
         noClassify: has("no-classify") || process.env.PASSK_CLASSIFY === "0",
@@ -123,6 +131,7 @@ async function main() {
   passk probe   <task.yaml>
   passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
                             [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
+                            [--resume [runs/dir]]   finish a bench that was interrupted
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B> [--out dir]

@@ -1,0 +1,10 @@
+# A task for the scripted provider (PASSK_PROVIDER=scripted). No VM, no model:
+# used to test the harness itself under injected faults. See test/resume.test.ts.
+id: fake
+name: Scripted harness test
+prompt: Write the magic word to the target file.
+checks:
+  - type: file_contains
+    path: /tmp/target.txt
+    text: magic
+max_steps: 12

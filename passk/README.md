@@ -67,6 +67,42 @@ success, and Fisher's exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
 
+## When a bench dies halfway
+
+Every run writes its own `run.json` the moment it finishes, and the bench's
+`bench.json` is written before the first fork and rewritten after every run,
+with `status: "running"` until the end. If the process dies at run 43 of 50
+(laptop sleep, network loss, a provider outage), the 43 verified runs are on
+disk and:
+
+```bash
+npm run passk run tasks/ticket-queue.yaml -- --k 50 --resume
+```
+
+finds the newest unfinished bench for that task and executes only the
+missing indices. Nothing runs twice; infrastructure losses are recorded at
+their index so a resume does not quietly retry them and shift the sample.
+`report`, `gate` and `compare` work on a partial bench at any time.
+
+## Testing the harness without a VM or a model
+
+`PASSK_PROVIDER=scripted` swaps in an in-memory desktop and a scripted agent
+whose behavior per run comes from `PASSK_SCRIPT`:
+
+```bash
+PASSK_PROVIDER=scripted PASSK_SCRIPT="pass*15,fail*3,hang,claim_only" \
+  npm run passk run tasks/fake.yaml -- --k 20
+```
+
+Behaviors: `pass`, `fail` (wrong state, claims success), `claim_only`
+(no state change, claims success), `hang` (runs to the step cap),
+`provider_err` (the model API fails), `crash_after` (task done, agent dies),
+`slow`. The real runner, checker, metrics, persistence and report run
+unchanged, so `test/resume.test.ts` can kill a 20-run bench halfway and
+resume it, prove no index ran twice, check every stop reason is accounted
+for, enforce a budget, and push 200 runs through at concurrency 16 in a few
+seconds, all for no money.
+
 ## Reading the numbers honestly
 
 Ten passes out of ten is an observation, not a proof of 100% reliability. Every

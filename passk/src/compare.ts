@@ -45,6 +45,7 @@ interface Side {
 
 export function loadBench(dir: string): BenchResult {
   const b = JSON.parse(fs.readFileSync(path.join(dir, "bench.json"), "utf8")) as BenchResult;
+  b.status ??= "complete"; // benches written before the manifest existed
   regrade(b.runs);
   backfillCosts(b.runs, b.model);
   b.metrics = computeMetrics(b.runs, b.k);
