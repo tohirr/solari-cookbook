@@ -8,11 +8,13 @@
  *   passk report  runs/<dir>                  re-render report.html from bench.json
  *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold
  *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
+ *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
@@ -74,6 +76,17 @@ async function main() {
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
       return;
     }
+    case "classify": {
+      // Classification is a separate, retryable step: it needs the model, and a
+      // network blip during it should not cost a 50-run bench its hypotheses.
+      const dir = must(target);
+      const bench = loadBench(dir);
+      bench.failures = await classifyFailures(bench.provenance?.task ?? { id: bench.taskId, name: bench.taskName, prompt: bench.prompt, checks: [] }, bench.runs, dir);
+      fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
+      fs.writeFileSync(path.join(dir, "report.html"), renderReport(bench));
+      for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause} (${f.confidence} confidence${f.divergenceStep !== null ? `, diverges @${f.divergenceStep}` : ""}) — ${f.explanation}`);
+      return;
+    }
     case "gate": {
       const bench = JSON.parse(fs.readFileSync(path.join(must(target), "bench.json"), "utf8")) as BenchResult;
       regrade(bench.runs);
@@ -104,6 +117,7 @@ async function main() {
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B>
+  passk classify <runs/dir>
 
   --budget N         stop launching new runs once estimated model spend reaches $N
   --require P        exit 2 unless observed pass@1 >= P

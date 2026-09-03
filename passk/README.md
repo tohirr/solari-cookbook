@@ -112,7 +112,14 @@ stdout), `screenshot_judge` (the model grades the final screen against a rubric)
 | `notes` / `notes-nodir` | default | Save-dialog handling; an environment pair (folder present vs missing) |
 | `rename-invoices` / `-clarified` | default | File manager; a prompt pair (ambiguous vs spelled out) |
 | `q3-total` | office | LibreOffice Calc, formulas, the CSV "keep format" dialog |
-| `ticket-queue` | default | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. |
+| `ticket-queue` / `-verify` / `-reload` | default | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. Three prompt conditions on one snapshot. |
+| `invoice-entry` | office | Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment's sha256. |
+
+LedgerDesk and the ticket queue are mocks on purpose. A mock lets the bench
+own the state, plant a trap, and verify exactly. What they keep from the real
+thing is the shape: existing records to search, a duplicate to avoid, required
+fields, dropdowns, a file upload, a business rule ("pending review"), and a
+consequential action that must not happen.
 
 The ticket queue is the shape of task Pinetree describes: a proprietary
 dashboard with no API. Because the app lives in the snapshot, fifty runs cost
@@ -151,6 +158,16 @@ run       fork ×k from snapshot ──▶ agent loop on each ──▶ checks �
   `xdotool click 4|5|6|7`, which the default template ships.
 - **`sandboxes.createDesktop`, not `desktops.create`, for forks.** Only the
   sandbox-flavoured route accepts `fromSnapshot`.
+- **Lowercase the letters in chords.** `ctrl+A` reaches xdotool as
+  ctrl+shift+a, which in Chrome opens the tab-search panel and silently
+  swallows everything typed next. One capital letter cost a whole run.
+- **The control channel can drop right after a fork** on the office template:
+  up for `connect()` and `health()`, gone by the first action. passk reconnects
+  once and retries the action instead of failing the run.
+- **Chrome will not upload a file from `/root`.** A form with a file input
+  chosen from under `/root` fails with `ERR_ACCESS_DENIED` on submit and never
+  reaches the server; the same file under `/home/desktop` or `/tmp` uploads
+  fine. Put task inputs the agent must attach under the desktop user's home.
 - **Verify the verifier.** An `exec` check that ran `cat` on two candidate
   paths failed with exit 1 whenever the first path was missing, even though the
   second printed the right text. Two real passes were scored as failures until

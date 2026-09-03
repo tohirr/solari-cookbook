@@ -45,7 +45,9 @@ const MODS: Record<string, string> = {
   win: "super", alt: "alt", option: "alt", shift: "shift", meta: "super",
 };
 function parseKeyChord(text: string): string[] {
-  return text.split("+").map((k) => MODS[k.trim().toLowerCase()] ?? k.trim());
+  // Single letters are lowercased so a chord never picks up an implicit shift
+  // (ctrl+A → ctrl+shift+a, which opens Chrome's tab search and eats the next typing).
+  return text.split("+").map((k) => { const t = k.trim(); return MODS[t.toLowerCase()] ?? (t.length === 1 ? t.toLowerCase() : t); });
 }
 const chord = (keys: string[]) => keys.join("+");
 

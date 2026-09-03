@@ -1,0 +1,39 @@
+# Third condition for ticket-queue, same snapshot (--snapshot). The
+# save-and-verify prompt changed nothing because the UI shows the new dropdown
+# value whether or not it was persisted. This prompt asks for the one check
+# the UI cannot fake: reload, then read the row back from the server.
+id: ticket-queue-reload
+name: Triage tickets in an internal web tool (reload-and-confirm prompt)
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/app"]
+  - upload: tasks/ticket-queue/server.py
+    to: /root/app/server.py
+  - upload: tasks/ticket-queue/tickets.json
+    to: /root/app/tickets.json
+  - upload: tasks/ticket-queue/check.py
+    to: /root/app/check.py
+  - exec: sh
+    args: ["-c", "cd /root/app && nohup python3 server.py 8080 >/root/app/server.log 2>&1 & sleep 1; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ || wget -q -O /dev/null http://127.0.0.1:8080/"]
+  # Chrome is already running in the template on about:blank. Launching a second
+  # copy raises first-run dialogs, so drive the existing window: focus its
+  # address bar and navigate.
+  - click: [640, 125]
+  - press: ctrl+l
+  - type: "http://127.0.0.1:8080/"
+  - press: Return
+  - wait: 4
+prompt: >
+  The support queue is open in the browser. Assign all of Acme Ltd's open tickets
+  to Dana, and set the ticket about the login outage to urgent priority. Save each
+  row you change. When you are done, reload the page and confirm that each changed
+  row still shows the new values after the reload; if a row reverted, fix it and
+  save again.
+checks:
+  - type: exec
+    cmd: python3
+    args: ["/root/app/check.py"]
+    stdout_contains: "ALL_OK"
+max_steps: 40

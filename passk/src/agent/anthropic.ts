@@ -7,6 +7,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import fs from "node:fs";
 import path from "node:path";
 import { config } from "../config.js";
+import { withReconnect } from "../desktop.js";
 import { anthropic as claude } from "../llm.js";
 import type { TraceStep } from "../types.js";
 import { runComputerAction } from "./computer.js";
@@ -101,7 +102,7 @@ export async function runAnthropicAgent(opts: AgentRunOptions): Promise<AgentRun
           content: "Not executed: an earlier computer action in this turn failed." });
       } else {
         try {
-          const out = await runComputerAction(desktop, tu.name, tu.input);
+          const out = await withReconnect(desktop, () => runComputerAction(desktop, tu.name, tu.input));
           if (out.screenshot) {
             const file = `step-${String(step.index).padStart(3, "0")}.png`;
             fs.writeFileSync(path.join(outDir, file), out.screenshot);

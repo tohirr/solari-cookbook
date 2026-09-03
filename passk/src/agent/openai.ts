@@ -12,7 +12,7 @@ import type { Desktop } from "@solarisdk/sdk";
 import fs from "node:fs";
 import path from "node:path";
 import { config } from "../config.js";
-import { sleep } from "../desktop.js";
+import { sleep, withReconnect } from "../desktop.js";
 import { dataUrl, openai } from "../llm.js";
 import type { TraceStep } from "../types.js";
 import { DEFAULT_SYSTEM, type AgentRunOptions, type AgentRunOutput } from "./index.js";
@@ -27,7 +27,10 @@ const KEYMAP: Record<string, string> = {
   delete: "Delete", del: "Delete", home: "Home", end: "End", pageup: "Page_Up", pagedown: "Page_Down",
   arrowup: "Up", arrowdown: "Down", arrowleft: "Left", arrowright: "Right", up: "Up", down: "Down", left: "Left", right: "Right",
 };
-const key = (k: string) => KEYMAP[k.toLowerCase()] ?? (k.length === 1 ? k : k);
+// Single letters are lowercased: "CTRL+A" must become ctrl+a. Passing the capital
+// through makes xdotool add shift, and ctrl+shift+a in Chrome opens the tab search
+// panel, which then swallows everything typed next. Found the hard way.
+const key = (k: string) => KEYMAP[k.toLowerCase()] ?? (k.length === 1 ? k.toLowerCase() : k);
 
 async function withModifiers(desktop: Desktop, keys: string[] | null | undefined, fn: () => Promise<void>) {
   const mods = (keys ?? []).map(key);
@@ -140,7 +143,7 @@ export async function runOpenAIAgent(opts: AgentRunOptions): Promise<AgentRunOut
         };
         if (failed) step.error = "not executed: an earlier action in this batch failed";
         else {
-          try { await execAction(desktop, a); }
+          try { await withReconnect(desktop, () => execAction(desktop, a)); }
           catch (err) { failed = (err as Error).message; step.error = failed; }
         }
         step.durationMs = Date.now() - started;
@@ -150,7 +153,7 @@ export async function runOpenAIAgent(opts: AgentRunOptions): Promise<AgentRunOut
 
       // One screenshot per batch, attached to the last step so the trace stays visual.
       await sleep(500);
-      const png = await desktop.screenshot({ format: "png" });
+      const png = await withReconnect(desktop, () => desktop.screenshot({ format: "png" }));
       const file = `step-${String(Math.max(0, steps.length - 1)).padStart(3, "0")}.png`;
       fs.writeFileSync(path.join(outDir, file), png);
       if (steps.length) steps[steps.length - 1].screenshot = file;

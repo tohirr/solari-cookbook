@@ -71,13 +71,42 @@ export function forkDesktop(snapshotId: string, opts: Omit<BootOptions, "fromSna
   return bootDesktop({ ...opts, fromSnapshot: snapshotId });
 }
 
-/** Best-effort teardown: never let a cleanup error mask the real one. */
+/**
+ * Best-effort teardown: never let a cleanup error mask the real one. The
+ * handle's kill() goes over the control channel; when that channel is the
+ * thing that broke ("Not connected"), fall back to the plain HTTP delete so
+ * the VM does not sit there holding a slot until its idle timeout.
+ */
 export async function destroyDesktop(desktop: Desktop | undefined): Promise<void> {
   if (!desktop) return;
   try {
     await desktop.kill();
+    return;
   } catch (err) {
-    console.warn(`warn: failed to kill ${desktop.id}:`, (err as Error).message);
+    console.warn(`warn: kill() failed for ${desktop.id.slice(0, 16)}… (${(err as Error).message}); trying HTTP delete`);
+  }
+  try {
+    await solari().sandboxes.kill(desktop.id);
+  } catch (err) {
+    console.warn(`warn: HTTP delete also failed for ${desktop.id.slice(0, 16)}…: ${(err as Error).message}`);
+  }
+}
+
+/**
+ * Run one desktop call; if the control channel has dropped ("Not connected"),
+ * reconnect once and retry. Seen on the office template right after a fork:
+ * the channel is up for connect() and health(), then gone by the first action.
+ */
+export async function withReconnect<T>(desktop: Desktop, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    // "Not connected — call connect() first" and "Control channel closed (1006)" are the
+    // two spellings of the same event: the WebSocket went away under us.
+    if (!/not connected|channel closed/i.test((err as Error).message)) throw err;
+    await desktop.reconnect();
+    await sleep(500);
+    return fn();
   }
 }
 

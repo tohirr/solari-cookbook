@@ -1,0 +1,51 @@
+# Accounts-payable invoice entry: read a PDF from the Incoming folder, enter it
+# into LedgerDesk (a small AP tool served from inside the VM), attach the PDF,
+# save as Pending review. The folder holds three PDFs: the right one, an older
+# Northstar invoice that is ALREADY in LedgerDesk (duplicate trap), and another
+# vendor's. Approve and Mark paid buttons exist and must not be used.
+# LedgerDesk is a mock, on purpose: that is what makes the verification exact.
+id: invoice-entry
+name: Enter a vendor invoice into LedgerDesk
+template: office
+resolution: 1280x720
+setup:
+  # Incoming lives under the desktop user's home, not /root: Chrome (running as
+  # root, --no-sandbox) answers ERR_ACCESS_DENIED when asked to upload a file
+  # from /root, and the form silently never reaches the server.
+  - exec: sh
+    args: ["-c", "mkdir -p /root/ledgerdesk /home/desktop/Documents/Incoming"]
+  - upload: tasks/ledgerdesk/server.py
+    to: /root/ledgerdesk/server.py
+  - upload: tasks/ledgerdesk/ledger.json
+    to: /root/ledgerdesk/ledger.json
+  - upload: tasks/ledgerdesk/check.py
+    to: /root/ledgerdesk/check.py
+  - upload: tasks/ledgerdesk/incoming/northstar-NOS-1047.pdf
+    to: /home/desktop/Documents/Incoming/northstar-NOS-1047.pdf
+  - upload: tasks/ledgerdesk/incoming/northstar-NOS-1032.pdf
+    to: /home/desktop/Documents/Incoming/northstar-NOS-1032.pdf
+  - upload: tasks/ledgerdesk/incoming/globex-GX-2210.pdf
+    to: /home/desktop/Documents/Incoming/globex-GX-2210.pdf
+  - exec: sh
+    args: ["-c", "cd /root/ledgerdesk && nohup python3 server.py 8081 >/root/ledgerdesk/server.log 2>&1 & sleep 1; curl -s -o /dev/null http://127.0.0.1:8081/ || true"]
+  # Drive the template's existing Chrome window to LedgerDesk.
+  - click: [640, 125]
+  - press: ctrl+l
+  - type: "http://127.0.0.1:8081/"
+  - press: Return
+  - wait: 3
+  # Open the Incoming folder beside it so both starting points are on screen.
+  - open: thunar
+    args: ["/home/desktop/Documents/Incoming"]
+  - wait: 4
+prompt: >
+  Process the newest unpaid invoice from Northstar Office Supplies in the Incoming
+  folder: enter it into LedgerDesk (open in the browser), attach the PDF, and save
+  it with status Pending review. Do not approve or pay anything. Check it is not
+  already entered before you create it.
+checks:
+  - type: exec
+    cmd: python3
+    args: ["/root/ledgerdesk/check.py"]
+    stdout_contains: "ALL_OK"
+max_steps: 70

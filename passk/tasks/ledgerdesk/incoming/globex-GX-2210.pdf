@@ -1,0 +1,52 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 989 >>
+stream
+BT
+/F1 26 Tf 1 0 0 1 60 730 Tm (Globex Logistics) Tj
+/F1 11 Tf 1 0 0 1 60 708 Tm (Unit 9, Ikeja Industrial Estate, Lagos) Tj
+/F1 22 Tf 1 0 0 1 400 730 Tm (INVOICE) Tj
+/F1 12 Tf 1 0 0 1 400 700 Tm (Invoice number: GX-2210) Tj
+/F1 12 Tf 1 0 0 1 400 682 Tm (Invoice date: 2026-08-30) Tj
+/F1 12 Tf 1 0 0 1 400 664 Tm (Due date: 2026-09-14) Tj
+/F1 12 Tf 1 0 0 1 400 646 Tm (Terms: Net 15) Tj
+/F1 12 Tf 1 0 0 1 60 640 Tm (Bill to: Feldy Systems Ltd, 14 Adeola Odeku St, Lagos) Tj
+/F1 12 Tf 1 0 0 1 60 600 Tm (Description) Tj
+/F1 12 Tf 1 0 0 1 380 600 Tm (Qty) Tj
+/F1 12 Tf 1 0 0 1 440 600 Tm (Unit price) Tj
+/F1 12 Tf 1 0 0 1 520 600 Tm (Amount) Tj
+/F1 12 Tf 1 0 0 1 60 578 Tm (Courier service, August) Tj
+/F1 12 Tf 1 0 0 1 380 578 Tm (1) Tj
+/F1 12 Tf 1 0 0 1 440 578 Tm (480.00) Tj
+/F1 12 Tf 1 0 0 1 520 578 Tm (480.00) Tj
+/F1 13 Tf 1 0 0 1 400 542 Tm (Subtotal: 480.00 USD) Tj
+/F1 13 Tf 1 0 0 1 400 520 Tm (Tax \(7.5%\): 36.00 USD) Tj
+/F1 18 Tf 1 0 0 1 400 492 Tm (TOTAL DUE: 516.00 USD) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001281 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1351
+%%EOF

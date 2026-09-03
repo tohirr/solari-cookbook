@@ -1,0 +1,16 @@
+{
+  "next_id": 219,
+  "vendors": [
+    {"id": "V-101", "name": "Globex Logistics", "terms": "Net 15", "currency": "USD"},
+    {"id": "V-104", "name": "Northstar Office Supplies", "terms": "Net 30", "currency": "USD"},
+    {"id": "V-107", "name": "Initech Cloud Services", "terms": "Net 30", "currency": "USD"},
+    {"id": "V-112", "name": "Ikeja Facilities Management", "terms": "Due on receipt", "currency": "NGN"}
+  ],
+  "invoices": [
+    {"id": "INV-0215", "vendor_id": "V-107", "vendor_name": "Initech Cloud Services", "invoice_number": "IC-88120", "invoice_date": "2026-07-31", "subtotal": 2400.0, "tax": 180.0, "total": 2580.0, "currency": "USD", "terms": "Net 30", "status": "paid", "attachment": null, "created_by": "seed"},
+    {"id": "INV-0216", "vendor_id": "V-104", "vendor_name": "Northstar Office Supplies", "invoice_number": "NOS-1032", "invoice_date": "2026-07-30", "subtotal": 567.0, "tax": 42.52, "total": 609.52, "currency": "USD", "terms": "Net 30", "status": "approved", "attachment": null, "created_by": "seed"},
+    {"id": "INV-0217", "vendor_id": "V-112", "vendor_name": "Ikeja Facilities Management", "invoice_number": "IFM-0808", "invoice_date": "2026-08-08", "subtotal": 350000.0, "tax": 26250.0, "total": 376250.0, "currency": "NGN", "terms": "Due on receipt", "status": "pending_review", "attachment": null, "created_by": "seed"},
+    {"id": "INV-0218", "vendor_id": "V-101", "vendor_name": "Globex Logistics", "invoice_number": "GX-2188", "invoice_date": "2026-08-15", "subtotal": 480.0, "tax": 36.0, "total": 516.0, "currency": "USD", "terms": "Net 15", "status": "paid", "attachment": null, "created_by": "seed"}
+  ],
+  "events": []
+}

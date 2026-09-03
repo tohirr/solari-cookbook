@@ -9,7 +9,7 @@ import { runAgent } from "./agent/index.js";
 import { runChecks } from "./checker.js";
 import { classifyFailures } from "./classify.js";
 import { config, readSnapshots } from "./config.js";
-import { destroyDesktop, forkDesktop } from "./desktop.js";
+import { destroyDesktop, forkDesktop, solari, withReconnect } from "./desktop.js";
 import { computeMetrics, estimateCostUsd } from "./metrics.js";
 import { collectProvenance } from "./provenance.js";
 import { renderReport } from "./report/html.js";
@@ -52,6 +52,7 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   });
   const completed = runs.filter((r): r is RunResult => r !== null).sort((a, b) => a.runIndex - b.runIndex);
 
+  await sweep(task.id);
   const metrics = computeMetrics(completed, k);
   const failures = opts.noClassify ? [] : await classifyFailures(task, completed, dir);
 
@@ -64,6 +65,9 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   return { bench, dir };
 }
 
+/** Run indices currently holding a desktop in this process. Anything tagged with this task and not in here is a leak. */
+const liveRuns = new Set<string>();
+
 async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir: string): Promise<RunResult> {
   const outDir = path.join(benchDir, `run-${String(runIndex).padStart(2, "0")}`);
   fs.mkdirSync(outDir, { recursive: true });
@@ -73,6 +77,7 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
 
   try {
     desktop = await forkWithRetry(snapshotId, task, runIndex, tag);
+    liveRuns.add(String(runIndex));
     console.log(`${tag} forked → ${desktop.id}`);
 
     const agent = await runAgent({
@@ -80,7 +85,8 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
       onStep: (s) => console.log(`${tag} #${s.index} ${s.name}${s.error ? "  ✗ " + s.error : ""}`),
     });
 
-    const finalPng = await desktop.screenshot({ format: "png" });
+    const live = desktop;
+    const finalPng = await withReconnect(live, () => live.screenshot({ format: "png" }));
     fs.writeFileSync(path.join(outDir, "final.png"), finalPng);
     const checks = await runChecks(desktop, task.checks, finalPng);
     // Outcome is judged by the checks alone. Whether the agent stopped on its
@@ -108,6 +114,7 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     };
   } finally {
     await destroyDesktop(desktop);
+    liveRuns.delete(String(runIndex));
   }
 }
 
@@ -127,9 +134,44 @@ async function forkWithRetry(snapshotId: string, task: Task, runIndex: number, t
       const msg = (err as Error).message;
       if (i >= attempts) throw err;
       const wait = /concurrent/i.test(msg) ? 30_000 : 5_000;
+      // A concurrency error mid-bench usually means an earlier run's VM outlived
+      // its teardown (a network blip at the wrong moment). Kill anything tagged
+      // with this task that no live run owns before waiting.
+      if (/concurrent/i.test(msg)) await killStale(task.id, tag);
       console.warn(`${tag} fork failed (${msg}); retry ${i}/${attempts - 1} in ${wait / 1000}s`);
       await new Promise((r) => setTimeout(r, wait));
     }
+  }
+}
+
+async function killStale(taskId: string, tag: string): Promise<void> {
+  try {
+    for await (const s of solari().sandboxes.listAll({ state: "running" })) {
+      if (s.metadata?.app === "passk" && s.metadata?.task === taskId && !liveRuns.has(String(s.metadata?.run))) {
+        await solari().sandboxes.kill(s.sandboxId);
+        console.warn(`${tag} killed a leaked desktop from run ${s.metadata.run}`);
+      }
+    }
+  } catch (err) {
+    console.warn(`${tag} stale-session sweep failed: ${(err as Error).message}`);
+  }
+}
+
+/**
+ * Kill anything from this bench that is still running. Per-run teardown can
+ * fail when the network drops at the wrong moment, and a leaked VM holds a
+ * concurrency slot until its idle timeout, which breaks the next bench.
+ */
+async function sweep(taskId: string): Promise<void> {
+  try {
+    for await (const s of solari().sandboxes.listAll({ state: "running" })) {
+      if (s.metadata?.app === "passk" && s.metadata?.task === taskId) {
+        await solari().sandboxes.kill(s.sandboxId);
+        console.warn(`sweep: killed leaked desktop for run ${s.metadata.run ?? "?"}`);
+      }
+    }
+  } catch (err) {
+    console.warn(`sweep failed: ${(err as Error).message}`);
   }
 }
 
