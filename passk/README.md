@@ -97,8 +97,26 @@ checks:                     # evaluated INSIDE the desktop after the agent stops
     text: hello
 ```
 
+Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
+`write` (text to a guest path), `upload` (local file to a guest path), `click`
+(x, y), `press` (a key or "+"-joined chord), `type` (literal text), `wait`
+(seconds). Everything runs once, before the snapshot, so forks pay none of it.
+
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
-stdout), `screenshot_judge` (Claude grades the final screen against a rubric).
+stdout), `screenshot_judge` (the model grades the final screen against a rubric).
+
+## Tasks that ship
+
+| Task | Template | What it exercises |
+|---|---|---|
+| `notes` / `notes-nodir` | default | Save-dialog handling; an environment pair (folder present vs missing) |
+| `rename-invoices` / `-clarified` | default | File manager; a prompt pair (ambiguous vs spelled out) |
+| `q3-total` | office | LibreOffice Calc, formulas, the CSV "keep format" dialog |
+| `ticket-queue` | default | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. |
+
+The ticket queue is the shape of task Pinetree describes: a proprietary
+dashboard with no API. Because the app lives in the snapshot, fifty runs cost
+about a dollar on a budget model.
 
 ## How it works
 

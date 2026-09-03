@@ -20,8 +20,12 @@ export type SetupStep =
   | { exec: string; args?: string[] }
   | { open: string; args?: string[] }
   | { write: string; content: string }
+  /** Copy a local file into the guest. Paths are relative to the working directory. */
+  | { upload: string; to: string }
   /** Press a key or "+"-joined chord, e.g. "Return" or "ctrl+s". */
   | { press: string }
+  /** Type literal text into whatever has focus. */
+  | { type: string }
   | { click: [number, number] }
   | { wait: number };
 

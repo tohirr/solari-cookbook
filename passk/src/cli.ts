@@ -115,9 +115,11 @@ async function main() {
 function printSummary(bench: BenchResult, k: number): void {
   const m = bench.metrics;
   const pct = (x: number) => `${(x * 100).toFixed(0)}%`;
-  const kk = Math.min(k, m.n);
+  // pass^k for the k people actually ask about, not for k=n (which is 0 whenever anything failed).
+  const ks = [5, 10].filter((x) => x <= m.n);
+  if (!ks.length && m.n) ks.push(m.n);
   console.log(`\nobserved  ${m.passed}/${m.n} passed  (pass@1 ${pct(m.passAt1)}, 95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)})`);
-  console.log(`pass^${kk}    ${pct(m.passPowK[kk] ?? 0)} estimated, lower bound ${pct(m.passPowKLower[kk] ?? 0)}`);
+  for (const kk of ks) console.log(`pass^${kk}${" ".repeat(Math.max(1, 6 - String(kk).length))}${pct(m.passPowK[kk] ?? 0)} estimated, lower bound ${pct(m.passPowKLower[kk] ?? 0)}`);
   if (m.errored || m.skipped) console.log(`end-to-end ${m.passed}/${m.requested} (${m.errored} infra error${m.errored === 1 ? "" : "s"}, ${m.skipped} skipped for budget)`);
   console.log(`steps     median ${m.medianSteps}, p95 ${m.p95Steps}, range ${m.minSteps}–${m.maxSteps}`);
   console.log(`cost      $${m.totalCostUsd.toFixed(2)} total${m.costPerSuccessUsd !== null ? `, $${m.costPerSuccessUsd.toFixed(3)} per success` : ""}`);

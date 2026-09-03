@@ -1,0 +1,8 @@
+[
+  {"id": 101, "title": "Login outage for all users since 09:10", "customer": "Acme Ltd", "status": "open", "priority": "high", "assignee": "unassigned"},
+  {"id": 102, "title": "Invoice PDF won't download", "customer": "Acme Ltd", "status": "open", "priority": "normal", "assignee": "Sam"},
+  {"id": 103, "title": "Password reset email delayed", "customer": "Acme Ltd", "status": "closed", "priority": "normal", "assignee": "Sam"},
+  {"id": 104, "title": "Dashboard shows wrong monthly totals", "customer": "Globex", "status": "open", "priority": "high", "assignee": "unassigned"},
+  {"id": 105, "title": "Export to CSV fails over 10k rows", "customer": "Initech", "status": "open", "priority": "low", "assignee": "Dana"},
+  {"id": 106, "title": "Feature request: dark mode", "customer": "Globex", "status": "open", "priority": "low", "assignee": "unassigned"}
+]
