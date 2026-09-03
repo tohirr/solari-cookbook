@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # Ambiguity on purpose: "oldest" could mean by filename date or by file mtime,
 # and "archive" could mean a folder or a .zip. The probe should catch both.
 id: rename-invoices

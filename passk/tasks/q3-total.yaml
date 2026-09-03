@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # Spreadsheet work on the office template. The "Keep current format?" dialog
 # that LibreOffice throws when saving a CSV is a classic place for agents to
 # fall over, and "save" is quietly ambiguous about format.

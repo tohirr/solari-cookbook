@@ -15,6 +15,15 @@
 number read from the bench files. `sh demo.sh` runs the whole pipeline in forty
 seconds with no API spend.
 
+**Who it's for.** passk is for teams shipping computer-use agents. An engineer
+defines a task and its success criteria once; passk executes it repeatedly
+from the same state and produces a report that engineering, product and
+operations can all read. The operator is an agent or QA engineer. The report
+consumer does not need to know what YAML is. The interface is a CLI plus YAML
+task files, on purpose: like a test runner, it is configuration as code, and
+the hard part of any task is the verifier, which is not something a wizard
+can write for you.
+
 `passk` forks one Solari desktop snapshot *k* times, runs the same task on every
 fork with the same agent, and tells you two things a single demo never will:
 
@@ -120,6 +129,31 @@ consequential action that must not happen.
 The ticket queue is the shape of task Pinetree describes: a proprietary
 dashboard with no API. Because the app lives in the snapshot, fifty runs cost
 about a dollar on a budget model.
+
+## Benching your own agent
+
+The bundled loops are one Claude loop and one OpenAI loop, chosen by
+`PASSK_PROVIDER`. A team with its own agent writes a third file in
+`src/agent/` implementing the same interface (`AgentRunOptions →
+AgentRunOutput` in `src/agent/index.ts`): it receives a live desktop handle,
+the prompt, a step budget and an output directory, and returns the trace of
+actions it took, its token usage, and how it stopped. Two rules make the
+bench honest and are not negotiable: the agent never sees the task's checks,
+and the agent's own claim of success is recorded but never graded. The
+scripted agent in `src/agent/scripted.ts` is the smallest example.
+
+## First run
+
+```bash
+npm run passk doctor
+```
+
+checks the keys, reaches Solari, boots and kills one desktop, sends the
+model a one-token request, and prints what a run would use: provider, model,
+concurrency, and the safety setting. `npm run passk sweep` kills anything
+tagged passk that an interrupted bench left running. Task files carry a
+`yaml-language-server` schema hint; with the YAML extension in VS Code you
+get completion and validation from `schema/task.schema.json`.
 
 ## Evidence
 

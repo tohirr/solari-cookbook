@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # The intervention twin of ticket-queue. Same setup, same checks, run against
 # the SAME snapshot (--snapshot). One sentence is added to the prompt: verify
 # each row after saving. The baseline's three failures were all an unsaved row

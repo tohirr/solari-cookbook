@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # The clarified twin of rename-invoices. Same setup, same checks, same snapshot
 # (run it with --snapshot <the rename-invoices snapshot>). Only the prompt
 # changes: it answers the questions the probe raised.

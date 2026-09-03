@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # A task for the scripted provider (PASSK_PROVIDER=scripted). No VM, no model:
 # used to test the harness itself under injected faults. See test/resume.test.ts.
 id: fake

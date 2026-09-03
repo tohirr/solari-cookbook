@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # The smallest real task: open the editor, write a line, save it somewhere specific.
 # Trivial for a human. Watch how often "save as" goes sideways for an agent.
 id: notes

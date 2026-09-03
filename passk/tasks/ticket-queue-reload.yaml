@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # Third condition for ticket-queue, same snapshot (--snapshot). The
 # save-and-verify prompt changed nothing because the UI shows the new dropdown
 # value whether or not it was persisted. This prompt asks for the one check

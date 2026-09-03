@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=../schema/task.schema.json
 # Environment twin of notes: identical prompt and checks, but the Documents
 # folder does NOT exist where the (root-owned) editor will look for it. Only
 # the environment changes between this and notes.yaml.

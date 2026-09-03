@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/tohirr/solari-cookbook/passk/schema/task.schema.json",
+  "title": "passk task",
+  "description": "A task passk can bench: how to set the desktop up, what to ask the agent, and how to verify the outcome inside the VM.",
+  "type": "object",
+  "required": ["id", "name", "prompt", "checks"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Short slug; names the snapshot and the run folders." },
+    "name": { "type": "string", "description": "Human title, shown on reports." },
+    "template": { "type": "string", "default": "default", "description": "Solari desktop template: default | office | code | a custom template id." },
+    "resolution": { "type": "string", "pattern": "^\\d+x\\d+$", "default": "1280x720" },
+    "max_steps": { "type": "integer", "minimum": 1, "default": 40, "description": "Hard cap on agent actions per run. A run that hits it is graded on its checks, with the cap recorded as its stop reason." },
+    "prompt": { "type": "string", "description": "Exactly what a user would type. Ambiguity is allowed; the probe will find it." },
+    "setup": {
+      "type": "array",
+      "description": "Runs once before the snapshot, so forks pay none of it.",
+      "items": {
+        "oneOf": [
+          { "type": "object", "required": ["exec"], "additionalProperties": false, "properties": { "exec": { "type": "string", "description": "Program to run (argv, not a shell; use sh -c for shell syntax)." }, "args": { "type": "array", "items": { "type": "string" } } } },
+          { "type": "object", "required": ["open"], "additionalProperties": false, "properties": { "open": { "type": "string", "description": "GUI app to launch by name, e.g. mousepad, thunar, libreoffice." }, "args": { "type": "array", "items": { "type": "string" } } } },
+          { "type": "object", "required": ["write", "content"], "additionalProperties": false, "properties": { "write": { "type": "string", "description": "Guest path to write." }, "content": { "type": "string" } } },
+          { "type": "object", "required": ["upload", "to"], "additionalProperties": false, "properties": { "upload": { "type": "string", "description": "Local file, relative to the working directory." }, "to": { "type": "string", "description": "Guest path. Files the agent must attach in Chrome belong under /home/desktop, not /root." } } },
+          { "type": "object", "required": ["click"], "additionalProperties": false, "properties": { "click": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 } } },
+          { "type": "object", "required": ["press"], "additionalProperties": false, "properties": { "press": { "type": "string", "description": "A key or +-joined chord: Return, ctrl+l, alt+F4." } } },
+          { "type": "object", "required": ["type"], "additionalProperties": false, "properties": { "type": { "type": "string", "description": "Literal text to type into whatever has focus." } } },
+          { "type": "object", "required": ["wait"], "additionalProperties": false, "properties": { "wait": { "type": "number", "description": "Seconds." } } }
+        ]
+      }
+    },
+    "checks": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Evaluated inside the desktop after the agent stops. A run passes only if every check passes. Nothing the agent says counts.",
+      "items": {
+        "oneOf": [
+          { "type": "object", "required": ["type", "path"], "additionalProperties": false, "properties": { "type": { "const": "file_exists" }, "path": { "type": "string" } } },
+          { "type": "object", "required": ["type", "path", "text"], "additionalProperties": false, "properties": { "type": { "const": "file_contains" }, "path": { "type": "string" }, "text": { "type": "string" } } },
+          { "type": "object", "required": ["type", "path", "text"], "additionalProperties": false, "properties": { "type": { "const": "file_equals" }, "path": { "type": "string" }, "text": { "type": "string" } } },
+          { "type": "object", "required": ["type", "cmd"], "additionalProperties": false, "properties": { "type": { "const": "exec" }, "cmd": { "type": "string" }, "args": { "type": "array", "items": { "type": "string" } }, "stdout_contains": { "type": "string", "description": "With this set and no exit_code, only the output is judged." }, "exit_code": { "type": "integer" } } },
+          { "type": "object", "required": ["type", "rubric"], "additionalProperties": false, "properties": { "type": { "const": "screenshot_judge" }, "rubric": { "type": "string", "description": "The model grades the final screen against this. Weakest check; prefer state." } } }
+        ]
+      }
+    }
+  }
+}

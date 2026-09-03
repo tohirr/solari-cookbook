@@ -10,6 +10,8 @@
  *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *   passk export  runs/<dir> evidence/<name>  copy a bench with only the screenshots that carry proof
+ *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
+ *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
@@ -17,6 +19,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
+import { doctor } from "./doctor.js";
 import { exportBench } from "./export.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
@@ -88,6 +91,19 @@ async function main() {
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
       return;
     }
+    case "doctor": {
+      process.exitCode = (await doctor()) ? 0 : 1;
+      return;
+    }
+    case "sweep": {
+      const { solari } = await import("./desktop.js");
+      let n = 0;
+      for await (const s of solari().sandboxes.listAll({})) {
+        if (s.metadata?.app === "passk") { await solari().sandboxes.kill(s.sandboxId); n++; console.log(`killed ${s.metadata.task ?? "?"} run ${s.metadata.run ?? s.metadata.role ?? "?"}`); }
+      }
+      console.log(n ? `${n} killed` : "nothing tagged passk is running");
+      return;
+    }
     case "export": {
       const out = process.argv[4];
       if (!out) { console.error("export needs a source bench dir and a destination dir"); process.exit(1); }
@@ -139,6 +155,8 @@ async function main() {
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B> [--out dir]
   passk export  <runs/dir> <evidence/dir>
+  passk doctor
+  passk sweep
   passk classify <runs/dir>
 
   --budget N         stop launching new runs once estimated model spend reaches $N
