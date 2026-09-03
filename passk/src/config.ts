@@ -38,7 +38,7 @@ export const config = {
   get provider() { return detectProvider(); },
   /** No Solari, no model: in-memory desktops and the scripted agent. For testing the harness itself. */
   get fake() { return process.env.PASSK_FAKE === "1" || detectProvider() === "scripted"; },
-  get model() { return process.env.PASSK_MODEL ?? DEFAULT_MODEL[detectProvider()]; },
+  get model() { const p = detectProvider(); return p === "scripted" ? "scripted" : process.env.PASSK_MODEL ?? DEFAULT_MODEL[p]; },
   effort: (process.env.PASSK_EFFORT ?? "high") as "low" | "medium" | "high" | "xhigh" | "max",
   /**
    * What to do when the model raises a safety check on an action (OpenAI's

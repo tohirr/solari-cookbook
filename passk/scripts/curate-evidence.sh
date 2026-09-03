@@ -40,4 +40,5 @@ $P compare evidence/rename-invoices evidence/rename-invoices-clarified   --out e
 for f in evidence/compare-*/compare.html; do sed -i '' 's/\.png"/.jpg"/g' "$f"; done
 
 python3 scripts/evidence-index.py > evidence/README.md
+npx tsx scripts/showcase.ts
 du -sh evidence; echo "$(find evidence -name '*.jpg' | wc -l) screenshots"

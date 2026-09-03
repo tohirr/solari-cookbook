@@ -9,6 +9,12 @@
 > and traces. The Claude agent loop is written but unexercised for want of a
 > working key; the OpenAI loop produced everything here.
 
+<p align="center"><a href="evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="docs/compare-ticket-queue.jpg" alt="Three prompts, one snapshot: 47/50, 47/49, 49/49" width="100%"></a></p>
+
+**Start here:** [`evidence/index.html`](evidence/index.html) is the showcase, with every
+number read from the bench files. `sh demo.sh` runs the whole pipeline in forty
+seconds with no API spend.
+
 `passk` forks one Solari desktop snapshot *k* times, runs the same task on every
 fork with the same agent, and tells you two things a single demo never will:
 
@@ -92,6 +98,8 @@ Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
 
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
+
+<p align="center"><a href="evidence/invoice-entry/report.html"><img src="docs/report-invoice-entry.jpg" alt="Invoice entry report: 23/26, every run a dot, effort per run, filmstrips" width="100%"></a></p>
 
 ## Tasks that ship
 
