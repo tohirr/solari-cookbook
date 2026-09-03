@@ -33,6 +33,21 @@ past. Copy one into your project and change the parts you care about.
 | --- | --- | --- |
 | [desktop-computer-use-py](examples/desktop-computer-use-py) | Python | Screenshot, click, and type on a Linux GUI |
 
+## passk — does your computer-use agent pass twice?
+
+[`passk/`](passk/) is a reliability bench for computer-use agents, built on
+the desktop snapshot and fork APIs in this repo. It snapshots one desktop,
+forks it *k* times, runs the same agent on every fork, verifies the outcome
+inside the VM, and reports pass@k and pass^k with honest intervals. A
+`compare` command puts two conditions from the same snapshot side by side.
+
+Headline result so far, on the cheapest model available: an internal ticket
+tool went 47/50 → 47/49 → 49/49 across three prompts on one snapshot, and the
+bench explains why the middle one changed nothing. An accounts-payable entry
+task (PDF → mock ERP, with a duplicate trap and forbidden buttons) scored
+23/26 for 2.4 cents a run. Every number is in
+[`passk/evidence/`](passk/evidence/) with screenshots and traces.
+
 ## Running an example
 
 Each directory is self-contained.

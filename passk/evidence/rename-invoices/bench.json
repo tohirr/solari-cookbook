@@ -1,0 +1,1467 @@
+{
+  "taskId": "rename-invoices",
+  "taskName": "Archive the oldest invoices",
+  "prompt": "The invoices folder is open in the file manager. Move the two oldest invoices into an archive folder next to them.\n",
+  "model": "gpt-5.6-luna",
+  "snapshotId": "snap_dl557nkf1rqn",
+  "k": 5,
+  "startedAt": "2026-09-02T22:53:22.314Z",
+  "finishedAt": "2026-09-02T23:00:00.313Z",
+  "runs": [
+    {
+      "runIndex": 0,
+      "sessionId": "ZGVza3RvcC1wb29sLWktMDU5YzlhMDg0YzIyMDc3ZDg6dm1fMDAwODA5OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4ODM4OTY2Mzg4MQ.YllLgvyHKJF3tqe_iPfvzQZuCoS6Oh74sPCUotV4OHY",
+      "status": "passed",
+      "startedAt": "2026-09-02T22:53:22.357Z",
+      "finishedAt": "2026-09-02T22:55:40.297Z",
+      "durationMs": 137940,
+      "steps": [
+        {
+          "index": 0,
+          "name": "screenshot",
+          "input": {
+            "type": "screenshot"
+          },
+          "startedAt": "2026-09-02T22:54:29.054Z",
+          "durationMs": 0
+        },
+        {
+          "index": 1,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "SHIFT",
+              "N"
+            ]
+          },
+          "startedAt": "2026-09-02T22:54:36.322Z",
+          "durationMs": 497
+        },
+        {
+          "index": 2,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "archive"
+          },
+          "startedAt": "2026-09-02T22:54:41.871Z",
+          "durationMs": 1208
+        },
+        {
+          "index": 3,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:54:43.079Z",
+          "durationMs": 355
+        },
+        {
+          "index": 4,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 390,
+            "y": 207
+          },
+          "startedAt": "2026-09-02T22:54:47.663Z",
+          "durationMs": 453
+        },
+        {
+          "index": 5,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 208
+          },
+          "startedAt": "2026-09-02T22:54:48.116Z",
+          "durationMs": 1343
+        },
+        {
+          "index": 6,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "X"
+            ]
+          },
+          "startedAt": "2026-09-02T22:54:49.459Z",
+          "durationMs": 560
+        },
+        {
+          "index": 7,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 203
+          },
+          "startedAt": "2026-09-02T22:54:55.111Z",
+          "durationMs": 545
+        },
+        {
+          "index": 8,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "V"
+            ]
+          },
+          "startedAt": "2026-09-02T22:54:58.392Z",
+          "durationMs": 584
+        },
+        {
+          "index": 9,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 373,
+            "y": 109
+          },
+          "startedAt": "2026-09-02T22:55:06.259Z",
+          "durationMs": 399
+        },
+        {
+          "index": 10,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "A"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:06.658Z",
+          "durationMs": 393
+        },
+        {
+          "index": 11,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "/root/Documents/invoices/"
+          },
+          "startedAt": "2026-09-02T22:55:07.051Z",
+          "durationMs": 2003
+        },
+        {
+          "index": 12,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:09.055Z",
+          "durationMs": 305
+        },
+        {
+          "index": 13,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "A"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:14.209Z",
+          "durationMs": 509
+        },
+        {
+          "index": 14,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "/root/Documents/invoices/"
+          },
+          "startedAt": "2026-09-02T22:55:14.719Z",
+          "durationMs": 3367
+        },
+        {
+          "index": 15,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:18.086Z",
+          "durationMs": 634
+        },
+        {
+          "index": 16,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ALT",
+              "UP"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:23.745Z",
+          "durationMs": 390
+        },
+        {
+          "index": 17,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 390,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:55:29.924Z",
+          "durationMs": 553
+        },
+        {
+          "index": 18,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:55:30.477Z",
+          "durationMs": 1197
+        },
+        {
+          "index": 19,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 532,
+                "y": 205
+              },
+              {
+                "x": 480,
+                "y": 205
+              },
+              {
+                "x": 420,
+                "y": 205
+              },
+              {
+                "x": 340,
+                "y": 205
+              },
+              {
+                "x": 280,
+                "y": 205
+              },
+              {
+                "x": 247,
+                "y": 205
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:31.675Z",
+          "durationMs": 699
+        },
+        {
+          "index": 20,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:55:35.621Z",
+          "durationMs": 579
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "type": "exec",
+            "cmd": "sh",
+            "args": [
+              "-c",
+              "ls /root/Documents/invoices/archive | grep -c invoice"
+            ],
+            "stdout_contains": "2"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+          },
+          "passed": true
+        }
+      ],
+      "finalScreenshot": "final.jpg",
+      "finalMessage": "Created an `archive` folder and moved the two oldest invoices into it.",
+      "usage": {
+        "inputTokens": 89388,
+        "outputTokens": 935,
+        "costUsd": 0.018999600000000002
+      }
+    },
+    {
+      "runIndex": 1,
+      "sessionId": "ZGVza3RvcC1wb29sLWktMDU5YzlhMDg0YzIyMDc3ZDg6dm1fMDAwODEwOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4ODM4OTY4MTk5NA.JXah-sups0UkzblhicdLYxHhYRF5jHPx1zAr6D1ARXY",
+      "status": "passed",
+      "startedAt": "2026-09-02T22:53:22.364Z",
+      "finishedAt": "2026-09-02T22:55:40.444Z",
+      "durationMs": 138080,
+      "steps": [
+        {
+          "index": 0,
+          "name": "screenshot",
+          "input": {
+            "type": "screenshot"
+          },
+          "startedAt": "2026-09-02T22:54:47.994Z",
+          "durationMs": 0,
+          "screenshot": "step-000.jpg"
+        },
+        {
+          "index": 1,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 248,
+            "y": 216
+          },
+          "startedAt": "2026-09-02T22:54:54.732Z",
+          "durationMs": 453
+        },
+        {
+          "index": 2,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 390,
+            "y": 216
+          },
+          "startedAt": "2026-09-02T22:54:55.185Z",
+          "durationMs": 1165
+        },
+        {
+          "index": 3,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "X"
+            ]
+          },
+          "startedAt": "2026-09-02T22:54:56.350Z",
+          "durationMs": 662,
+          "screenshot": "step-003.jpg"
+        },
+        {
+          "index": 4,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "SHIFT",
+              "N"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:01.563Z",
+          "durationMs": 505,
+          "screenshot": "step-004.jpg"
+        },
+        {
+          "index": 5,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "archive"
+          },
+          "startedAt": "2026-09-02T22:55:06.034Z",
+          "durationMs": 609
+        },
+        {
+          "index": 6,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:06.644Z",
+          "durationMs": 597,
+          "screenshot": "step-006.jpg"
+        },
+        {
+          "index": 7,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 247,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:55:10.878Z",
+          "durationMs": 623,
+          "screenshot": "step-007.jpg"
+        },
+        {
+          "index": 8,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "V"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:15.137Z",
+          "durationMs": 593,
+          "screenshot": "step-008.jpg"
+        },
+        {
+          "index": 9,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ALT",
+              "UP"
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:21.118Z",
+          "durationMs": 357,
+          "screenshot": "step-009.jpg"
+        },
+        {
+          "index": 10,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 390,
+                "y": 205
+              },
+              {
+                "x": 350,
+                "y": 204
+              },
+              {
+                "x": 300,
+                "y": 204
+              },
+              {
+                "x": 248,
+                "y": 205
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:25.592Z",
+          "durationMs": 470,
+          "screenshot": "step-010.jpg"
+        },
+        {
+          "index": 11,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 390,
+                "y": 205
+              },
+              {
+                "x": 350,
+                "y": 204
+              },
+              {
+                "x": 300,
+                "y": 204
+              },
+              {
+                "x": 247,
+                "y": 205
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:55:29.555Z",
+          "durationMs": 425,
+          "screenshot": "step-011.jpg"
+        },
+        {
+          "index": 12,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 247,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:55:33.048Z",
+          "durationMs": 615,
+          "screenshot": "step-012.jpg"
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "type": "exec",
+            "cmd": "sh",
+            "args": [
+              "-c",
+              "ls /root/Documents/invoices/archive | grep -c invoice"
+            ],
+            "stdout_contains": "2"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+          },
+          "passed": true
+        }
+      ],
+      "finalScreenshot": "final.jpg",
+      "finalMessage": "Moved the two oldest invoices into the new `archive` folder.",
+      "usage": {
+        "inputTokens": 75435,
+        "outputTokens": 763,
+        "costUsd": 0.0160026
+      }
+    },
+    {
+      "runIndex": 2,
+      "sessionId": "ZGVza3RvcC1wb29sLWktMDU5YzlhMDg0YzIyMDc3ZDg6dm1fMDAwODE0OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4ODM4OTc3MTU4Ng.PJn6YdNGaa8ASJmUSoa3rViZL8xGJCTqC_3BuxtSnwY",
+      "status": "passed",
+      "startedAt": "2026-09-02T22:55:42.035Z",
+      "finishedAt": "2026-09-02T22:57:09.156Z",
+      "durationMs": 87121,
+      "steps": [
+        {
+          "index": 0,
+          "name": "screenshot",
+          "input": {
+            "type": "screenshot"
+          },
+          "startedAt": "2026-09-02T22:56:17.695Z",
+          "durationMs": 0
+        },
+        {
+          "index": 1,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "SHIFT",
+              "N"
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:23.764Z",
+          "durationMs": 355
+        },
+        {
+          "index": 2,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "archive"
+          },
+          "startedAt": "2026-09-02T22:56:27.958Z",
+          "durationMs": 2138
+        },
+        {
+          "index": 3,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:30.097Z",
+          "durationMs": 484
+        },
+        {
+          "index": 4,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 389,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:56:35.621Z",
+          "durationMs": 513
+        },
+        {
+          "index": 5,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:56:36.135Z",
+          "durationMs": 1090
+        },
+        {
+          "index": 6,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "X"
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:37.225Z",
+          "durationMs": 714
+        },
+        {
+          "index": 7,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:56:42.376Z",
+          "durationMs": 797
+        },
+        {
+          "index": 8,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "V"
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:43.174Z",
+          "durationMs": 530
+        },
+        {
+          "index": 9,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ALT",
+              "LEFT"
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:47.661Z",
+          "durationMs": 677
+        },
+        {
+          "index": 10,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 390,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:56:57.366Z",
+          "durationMs": 677
+        },
+        {
+          "index": 11,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:56:58.043Z",
+          "durationMs": 1451
+        },
+        {
+          "index": 12,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 532,
+                "y": 205
+              },
+              {
+                "x": 487,
+                "y": 205
+              },
+              {
+                "x": 415,
+                "y": 205
+              },
+              {
+                "x": 347,
+                "y": 205
+              },
+              {
+                "x": 302,
+                "y": 205
+              },
+              {
+                "x": 248,
+                "y": 205
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:56:59.495Z",
+          "durationMs": 643
+        },
+        {
+          "index": 13,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:57:03.644Z",
+          "durationMs": 579
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "type": "exec",
+            "cmd": "sh",
+            "args": [
+              "-c",
+              "ls /root/Documents/invoices/archive | grep -c invoice"
+            ],
+            "stdout_contains": "2"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+          },
+          "passed": true
+        }
+      ],
+      "finalScreenshot": "final.jpg",
+      "finalMessage": "Moved the two oldest invoices into the new `archive` folder.",
+      "usage": {
+        "inputTokens": 50759,
+        "outputTokens": 600,
+        "costUsd": 0.010871800000000001
+      }
+    },
+    {
+      "runIndex": 3,
+      "sessionId": "ZGVza3RvcC1wb29sLWktMDU5YzlhMDg0YzIyMDc3ZDg6dm1fMDAwODEzOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4ODM4OTc5OTQwNg.Wahr1j8RomOTT5RVvWiKpJ0gS50RXmHnPbPpr6koB84",
+      "status": "passed",
+      "startedAt": "2026-09-02T22:55:42.111Z",
+      "finishedAt": "2026-09-02T22:59:58.184Z",
+      "durationMs": 256073,
+      "steps": [
+        {
+          "index": 0,
+          "name": "screenshot",
+          "input": {
+            "type": "screenshot"
+          },
+          "startedAt": "2026-09-02T22:57:03.379Z",
+          "durationMs": 0
+        },
+        {
+          "index": 1,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 532,
+            "y": 438
+          },
+          "startedAt": "2026-09-02T22:57:33.278Z",
+          "durationMs": 400
+        },
+        {
+          "index": 2,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "SHIFT",
+              "N"
+            ]
+          },
+          "startedAt": "2026-09-02T22:57:33.679Z",
+          "durationMs": 456
+        },
+        {
+          "index": 3,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "archive"
+          },
+          "startedAt": "2026-09-02T22:57:46.483Z",
+          "durationMs": 694
+        },
+        {
+          "index": 4,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 429,
+            "y": 381
+          },
+          "startedAt": "2026-09-02T22:57:47.178Z",
+          "durationMs": 436
+        },
+        {
+          "index": 5,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 388,
+            "y": 207
+          },
+          "startedAt": "2026-09-02T22:58:00.259Z",
+          "durationMs": 1528
+        },
+        {
+          "index": 6,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 207
+          },
+          "startedAt": "2026-09-02T22:58:01.787Z",
+          "durationMs": 1160
+        },
+        {
+          "index": 7,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "X"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:13.942Z",
+          "durationMs": 558
+        },
+        {
+          "index": 8,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 247,
+            "y": 206
+          },
+          "startedAt": "2026-09-02T22:58:14.500Z",
+          "durationMs": 705
+        },
+        {
+          "index": 9,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "V"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:33.435Z",
+          "durationMs": 403
+        },
+        {
+          "index": 10,
+          "name": "wait",
+          "input": {
+            "type": "wait"
+          },
+          "startedAt": "2026-09-02T22:58:33.840Z",
+          "durationMs": 2001
+        },
+        {
+          "index": 11,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ALT",
+              "UP"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:54.749Z",
+          "durationMs": 351
+        },
+        {
+          "index": 12,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 389,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:59:17.193Z",
+          "durationMs": 445
+        },
+        {
+          "index": 13,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 530,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:59:17.638Z",
+          "durationMs": 1344
+        },
+        {
+          "index": 14,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 530,
+                "y": 204
+              },
+              {
+                "x": 487,
+                "y": 204
+              },
+              {
+                "x": 407,
+                "y": 204
+              },
+              {
+                "x": 328,
+                "y": 204
+              },
+              {
+                "x": 247,
+                "y": 204
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:59:18.982Z",
+          "durationMs": 550
+        },
+        {
+          "index": 15,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:59:37.414Z",
+          "durationMs": 707
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "type": "exec",
+            "cmd": "sh",
+            "args": [
+              "-c",
+              "ls /root/Documents/invoices/archive | grep -c invoice"
+            ],
+            "stdout_contains": "2"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+          },
+          "passed": true
+        }
+      ],
+      "finalScreenshot": "final.jpg",
+      "finalMessage": "Created an `archive` folder and moved the two oldest invoices into it.",
+      "usage": {
+        "inputTokens": 62354,
+        "outputTokens": 661,
+        "costUsd": 0.013264000000000001
+      }
+    },
+    {
+      "runIndex": 4,
+      "sessionId": "ZGVza3RvcC1wb29sLWktMDU5YzlhMDg0YzIyMDc3ZDg6dm1fMDAwODE2OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4ODM4OTg1ODI5MQ.G1T2z2UR7eyfRK3h7bhLZ2Q3U16p8rWW3-m8sn27LhA",
+      "status": "passed",
+      "startedAt": "2026-09-02T22:57:10.402Z",
+      "finishedAt": "2026-09-02T22:59:59.876Z",
+      "durationMs": 169474,
+      "steps": [
+        {
+          "index": 0,
+          "name": "screenshot",
+          "input": {
+            "type": "screenshot"
+          },
+          "startedAt": "2026-09-02T22:57:45.530Z",
+          "durationMs": 0
+        },
+        {
+          "index": 1,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "SHIFT",
+              "N"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:00.660Z",
+          "durationMs": 584
+        },
+        {
+          "index": 2,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "archive"
+          },
+          "startedAt": "2026-09-02T22:58:01.245Z",
+          "durationMs": 1054
+        },
+        {
+          "index": 3,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:02.303Z",
+          "durationMs": 422
+        },
+        {
+          "index": 4,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 389,
+            "y": 215
+          },
+          "startedAt": "2026-09-02T22:58:21.755Z",
+          "durationMs": 799
+        },
+        {
+          "index": 5,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 215
+          },
+          "startedAt": "2026-09-02T22:58:22.554Z",
+          "durationMs": 1992
+        },
+        {
+          "index": 6,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "X"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:24.546Z",
+          "durationMs": 641
+        },
+        {
+          "index": 7,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 246,
+            "y": 205
+          },
+          "startedAt": "2026-09-02T22:58:44.797Z",
+          "durationMs": 769
+        },
+        {
+          "index": 8,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "V"
+            ]
+          },
+          "startedAt": "2026-09-02T22:58:45.566Z",
+          "durationMs": 630
+        },
+        {
+          "index": 9,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "CTRL",
+              "L"
+            ]
+          },
+          "startedAt": "2026-09-02T22:59:00.004Z",
+          "durationMs": 683
+        },
+        {
+          "index": 10,
+          "name": "type",
+          "input": {
+            "type": "type",
+            "text": "/root/Documents/invoices/"
+          },
+          "startedAt": "2026-09-02T22:59:00.687Z",
+          "durationMs": 1831
+        },
+        {
+          "index": 11,
+          "name": "keypress",
+          "input": {
+            "type": "keypress",
+            "keys": [
+              "ENTER"
+            ]
+          },
+          "startedAt": "2026-09-02T22:59:02.519Z",
+          "durationMs": 439
+        },
+        {
+          "index": 12,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": null,
+            "x": 389,
+            "y": 215
+          },
+          "startedAt": "2026-09-02T22:59:16.332Z",
+          "durationMs": 572
+        },
+        {
+          "index": 13,
+          "name": "click",
+          "input": {
+            "type": "click",
+            "button": "left",
+            "keys": [
+              "CTRL"
+            ],
+            "x": 532,
+            "y": 215
+          },
+          "startedAt": "2026-09-02T22:59:16.905Z",
+          "durationMs": 1217
+        },
+        {
+          "index": 14,
+          "name": "drag",
+          "input": {
+            "type": "drag",
+            "keys": null,
+            "path": [
+              {
+                "x": 532,
+                "y": 215
+              },
+              {
+                "x": 492,
+                "y": 212
+              },
+              {
+                "x": 430,
+                "y": 207
+              },
+              {
+                "x": 365,
+                "y": 205
+              },
+              {
+                "x": 310,
+                "y": 204
+              },
+              {
+                "x": 245,
+                "y": 204
+              }
+            ]
+          },
+          "startedAt": "2026-09-02T22:59:18.122Z",
+          "durationMs": 565
+        },
+        {
+          "index": 15,
+          "name": "double_click",
+          "input": {
+            "type": "double_click",
+            "keys": null,
+            "x": 245,
+            "y": 204
+          },
+          "startedAt": "2026-09-02T22:59:33.031Z",
+          "durationMs": 576
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "type": "exec",
+            "cmd": "sh",
+            "args": [
+              "-c",
+              "ls /root/Documents/invoices/archive | grep -c invoice"
+            ],
+            "stdout_contains": "2"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "type": "file_exists",
+            "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+          },
+          "passed": true
+        }
+      ],
+      "finalScreenshot": "final.jpg",
+      "finalMessage": "Created the `archive` folder and moved the two oldest invoices into it.",
+      "usage": {
+        "inputTokens": 40910,
+        "outputTokens": 661,
+        "costUsd": 0.008975200000000001
+      }
+    }
+  ],
+  "metrics": {
+    "requested": 5,
+    "n": 5,
+    "passed": 5,
+    "errored": 0,
+    "skipped": 0,
+    "passAt1": 1,
+    "passAt1Lower": 0.565508505247919,
+    "passAt1Upper": 1,
+    "endToEnd": 1,
+    "passPowK": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1
+    },
+    "passPowKLower": {
+      "1": 0.565508505247919,
+      "2": 0.3197998695077356,
+      "3": 0.1808495461837991,
+      "4": 0.10227195653716471,
+      "5": 0.057835661270112144
+    },
+    "passAtK": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "5": 1
+    },
+    "meanSteps": 16,
+    "medianSteps": 16,
+    "p95Steps": 20,
+    "minSteps": 13,
+    "maxSteps": 21,
+    "meanDurationMs": 157737.6,
+    "medianDurationMs": 138080,
+    "p95DurationMs": 238753.2,
+    "totalCostUsd": 0.0681132,
+    "costPerSuccessUsd": 0.01362264
+  },
+  "failures": [],
+  "provenance": {
+    "passkVersion": "0.1.0",
+    "gitCommit": "aa5e75e",
+    "provider": "openai",
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "concurrency": 2,
+    "node": "v24.18.0",
+    "packages": {
+      "@solarisdk/sdk": "unknown",
+      "@anthropic-ai/sdk": "unknown",
+      "openai": "unknown"
+    },
+    "taskHash": "32d4cac66da39a63",
+    "task": {
+      "template": "default",
+      "resolution": "1280x720",
+      "max_steps": 40,
+      "id": "rename-invoices",
+      "name": "Archive the oldest invoices",
+      "setup": [
+        {
+          "exec": "sh",
+          "args": [
+            "-c",
+            "mkdir -p /root/Documents/invoices && cd /root/Documents/invoices && for d in 2024-11-03 2025-01-15 2025-03-02 2025-06-20 2025-08-09; do printf 'INVOICE %s\n' $d > invoice-$d.txt; done"
+          ]
+        },
+        {
+          "open": "thunar",
+          "args": [
+            "/root/Documents/invoices"
+          ]
+        },
+        {
+          "wait": 4
+        }
+      ],
+      "prompt": "The invoices folder is open in the file manager. Move the two oldest invoices into an archive folder next to them.\n",
+      "checks": [
+        {
+          "type": "exec",
+          "cmd": "sh",
+          "args": [
+            "-c",
+            "ls /root/Documents/invoices/archive | grep -c invoice"
+          ],
+          "stdout_contains": "2"
+        },
+        {
+          "type": "file_exists",
+          "path": "/root/Documents/invoices/archive/invoice-2024-11-03.txt"
+        },
+        {
+          "type": "file_exists",
+          "path": "/root/Documents/invoices/archive/invoice-2025-01-15.txt"
+        }
+      ]
+    },
+    "budgetUsd": 0.3
+  }
+}

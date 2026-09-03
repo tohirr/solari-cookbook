@@ -1,0 +1,123 @@
+{
+  "a": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/notes-nodir",
+    "taskId": "notes-nodir",
+    "taskName": "Save a note in Mousepad (no Documents folder)",
+    "prompt": "A text editor is open. Type the line \"standup 10am, bring the Q3 numbers\" into it and save the file as notes.txt inside the Documents folder.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dl57iyjtotlb",
+    "taskHash": "50cb7811b2e6f066",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"sh\",\"args\":[\"-c\",\"cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null\"],\"stdout_contains\":\"standup 10am, bring the Q3 numbers\"}]",
+    "metrics": {
+      "requested": 5,
+      "n": 5,
+      "passed": 2,
+      "errored": 0,
+      "skipped": 0,
+      "passAt1": 0.4,
+      "passAt1Lower": 0.11761823115925325,
+      "passAt1Upper": 0.769280067791163,
+      "endToEnd": 0.4,
+      "passPowK": {
+        "1": 0.4,
+        "2": 0.1,
+        "3": 0,
+        "4": 0,
+        "5": 0
+      },
+      "passPowKLower": {
+        "1": 0.11761823115925325,
+        "2": 0.013834048301031533,
+        "3": 0.0016271362909390016,
+        "4": 0.00019138089239527343,
+        "5": 0.000022509882041211443
+      },
+      "passAtK": {
+        "1": 0.4,
+        "2": 0.7,
+        "3": 0.9,
+        "4": 1,
+        "5": 1
+      },
+      "meanSteps": 26,
+      "medianSteps": 30,
+      "p95Steps": 32.6,
+      "minSteps": 13,
+      "maxSteps": 33,
+      "meanDurationMs": 93101.2,
+      "medianDurationMs": 101359,
+      "p95DurationMs": 111694.6,
+      "totalCostUsd": 0.10352460000000001,
+      "costPerSuccessUsd": 0.0277332
+    }
+  },
+  "b": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/notes",
+    "taskId": "notes",
+    "taskName": "Save a note in Mousepad",
+    "prompt": "A text editor is open. Type the line \"standup 10am, bring the Q3 numbers\" into it and save the file as notes.txt inside the Documents folder.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dl5517k5qewv",
+    "taskHash": "00c097faf5ca6284",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"sh\",\"args\":[\"-c\",\"cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null\"],\"stdout_contains\":\"standup 10am, bring the Q3 numbers\"}]",
+    "metrics": {
+      "requested": 5,
+      "n": 5,
+      "passed": 5,
+      "errored": 0,
+      "skipped": 0,
+      "passAt1": 1,
+      "passAt1Lower": 0.565508505247919,
+      "passAt1Upper": 1,
+      "endToEnd": 1,
+      "passPowK": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "passPowKLower": {
+        "1": 0.565508505247919,
+        "2": 0.3197998695077356,
+        "3": 0.1808495461837991,
+        "4": 0.10227195653716471,
+        "5": 0.057835661270112144
+      },
+      "passAtK": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "meanSteps": 9,
+      "medianSteps": 9,
+      "p95Steps": 9,
+      "minSteps": 9,
+      "maxSteps": 9,
+      "meanDurationMs": 75115,
+      "medianDurationMs": 65836,
+      "p95DurationMs": 105498,
+      "totalCostUsd": 0.0255146,
+      "costPerSuccessUsd": 0.0051029199999999995
+    }
+  },
+  "heldFixed": [
+    "prompt",
+    "model",
+    "checks"
+  ],
+  "changed": [
+    "snapshot"
+  ],
+  "warnings": [],
+  "delta": {
+    "passAt1": 0.6,
+    "medianSteps": -21,
+    "p95Steps": -23.6,
+    "medianDurationMs": -35523,
+    "costPerSuccessUsd": -0.02263028
+  },
+  "fisherP": 0.1666666666666663
+}

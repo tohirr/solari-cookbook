@@ -2,11 +2,12 @@
 
 **Does your computer-use agent pass twice?**
 
-> **Status: work in progress, building in public.** `prepare`, `probe`, `run`
-> and `report` all run end to end on Solari today with the OpenAI agent. The
-> Claude agent loop is written but not yet exercised against a live key. Next
-> up: a designed report page, a two-model comparison on one snapshot, and a
-> third task on the office template.
+> **Status: built in public, evidence published.** Nine tasks across three
+> Solari templates, 250+ verified runs, one controlled three-way experiment,
+> and a mock accounts-payable workflow, all on a budget model for under $4 of
+> model spend. Every number is in [`evidence/`](evidence/) with screenshots
+> and traces. The Claude agent loop is written but unexercised for want of a
+> working key; the OpenAI loop produced everything here.
 
 `passk` forks one Solari desktop snapshot *k* times, runs the same task on every
 fork with the same agent, and tells you two things a single demo never will:
@@ -104,6 +105,14 @@ Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
 
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
+
+## Evidence
+
+[`evidence/`](evidence/) holds every bench cited in this README: `bench.json`
+with every action, check, provenance record and task hash; the report page;
+the final screenshot of every run; and every screenshot of every failed run
+and of the shortest passing run. Comparison folders hold the paired results.
+`sh scripts/curate-evidence.sh` rebuilds it from `runs/`.
 
 ## Tasks that ship
 

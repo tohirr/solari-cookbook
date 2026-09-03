@@ -9,6 +9,7 @@
  *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold
  *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
+ *   passk export  runs/<dir> evidence/<name>  copy a bench with only the screenshots that carry proof
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
@@ -16,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
+import { exportBench } from "./export.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
 import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
@@ -69,11 +71,18 @@ async function main() {
       if (!dirB) { console.error("compare needs two bench directories"); process.exit(1); }
       const c = compareBenches(must(target), dirB);
       console.log(formatComparison(c));
-      const outDir = path.join(config.runsDir, `compare-${new Date().toISOString().replace(/[:.]/g, "-")}`);
+      const outDir = flag("out") ? path.resolve(flag("out")!) : path.join(config.runsDir, `compare-${new Date().toISOString().replace(/[:.]/g, "-")}`);
       fs.mkdirSync(outDir, { recursive: true });
       fs.writeFileSync(path.join(outDir, "compare.json"), JSON.stringify(c, null, 2));
       fs.writeFileSync(path.join(outDir, "compare.html"), renderCompare(c, loadBench(c.a.dir), loadBench(c.b.dir), outDir));
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
+      return;
+    }
+    case "export": {
+      const out = process.argv[4];
+      if (!out) { console.error("export needs a source bench dir and a destination dir"); process.exit(1); }
+      const { bench, files, bytes } = exportBench(must(target), out);
+      console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${files} screenshots, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
       return;
     }
     case "classify": {
@@ -116,7 +125,8 @@ async function main() {
                             [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
-  passk compare <runs/A> <runs/B>
+  passk compare <runs/A> <runs/B> [--out dir]
+  passk export  <runs/dir> <evidence/dir>
   passk classify <runs/dir>
 
   --budget N         stop launching new runs once estimated model spend reaches $N
