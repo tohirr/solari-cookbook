@@ -11,6 +11,7 @@
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *   passk export  runs/<dir> evidence/<name>  copy a bench with only the screenshots that carry proof
  *   passk validate tasks/notes.yaml           prove the checks fail before and pass after the task's golden steps
+ *   passk recommend runs/<dir>                what to change next, and what to keep fixed, from a finished bench
  *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
  *
@@ -22,14 +23,15 @@ import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
 import { doctor } from "./doctor.js";
 import { exportBench } from "./export.js";
+import { recommendDir } from "./recommend.js";
 import { validateTask } from "./validate.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
-import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
+import { backfillCosts, computeMetrics, regrade, runsForLowerBound, wilson } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
 import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
-import { findResumable, runBench } from "./runner.js";
+import { findLatest, findResumable, runBench } from "./runner.js";
 import type { BenchResult } from "./types.js";
 
 function flag(name: string, fallback?: string): string | undefined {
@@ -61,9 +63,11 @@ async function main() {
       let resumeDir: string | undefined;
       if (has("resume")) {
         const given = flag("resume");
-        resumeDir = given && !given.startsWith("--") && fs.existsSync(path.join(given, "bench.json")) ? given : findResumable(task.id);
-        if (!resumeDir) { console.error(`nothing to resume for "${task.id}"`); process.exit(1); }
+        resumeDir = given && !given.startsWith("--") && fs.existsSync(path.join(given, "bench.json")) ? given : findResumable(task.id) ?? findLatest(task.id);
+        if (!resumeDir) { console.error(`nothing to resume or extend for "${task.id}"`); process.exit(1); }
       }
+      // What this sample size can establish, said before spending.
+      feasibility(k, flag("require-lower") ? Number(flag("require-lower")) : undefined);
       if (!resumeDir && !flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
       const { bench, dir } = await runBench({
         task, k, resumeDir,
@@ -91,6 +95,10 @@ async function main() {
       fs.writeFileSync(path.join(outDir, "compare.json"), JSON.stringify(c, null, 2));
       fs.writeFileSync(path.join(outDir, "compare.html"), renderCompare(c, loadBench(c.a.dir), loadBench(c.b.dir), outDir));
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
+      return;
+    }
+    case "recommend": {
+      console.log(recommendDir(must(target)));
       return;
     }
     case "validate": {
@@ -161,13 +169,14 @@ async function main() {
   passk probe   <task.yaml>
   passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
                             [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
-                            [--resume [runs/dir]]   finish a bench that was interrupted
+                            [--resume [runs/dir]]   finish an interrupted bench, or extend a finished one with a larger --k
                             [--safety deny|allow]   what to do when the model raises a safety check (default deny)
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B> [--out dir]
   passk export  <runs/dir> <evidence/dir>
   passk validate <task.yaml> [--snapshot snap_…]
+  passk recommend <runs/dir>
   passk doctor
   passk sweep
   passk classify <runs/dir>
@@ -176,6 +185,20 @@ async function main() {
   --require P        exit 2 unless observed pass@1 >= P
   --require-lower P  exit 2 unless the 95% lower bound on pass@1 >= P (the stricter gate)`);
       process.exit(cmd ? 1 : 0);
+  }
+}
+
+/**
+ * Tell the user what k can prove before they pay for it. With --require-lower,
+ * refuse a sample that cannot reach the requested bound even if every run passes.
+ */
+function feasibility(k: number, requireLower: number | undefined): void {
+  const best = wilson(k, k).lower;
+  console.log(`k=${k}: if every run passes, the 95% lower bound on the pass rate is ${(best * 100).toFixed(0)}%`);
+  if (requireLower !== undefined && best < requireLower) {
+    const need = runsForLowerBound(requireLower);
+    console.error(`--require-lower ${requireLower} cannot be met with k=${k}: even ${k}/${k} gives ${(best * 100).toFixed(0)}%. About ${need} consecutive passes are needed. Raise --k or lower the requirement.`);
+    process.exit(2);
   }
 }
 

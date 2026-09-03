@@ -195,6 +195,59 @@ success, and Fisher's exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
 
+## How many runs, and what to change
+
+Both are yours to decide. passk's job is to make each choice legible before
+you pay for it, and to keep the experiment honest afterwards.
+
+**How many runs.** Every run is one execution; a *condition* is k runs with
+nothing changed between them. What an all-pass condition can establish:
+
+| Runs per condition | Lower bound if every run passes | Good for |
+|---:|---:|---|
+| 3 | 44% | does the task work at all |
+| 5 | 57% | choosing between two interventions |
+| 10 | 72% | the configuration you keep |
+| 35 | 90% | a "90% reliable" claim |
+| 73 | 95% | a "95% reliable" claim |
+
+`passk run` prints this for the k you chose, and with `--require-lower` it
+refuses to start a sample that could not meet the requirement even if every
+run passed. Start small, then extend: `--resume` with a larger `--k` adds
+runs to a finished bench on the same snapshot.
+
+**What to change.** Exactly one thing per experiment, on the same snapshot
+with the same checks: a prompt, an environment detail, a model, a plan. The
+failure evidence from the last bench says which. `passk recommend
+runs/<dir>` reads a finished bench and suggests the category of the next
+experiment with what to keep fixed; it is a recommendation, not a diagnosis,
+and it will never rewrite your prompt or switch your model. Roughly:
+
+| The evidence shows | Try next |
+|---|---|
+| failures reported success anyway | a verification step that reads state back, not a screenshot |
+| runs interpreted the task differently | one clarification at a time (`passk probe` lists candidates) |
+| same plan, environment flinched | an environment change, not a prompt change |
+| same goal, different routes | a prompt that names the short strategy; compare effort and cost |
+| every failure hit the step cap | a higher cap before blaming the agent |
+| losses to infrastructure or the verifier | fix that first; the agent is not the variable |
+
+**The loop that produced the results in `evidence/`:** validate the
+verifier; run a baseline at k=3; read the failed runs; choose one
+intervention; run A against B at k=5 each; compare pass rate, interval,
+effort and cost; decide; run k=10 or more only for the configuration you
+keep, and save it as the regression baseline. Nothing stops automatically:
+the planned k and the completed count are both recorded, and stopping is
+your call.
+
+**Who decides what.** You: which workflow matters, what counts as success,
+acceptable risk, budget, k, which change to test, whether to ship. passk:
+equivalent runs, whether checks passed, intervals, whether a comparison
+changed more than one thing, whether a claim exceeds the evidence, a
+failure hypothesis, a suggested next experiment, and whether a gate passes.
+Never passk: rewriting a prompt, switching a model, declaring anything safe
+for production, or ignoring a failed check.
+
 ## Reading the numbers honestly
 
 Ten passes out of ten is an observation, not a proof of 100% reliability. Every

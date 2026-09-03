@@ -23,6 +23,16 @@ export function wilson(successes: number, n: number, z = 1.96): { lower: number;
 }
 
 /**
+ * The smallest all-pass sample whose Wilson lower bound reaches `target`.
+ * 0.70 → 10, 0.90 → 35, 0.95 → 73. This is what a requested confidence
+ * costs, and the tool says so before any money is spent.
+ */
+export function runsForLowerBound(target: number, z = 1.96): number {
+  for (let n = 1; n <= 10_000; n++) if (wilson(n, n, z).lower >= target) return n;
+  return Infinity;
+}
+
+/**
  * pass@k and pass^k from n attempted runs with c passes.
  *
  * pass@k  = P(at least one of k passes) = 1 - C(n-c, k) / C(n, k)   (Chen et al. 2021)

@@ -61,6 +61,13 @@ export function findResumable(taskId: string): string | undefined {
   return undefined;
 }
 
+/** Newest bench directory for a task, any status. */
+export function findLatest(taskId: string): string | undefined {
+  if (!fs.existsSync(config.runsDir)) return undefined;
+  const d = fs.readdirSync(config.runsDir).filter((x) => x.startsWith(`${taskId}-`) && fs.existsSync(path.join(config.runsDir, x, "bench.json"))).sort().reverse()[0];
+  return d ? path.join(config.runsDir, d) : undefined;
+}
+
 export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchResult; dir: string }> {
   const { task, k } = opts;
   const concurrency = opts.concurrency ?? config.concurrency;
@@ -73,11 +80,13 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   if (opts.resumeDir) {
     dir = path.resolve(opts.resumeDir);
     const prior = JSON.parse(fs.readFileSync(path.join(dir, "bench.json"), "utf8")) as BenchResult;
-    if (prior.status === "complete") throw new Error(`${dir} is already complete; nothing to resume`);
     existing = readCompletedRuns(dir);
+    if (prior.status === "complete" && k <= prior.k) throw new Error(`${dir} is complete with k=${prior.k}; pass a larger --k to extend it`);
     startedAt = prior.startedAt;
     snapshotId = prior.snapshotId;
-    console.log(`resuming ${task.id}: ${existing.length}/${prior.k} runs already on disk`);
+    // Extending a finished bench ("run 5, look, then 30") keeps the same
+    // snapshot so the new runs are exchangeable with the old ones.
+    console.log(`${prior.status === "complete" ? "extending" : "resuming"} ${task.id}: ${existing.length} runs on disk, target ${k}`);
   } else {
     snapshotId = opts.snapshotId ?? readSnapshots()[task.id] ?? (isFake() ? "snap_fake" : "");
     if (!snapshotId) throw new Error(`no snapshot for task "${task.id}" — run \`passk prepare\` first`);

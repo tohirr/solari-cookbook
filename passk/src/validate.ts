@@ -41,11 +41,15 @@ export async function validateTask(task: Task, snapshotId = readSnapshots()[task
     initial = await runChecks(desktop, task.checks);
     const again = await runChecks(desktop, task.checks);
     for (const [i, c] of initial.entries()) {
+      const inv = !!task.checks[i].invariant;
       if (c.errored) problems.push(`check ${i} (${label(c)}) could not run on the untouched state: ${c.detail}`);
-      else if (c.passed) problems.push(`check ${i} (${label(c)}) already passes before any agent acts; it cannot tell success from doing nothing`);
+      else if (inv && !c.passed) problems.push(`invariant check ${i} (${label(c)}) fails on the untouched state; it should hold before the agent acts: ${c.detail ?? ""}`);
+      else if (!inv && c.passed) problems.push(`check ${i} (${label(c)}) already passes before any agent acts; it cannot tell success from doing nothing (mark it \`invariant: true\` if it is a guard)`);
       if (c.passed !== again[i].passed) problems.push(`check ${i} (${label(c)}) gave different answers on two consecutive runs`);
     }
-    notes.push(`${initial.filter((c) => !c.passed && !c.errored).length}/${initial.length} checks fail on the untouched snapshot, as they should`);
+    const goals = task.checks.filter((c) => !c.invariant).length, invs = task.checks.length - goals;
+    notes.push(`${initial.filter((c, i) => !task.checks[i].invariant && !c.passed && !c.errored).length}/${goals} goal checks fail on the untouched snapshot, as they should${invs ? `; ${initial.filter((c, i) => task.checks[i].invariant && c.passed).length}/${invs} invariants hold` : ""}`);
+    if (goals === 0) problems.push("every check is an invariant; nothing distinguishes success from doing nothing");
 
     // 2. Golden state: after the task's own recipe for success, every check should pass.
     if (task.golden?.length) {

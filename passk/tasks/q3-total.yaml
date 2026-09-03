@@ -22,8 +22,11 @@ golden:
   - exec: sh
     args: ["-c", "printf 'Region,Amount\nLagos,1200\nAbuja,850\nKano,430\nIbadan,2100\nPort Harcourt,675\nTotal,5255\n' > /root/Documents/q3-sales.csv"]
 checks:
-  # "Passed" must mean the sheet survived intact, not just that a total appeared somewhere.
+  # "Passed" must mean the sheet survived intact, not just that a total appeared
+  # somewhere. The two guards are invariants: true before the agent acts, and
+  # they must still be true after.
   - type: exec
+    invariant: true
     cmd: sh
     args: ["-c", "head -1 /root/Documents/q3-sales.csv"]
     stdout_contains: "Region,Amount"
@@ -32,6 +35,7 @@ checks:
     args: ["-c", "grep -c . /root/Documents/q3-sales.csv"]
     stdout_contains: "7"
   - type: exec
+    invariant: true
     cmd: sh
     args: ["-c", "grep -E '^Port Harcourt,675$' /root/Documents/q3-sales.csv"]
     stdout_contains: "Port Harcourt,675"

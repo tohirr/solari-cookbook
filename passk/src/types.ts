@@ -5,15 +5,20 @@
  * desktop. A Bench is k runs of the same task from the same snapshot.
  */
 
-/** One assertion evaluated inside the desktop after the agent stops. */
-export type Check =
+/**
+ * One assertion evaluated inside the desktop after the agent stops.
+ * `invariant: true` marks a guard that must hold before AND after the agent
+ * acts (the data survived) rather than a goal that must become true. Both
+ * grade the run; `passk validate` treats them differently.
+ */
+export type Check = ({ invariant?: boolean }) & (
   | { type: "file_exists"; path: string }
   | { type: "file_contains"; path: string; text: string }
   | { type: "file_equals"; path: string; text: string }
   /** Run a command. With `stdout_contains` and no `exit_code`, only the output is judged; otherwise exit 0 (or `exit_code`) is required. */
   | { type: "exec"; cmd: string; args?: string[]; stdout_contains?: string; exit_code?: number }
-  /** Ask Claude to judge the final screenshot against a rubric. */
-  | { type: "screenshot_judge"; rubric: string };
+  /** Ask the model to judge the final screenshot against a rubric. */
+  | { type: "screenshot_judge"; rubric: string });
 
 /** A setup step run before the snapshot is taken (so every fork starts here). */
 export type SetupStep =
