@@ -69,14 +69,29 @@ test("stop reasons are recorded and a crash after completing the task still coun
   assert.equal(by[1].status, "failed");
   assert.equal(by[2].status, "failed");
   assert.equal(by[3].status, "failed"); assert.equal(by[3].stoppedBy, "max_steps");
-  assert.equal(by[4].status, "errored"); assert.match(by[4].error!, /429/);
+  assert.equal(by[4].status, "errored"); assert.equal(by[4].errorKind, "provider"); assert.match(by[4].error!, /429/);
   assert.equal(by[5].status, "passed", "the state is right; the agent crashing afterwards is a behavior note");
   assert.equal(by[5].stoppedBy, "error");
   assert.equal(by[6].status, "passed"); assert.equal(by[6].steps.length, 30);
-  // The provider error had steps, so it is an attempted run, not an infrastructure loss.
-  assert.equal(bench.metrics.errored, 0);
-  assert.equal(bench.metrics.n, 7);
+  // A provider outage is not the agent's reliability: lost, not scored, but counted end-to-end.
+  assert.deepEqual(bench.metrics.lost, { solari: 0, provider: 1, verifier: 0 });
+  assert.equal(bench.metrics.errored, 1);
+  assert.equal(bench.metrics.n, 6);
   assert.equal(bench.metrics.passed, 3);
+  assert.ok(Math.abs(bench.metrics.endToEnd - 3 / 7) < 1e-9);
+});
+
+test("a checker crash is a verifier loss, never an agent failure; a safety stop is a failure with its reason", async () => {
+  process.env.PASSK_SCRIPT = "verifier_err,safety,pass";
+  const { bench } = await runBench({ task: task(), k: 3, noClassify: true });
+  const by = Object.fromEntries(bench.runs.map((r) => [r.runIndex, r]));
+  assert.equal(by[0].status, "errored"); assert.equal(by[0].errorKind, "verifier");
+  assert.ok(by[0].checks.some((c) => c.errored));
+  assert.equal(by[1].status, "failed"); assert.equal(by[1].stoppedBy, "safety_check");
+  assert.equal(by[2].status, "passed");
+  assert.deepEqual(bench.metrics.lost, { solari: 0, provider: 0, verifier: 1 });
+  assert.equal(bench.metrics.n, 2);
+  assert.equal(bench.metrics.passed, 1);
 });
 
 test("the budget cap stops launching runs and the shortfall is reported", async () => {

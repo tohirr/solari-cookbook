@@ -5,7 +5,9 @@
 # the evidence folder. Run from passk/.
 set -e
 P="npx tsx src/cli.ts"
-rm -rf evidence && mkdir -p evidence
+# Bench folders are refreshed in place (existing JPEGs are kept, see export.ts);
+# comparison folders are regenerated.
+mkdir -p evidence && rm -rf evidence/compare-*
 
 export_bench() {
   name=$1; src=$(ls -d runs/$2/ 2>/dev/null | tail -1)

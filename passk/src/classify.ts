@@ -17,6 +17,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import { structured } from "./llm.js";
+import { lostKind } from "./metrics.js";
 import type { FailureAnalysis, RunResult, Task, TraceStep } from "./types.js";
 
 const Analysis = z.object({
@@ -60,9 +61,11 @@ export async function classifyFailures(task: Task, runs: RunResult[], benchDir: 
 
   const out: FailureAnalysis[] = [];
   for (const run of failing) {
-    if (run.status === "errored" && !run.steps.length) {
+    const lost = lostKind(run);
+    if (lost) {
+      const why = { solari: "Desktop infrastructure error", provider: "Model provider error after retries", verifier: "The checker could not run" }[lost];
       out.push({ runIndex: run.runIndex, divergenceStep: null, referencePassed, cause: "unknown", confidence: "high",
-        explanation: `Infrastructure error before the agent acted (${run.error}). Not an agent failure; excluded from pass estimates.` });
+        explanation: `${why} (${run.error ?? run.checks.find((c) => c.errored)?.detail ?? "no detail"}). Not an agent failure; not scored.` });
       continue;
     }
     const d = referencePassed && run !== ref ? divergencePoint(ref.steps, run.steps) : null;

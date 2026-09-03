@@ -6,7 +6,7 @@
  */
 import type { Desktop } from "@solarisdk/sdk";
 import { config } from "../config.js";
-import type { Check, TraceStep } from "../types.js";
+import type { Check, ErrorKind, TraceStep } from "../types.js";
 
 export interface AgentRunOptions {
   desktop: Desktop;
@@ -27,8 +27,10 @@ export interface AgentRunOutput {
   steps: TraceStep[];
   finalMessage: string;
   usage: { inputTokens: number; outputTokens: number };
-  stoppedBy: "end_turn" | "max_steps" | "refusal" | "error";
+  stoppedBy: "end_turn" | "max_steps" | "refusal" | "error" | "safety_check";
   error?: string;
+  /** Who was at fault when stoppedBy is "error". */
+  errorKind?: ErrorKind;
 }
 
 export const DEFAULT_SYSTEM = `You are operating a Linux desktop through screenshots and mouse/keyboard actions.

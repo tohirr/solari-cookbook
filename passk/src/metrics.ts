@@ -38,10 +38,24 @@ export function wilson(successes: number, n: number, z = 1.96): { lower: number;
  * attempted; `requested` counts what the user asked for. A fork that never
  * booted is not the agent's fault, but the user still did not get their run.
  */
+/**
+ * A run is "lost" (not scored against the agent) when it errored for a reason
+ * that is not the agent's: the desktop never came up, the model API was down,
+ * or the verifier itself crashed. Older benches carry no errorKind; for them
+ * an errored run with no steps is treated as a Solari loss, matching the rule
+ * that produced their numbers.
+ */
+export function lostKind(r: RunResult): "solari" | "provider" | "verifier" | null {
+  if (r.status !== "errored") return null;
+  if (r.errorKind === "provider" || r.errorKind === "verifier" || r.errorKind === "solari") return r.errorKind;
+  return r.steps.length === 0 ? "solari" : null;
+}
+
 export function computeMetrics(allRuns: RunResult[], requested = allRuns.length): BenchMetrics {
-  const infra = (r: RunResult) => r.status === "errored" && r.steps.length === 0;
-  const errored = allRuns.filter(infra).length;
-  const runs = allRuns.filter((r) => !infra(r));
+  const lost = { solari: 0, provider: 0, verifier: 0 };
+  for (const r of allRuns) { const k = lostKind(r); if (k) lost[k]++; }
+  const errored = lost.solari + lost.provider + lost.verifier;
+  const runs = allRuns.filter((r) => lostKind(r) === null);
   const n = runs.length;
   const c = runs.filter((r) => r.status === "passed").length;
   const ci = wilson(c, n);
@@ -62,6 +76,7 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
     n,
     passed: c,
     errored,
+    lost,
     skipped: Math.max(0, requested - allRuns.length),
     passAt1: n ? c / n : 0,
     passAt1Lower: ci.lower,
@@ -98,6 +113,7 @@ export function percentile(sorted: number[], p: number): number {
 export function regrade(runs: RunResult[]): void {
   for (const r of runs) {
     if (r.status === "errored") continue;
+    if (r.checks.some((c) => c.errored)) { r.status = "errored"; r.errorKind = "verifier"; continue; }
     r.status = r.checks.length > 0 && r.checks.every((c) => c.passed) ? "passed" : "failed";
   }
 }

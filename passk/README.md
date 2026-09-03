@@ -103,6 +103,33 @@ resume it, prove no index ran twice, check every stop reason is accounted
 for, enforce a budget, and push 200 runs through at concurrency 16 in a few
 seconds, all for no money.
 
+## Who gets blamed for what
+
+A run that does not complete normally is put in one of four bins, and only
+the first is scored against the agent:
+
+| Kind | Meaning | Scored? |
+|---|---|---|
+| `agent` | the agent's own doing: gave up, malformed action, crashed on its own logic | yes, as a failure |
+| `provider` | the model API failed after bounded retries (429, 5xx, connection) | no, listed as lost |
+| `solari` | the desktop never came up, or its channel was lost | no, listed as lost |
+| `verifier` | the checker itself could not run; the outcome is unknown | no, listed as lost |
+
+Model calls retry up to three times with exponential backoff and jitter on
+provider-side errors before a run is written off. A checker that cannot reach
+the VM marks its check `errored`, and that run is a verifier loss, never an
+agent failure. All lost runs count in end-to-end completion, so the report
+always shows what the user got as well as what the agent did.
+
+## Safety checks
+
+OpenAI's computer tool flags some actions as potentially consequential and
+asks the caller to acknowledge them. passk **stops the run by default**
+(`stoppedBy: "safety_check"`, scored as a failure with its reason). Set
+`PASSK_SAFETY=allow` or pass `--safety allow` to acknowledge automatically.
+That is only defensible inside a disposable VM with no route to real
+systems, which is what every bench in this repo is, and nowhere else.
+
 ## Reading the numbers honestly
 
 Ten passes out of ten is an observation, not a proof of 100% reliability. Every

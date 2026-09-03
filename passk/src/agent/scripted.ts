@@ -11,6 +11,8 @@
  *   provider_err throws the way a model API outage would
  *   crash_after  writes the right content, then throws (task done, agent died)
  *   slow         passes in 30 steps instead of 8
+ *   verifier_err does the task, then makes the checker's exec throw
+ *   safety       stops on an unacknowledged safety check
  *
  * Behavior repeats cyclically if the script is shorter than k. It records
  * every run index it was asked to execute, so a resume test can prove that
@@ -20,7 +22,7 @@ import type { FakeDesktop } from "../fake/desktop.js";
 import type { AgentRunOptions, AgentRunOutput } from "./index.js";
 import type { Check, TraceStep } from "../types.js";
 
-export type Behavior = "pass" | "fail" | "claim_only" | "hang" | "provider_err" | "crash_after" | "slow";
+export type Behavior = "pass" | "fail" | "claim_only" | "hang" | "provider_err" | "crash_after" | "slow" | "verifier_err" | "safety";
 
 export function parseScript(spec: string | undefined): Behavior[] {
   const out: Behavior[] = [];
@@ -74,10 +76,18 @@ export async function runScriptedAgent(opts: AgentRunOptions & { runIndex?: numb
       return { steps, finalMessage: "", usage, stoppedBy: "max_steps" };
     case "provider_err":
       await act(3);
-      return { steps, finalMessage: "", usage, stoppedBy: "error", error: "429 rate limit exceeded (simulated provider outage)" };
+      return { steps, finalMessage: "", usage, stoppedBy: "error", error: "429 rate limit exceeded (simulated provider outage)", errorKind: "provider" };
     case "crash_after":
       await act(8);
       if (want) await fake.fs.write(want.path, want.text + "\n");
-      return { steps, finalMessage: "", usage, stoppedBy: "error", error: "socket hang up (simulated agent crash after completing)" };
+      return { steps, finalMessage: "", usage, stoppedBy: "error", error: "agent loop threw after completing (simulated)", errorKind: "agent" };
+    case "verifier_err":
+      await act(8);
+      if (want) await fake.fs.write(want.path, want.text + "\n");
+      fake.execThrows = "python3: command not found (simulated verifier crash)";
+      return { steps, finalMessage: "Done.", usage, stoppedBy: "end_turn" };
+    case "safety":
+      await act(2);
+      return { steps, finalMessage: "", usage, stoppedBy: "safety_check", error: "safety check not acknowledged: pending_action" };
   }
 }

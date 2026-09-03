@@ -26,6 +26,8 @@ export class FakeDesktop {
   connected = false;
   /** Screenshots taken; the trace of a scripted run is derived from this. */
   screenshots = 0;
+  /** When set, exec and fs reads throw with this message: simulates a verifier that cannot reach the VM. */
+  execThrows: string | null = null;
 
   constructor(seed: Map<string, string> = new Map()) {
     this.id = `fake_${++seq}`;
@@ -44,16 +46,17 @@ export class FakeDesktop {
   readonly mouse = { move: async () => {}, click: async () => {}, doubleClick: async () => {}, down: async () => {}, up: async () => {}, scroll: async () => {}, drag: async () => {} };
   readonly keyboard = { type: async () => {}, press: async () => {}, hotkey: async () => {}, down: async () => {}, up: async () => {} };
   readonly fs = {
-    readText: async (p: string) => { const v = this.files.get(p); if (v === undefined) throw new Error(`ENOENT ${p}`); return v; },
+    readText: async (p: string) => { if (this.execThrows) throw new Error(this.execThrows); const v = this.files.get(p); if (v === undefined) throw new Error(`ENOENT ${p}`); return v; },
     read: async (p: string) => new TextEncoder().encode(await this.fs.readText(p)),
     write: async (p: string, data: Uint8Array | string) => { this.files.set(p, typeof data === "string" ? data : new TextDecoder().decode(data)); },
-    stat: async (p: string) => { if (!this.files.has(p)) throw new Error(`ENOENT ${p}`); return { path: p, size: this.files.get(p)!.length, isDir: false } as unknown; },
+    stat: async (p: string) => { if (this.execThrows) throw new Error(this.execThrows); if (!this.files.has(p)) throw new Error(`ENOENT ${p}`); return { path: p, size: this.files.get(p)!.length, isDir: false } as unknown; },
     list: async () => [] as unknown[],
     remove: async (p: string) => { this.files.delete(p); },
     mkdir: async () => {},
   };
   /** `cat <path>` and `sh -c "cat <path>"` read the fake filesystem; anything else exits 0 with empty output. */
   async exec(cmd: string, opts?: { args?: string[] }) {
+    if (this.execThrows) throw new Error(this.execThrows);
     const args = opts?.args ?? [];
     const line = cmd === "sh" && args[0] === "-c" ? args[1] : [cmd, ...args].join(" ");
     const m = line.match(/^cat\s+(\S+)/);

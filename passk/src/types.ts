@@ -60,6 +60,8 @@ export interface CheckResult {
   check: Check;
   passed: boolean;
   detail?: string;
+  /** The check itself could not run (command missing, VM unreachable). Not a verdict on the agent. */
+  errored?: boolean;
 }
 
 export type RunStatus = "passed" | "failed" | "errored";
@@ -68,7 +70,16 @@ export type RunStatus = "passed" | "failed" | "errored";
  * How the agent loop ended. Independent of pass/fail: a run can hit the step
  * cap with the task already done, or declare success with nothing saved.
  */
-export type StoppedBy = "end_turn" | "max_steps" | "refusal" | "error";
+export type StoppedBy = "end_turn" | "max_steps" | "refusal" | "error" | "safety_check";
+
+/**
+ * Who is responsible for a run that did not complete normally.
+ *   agent     the agent's own doing (malformed action, gave up, crashed on its own logic): scored as a failure
+ *   provider  the model API (429, 5xx, connection reset after retries): not the agent's reliability, not scored
+ *   solari    the desktop infrastructure (fork never ready, channel lost, concurrency): not scored
+ *   verifier  the checker itself crashed: the run's outcome is unknown, not scored
+ */
+export type ErrorKind = "agent" | "provider" | "solari" | "verifier";
 
 export interface RunResult {
   runIndex: number;
@@ -76,6 +87,8 @@ export interface RunResult {
   /** passed = every check passed, judged inside the VM. Nothing the agent said counts. */
   status: RunStatus;
   stoppedBy?: StoppedBy;
+  /** Set when status is "errored" (or the agent loop ended in error): who was at fault. */
+  errorKind?: ErrorKind;
   startedAt: string;
   finishedAt: string;
   durationMs: number;
@@ -151,8 +164,9 @@ export interface BenchMetrics {
   /** Runs the agent actually attempted (infra errors excluded). */
   n: number;
   passed: number;
-  /** Runs lost to infrastructure before the agent acted. Reported, not scored against the agent. */
+  /** Runs not scored against the agent, by cause. `errored` is their total. */
   errored: number;
+  lost: { solari: number; provider: number; verifier: number };
   /** Runs never started because the budget cap was reached. */
   skipped: number;
   /** Observed pass rate given a ready desktop: passed / n. A point estimate from a small sample. */

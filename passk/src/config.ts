@@ -40,6 +40,14 @@ export const config = {
   get fake() { return process.env.PASSK_FAKE === "1" || detectProvider() === "scripted"; },
   get model() { return process.env.PASSK_MODEL ?? DEFAULT_MODEL[detectProvider()]; },
   effort: (process.env.PASSK_EFFORT ?? "high") as "low" | "medium" | "high" | "xhigh" | "max",
+  /**
+   * What to do when the model raises a safety check on an action (OpenAI's
+   * computer tool does this for consequential-looking steps). "deny" stops the
+   * run; "allow" acknowledges automatically. Allow is only defensible inside a
+   * disposable VM with no route to real systems, which is what a bench is, so
+   * set PASSK_SAFETY=allow in .env for benches and never anywhere else.
+   */
+  get safety() { return (process.env.PASSK_SAFETY === "allow" ? "allow" : "deny") as "allow" | "deny"; },
   concurrency: Number(process.env.PASSK_CONCURRENCY ?? 2),
   /** Rolling idle window for a desktop. Resets on every action. */
   desktopTimeoutMs: 15 * 60_000,

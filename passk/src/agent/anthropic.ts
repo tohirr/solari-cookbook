@@ -8,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { config } from "../config.js";
 import { withReconnect } from "../desktop.js";
-import { anthropic as claude } from "../llm.js";
+import { anthropic as claude, isProviderError, withProviderRetry } from "../llm.js";
 import type { TraceStep } from "../types.js";
 import { runComputerAction } from "./computer.js";
 import { DEFAULT_SYSTEM, type AgentRunOptions, type AgentRunOutput } from "./index.js";
@@ -47,7 +47,7 @@ export async function runAnthropicAgent(opts: AgentRunOptions): Promise<AgentRun
 
     let response: Anthropic.Beta.BetaMessage;
     try {
-      response = await claude().beta.messages.create({
+      response = await withProviderRetry(() => claude().beta.messages.create({
         model: config.model,
         max_tokens: 16000,
         thinking: { type: "adaptive" },
@@ -59,9 +59,9 @@ export async function runAnthropicAgent(opts: AgentRunOptions): Promise<AgentRun
         system: [{ type: "text", text: opts.systemPrompt ?? DEFAULT_SYSTEM, cache_control: { type: "ephemeral" } }],
         tools: [COMPUTER_TOOLSET],
         messages,
-      });
+      }));
     } catch (err) {
-      return { steps, finalMessage, usage, stoppedBy: "error", error: (err as Error).message };
+      return { steps, finalMessage, usage, stoppedBy: "error", error: (err as Error).message, errorKind: isProviderError(err) ? "provider" : "agent" };
     }
 
     usage.inputTokens += response.usage.input_tokens;

@@ -160,13 +160,22 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     // own, hit the cap, or crashed is recorded separately: it is a behavior
     // signal, not a verdict.
     const passed = checks.every((c) => c.passed);
-    const status = agent.stoppedBy === "error" && !passed ? "errored" : passed ? "passed" : "failed";
-    console.log(`${tag} ${status.toUpperCase()} in ${agent.steps.length} steps (${agent.stoppedBy})`);
+    const verifierBroke = checks.some((c) => c.errored);
+    // Priority: a verifier that could not run leaves the outcome unknown; a
+    // provider outage is not the agent's doing; otherwise the checks decide,
+    // and an agent-side crash after a correct result is still a pass.
+    let status: RunResult["status"];
+    let errorKind: RunResult["errorKind"];
+    if (verifierBroke) { status = "errored"; errorKind = "verifier"; }
+    else if (!passed && agent.stoppedBy === "error" && agent.errorKind === "provider") { status = "errored"; errorKind = "provider"; }
+    else if (passed) { status = "passed"; }
+    else { status = "failed"; if (agent.stoppedBy === "error") errorKind = "agent"; }
+    console.log(`${tag} ${status.toUpperCase()}${errorKind ? ` (${errorKind})` : ""} in ${agent.steps.length} steps (${agent.stoppedBy})`);
 
     const result: RunResult = {
       runIndex, sessionId: desktop.id, status, startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: agent.steps, checks,
-      finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error, stoppedBy: agent.stoppedBy,
+      finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error, stoppedBy: agent.stoppedBy, errorKind,
       usage: { ...agent.usage, costUsd: estimateCostUsd(config.model, agent.usage.inputTokens, agent.usage.outputTokens) },
     };
     fs.writeFileSync(path.join(outDir, "run.json"), JSON.stringify(result, null, 2));
@@ -177,7 +186,7 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
     const result: RunResult = {
       runIndex, sessionId: desktop?.id ?? "", status: "errored", startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: [], checks: [],
-      usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 }, error: message, stoppedBy: "error",
+      usage: { inputTokens: 0, outputTokens: 0, costUsd: 0 }, error: message, stoppedBy: "error", errorKind: "solari",
     };
     // An infrastructure error is still a completed attempt at this index: record it
     // so a resume does not silently retry it and shift the sample.

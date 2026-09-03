@@ -18,7 +18,9 @@ export async function runChecks(desktop: Desktop, checks: Check[], finalScreensh
     try {
       out.push(await runCheck(desktop, check, finalScreenshot));
     } catch (err) {
-      out.push({ check, passed: false, detail: `check errored: ${(err as Error).message}` });
+      // The verifier could not run. That is not a verdict on the agent; the
+      // runner turns it into an unscored "verifier" loss.
+      out.push({ check, passed: false, errored: true, detail: `check could not run: ${(err as Error).message}` });
     }
   }
   return out;
@@ -28,7 +30,7 @@ async function runCheck(desktop: Desktop, check: Check, finalScreenshot?: Uint8A
   switch (check.type) {
     case "file_exists": {
       try { await desktop.fs.stat(check.path); return { check, passed: true }; }
-      catch { return { check, passed: false, detail: await whereIsIt(desktop, check.path) }; }
+      catch (err) { if (!isMissing(err)) throw err; return { check, passed: false, detail: await whereIsIt(desktop, check.path) }; }
     }
     case "file_contains": {
       const text = await readOr(desktop, check.path);
@@ -63,8 +65,12 @@ async function runCheck(desktop: Desktop, check: Check, finalScreenshot?: Uint8A
   }
 }
 
+/** A missing file is a result; any other read error means the verifier itself could not run. */
+const isMissing = (err: unknown) => /ENOENT|no such file|does not exist|file not found|(?<!command )not found/i.test(String((err as Error)?.message));
+
 async function readOr(desktop: Desktop, p: string): Promise<string | null> {
-  try { return await desktop.fs.readText(p); } catch { return null; }
+  try { return await desktop.fs.readText(p); }
+  catch (err) { if (isMissing(err)) return null; throw err; }
 }
 
 /**

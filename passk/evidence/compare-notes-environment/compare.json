@@ -13,6 +13,11 @@
       "n": 5,
       "passed": 2,
       "errored": 0,
+      "lost": {
+        "solari": 0,
+        "provider": 0,
+        "verifier": 0
+      },
       "skipped": 0,
       "passAt1": 0.4,
       "passAt1Lower": 0.11761823115925325,
@@ -65,6 +70,11 @@
       "n": 5,
       "passed": 5,
       "errored": 0,
+      "lost": {
+        "solari": 0,
+        "provider": 0,
+        "verifier": 0
+      },
       "skipped": 0,
       "passAt1": 1,
       "passAt1Lower": 0.565508505247919,

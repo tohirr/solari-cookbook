@@ -13,8 +13,9 @@ const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 export function verdict(b: BenchResult): string {
   const m = b.metrics;
   const spread = m.maxSteps > 0 && m.maxSteps >= m.minSteps * 2;
-  if (m.n === 0) return "No run reached the agent; every fork was lost to infrastructure.";
-  const head = `<b>${m.passed} of ${m.n} passed</b>${m.errored ? `, ${m.errored} lost to infrastructure` : ""}.`;
+  if (m.n === 0) return "No run was scorable: every attempt was lost to infrastructure, the provider, or the verifier.";
+  const lostText = [m.lost.solari ? `${m.lost.solari} to desktop infrastructure` : "", m.lost.provider ? `${m.lost.provider} to the model provider` : "", m.lost.verifier ? `${m.lost.verifier} to a checker crash` : ""].filter(Boolean).join(", ");
+  const head = `<b>${m.passed} of ${m.n} passed</b>${lostText ? `, ${lostText.replace(/^(\d+)/, "$1 lost")}` : ""}.`;
   if (m.passed === m.n && spread) return `${head} Same outcome every time, but the effort varied from ${m.minSteps} to ${m.maxSteps} steps: the pass rate hides how differently each run got there.`;
   if (m.passed === m.n) return `${head} Consistent in outcome and in effort (${m.minSteps}–${m.maxSteps} steps). With ${m.n} runs the pass rate is at least ${pct(m.passAt1Lower)} at 95% confidence.`;
   if (m.passed === 0) return `${head} The task never succeeded under these conditions; the failures below are hypotheses, not verdicts, because there is no passing run to compare against.`;
@@ -28,7 +29,7 @@ function runCard(b: BenchResult, r: RunResult): string {
     ...shots.map((s) => `<a href="${runDir(r.runIndex)}/${s.screenshot}" target="_blank" class="${f && f.divergenceStep !== null && s.index >= f.divergenceStep && s.index <= (f.divergenceStep + 1) ? "diverge" : ""}"><img loading="lazy" src="${runDir(r.runIndex)}/${s.screenshot}" alt="step ${s.index}"><em>${s.index}</em></a>`),
     r.finalScreenshot ? `<a href="${runDir(r.runIndex)}/${r.finalScreenshot}" target="_blank" class="final"><img loading="lazy" src="${runDir(r.runIndex)}/${r.finalScreenshot}" alt="final"><em>final</em></a>` : "",
   ].join("");
-  const stopped = r.stoppedBy && r.stoppedBy !== "end_turn" ? `<span class="pill neutral">${r.stoppedBy === "max_steps" ? "hit step cap" : r.stoppedBy}</span>` : "";
+  const stopped = r.stoppedBy && r.stoppedBy !== "end_turn" ? `<span class="pill neutral">${r.stoppedBy === "max_steps" ? "hit step cap" : r.stoppedBy === "safety_check" ? "stopped: safety check" : r.errorKind ? `${r.errorKind} error` : r.stoppedBy}</span>` : "";
   return `<div class="card run">
     <div class="id"><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stopped}<div style="margin-top:8px">${r.steps.length} steps · ${secs(r.durationMs)}${r.usage.costUsd !== undefined ? ` · ${usd(r.usage.costUsd)}` : ""}</div></div>
     <div>
@@ -64,8 +65,8 @@ export function renderReport(b: BenchResult): string {
 <p class="verdict">${verdict(b)}</p>
 
 <div class="card">
-  ${dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length })), m.skipped)}
-  <div class="legend"><span><i style="background:var(--good)"></i>passed</span><span><i style="background:var(--crit)"></i>failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>infrastructure, not scored</span>${m.skipped ? `<span><i style="border:2px solid var(--line-2);width:6px;height:6px"></i>skipped for budget</span>` : ""}</div>
+  ${dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), m.skipped)}
+  <div class="legend"><span><i style="background:var(--good)"></i>passed</span><span><i style="background:var(--crit)"></i>failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span>${m.skipped ? `<span><i style="border:2px solid var(--line-2);width:6px;height:6px"></i>skipped for budget</span>` : ""}</div>
   <div class="range" data-tip="observed ${pct(m.passAt1)}, 95% Wilson interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}"><i style="left:${m.passAt1Lower * 100}%;right:${100 - m.passAt1Upper * 100}%"></i><b style="left:${m.passAt1 * 100}%"></b></div>
   <div class="range-labels"><span>0%</span><span>pass rate: observed ${pct(m.passAt1)}, plausible range ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}</span><span>100%</span></div>
 </div>
@@ -74,7 +75,7 @@ export function renderReport(b: BenchResult): string {
 <div class="kpis">
   <div class="card kpi"><b>${m.passed}/${m.n}</b><span>observed passes</span><span class="sub">pass@1 ${pct(m.passAt1)} · interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}</span></div>
   <div class="card kpi"><b>${pct(m.passPowK[kShow] ?? 0)}</b><span>pass^${kShow} · all ${kShow} in a row</span><span class="sub">lower bound ${pct(m.passPowKLower[kShow] ?? 0)}</span></div>
-  <div class="card kpi"><b>${m.passed}/${m.requested}</b><span>end-to-end</span><span class="sub">${m.errored} infra error${m.errored === 1 ? "" : "s"}${m.skipped ? `, ${m.skipped} skipped` : ""}</span></div>
+  <div class="card kpi"><b>${m.passed}/${m.requested}</b><span>end-to-end</span><span class="sub">${m.errored ? [m.lost.solari ? `${m.lost.solari} desktop` : "", m.lost.provider ? `${m.lost.provider} provider` : "", m.lost.verifier ? `${m.lost.verifier} verifier` : ""].filter(Boolean).join(", ") + " lost" : "no runs lost"}${m.skipped ? `, ${m.skipped} skipped` : ""}</span></div>
   <div class="card kpi"><b>${m.medianSteps}</b><span>median steps</span><span class="sub">p95 ${m.p95Steps} · range ${m.minSteps}–${m.maxSteps}</span></div>
   <div class="card kpi"><b>${secs(m.medianDurationMs)}</b><span>median duration</span><span class="sub">p95 ${secs(m.p95DurationMs)}</span></div>
   <div class="card kpi"><b>${usd(m.costPerSuccessUsd)}</b><span>per successful run</span><span class="sub">${usd(m.totalCostUsd, 2)} total model spend</span></div>

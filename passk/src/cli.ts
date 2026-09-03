@@ -35,6 +35,8 @@ const has = (name: string) => process.argv.includes(`--${name}`);
 
 async function main() {
   const [cmd, target] = process.argv.slice(2);
+  // --safety allow|deny overrides PASSK_SAFETY for this invocation.
+  if (flag("safety")) process.env.PASSK_SAFETY = flag("safety");
   switch (cmd) {
     case "prepare": {
       await prepareTask(loadTask(must(target)));
@@ -132,6 +134,7 @@ async function main() {
   passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
                             [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
                             [--resume [runs/dir]]   finish a bench that was interrupted
+                            [--safety deny|allow]   what to do when the model raises a safety check (default deny)
   passk report  <runs/dir>
   passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
   passk compare <runs/A> <runs/B> [--out dir]
@@ -153,7 +156,7 @@ function printSummary(bench: BenchResult, k: number): void {
   if (!ks.length && m.n) ks.push(m.n);
   console.log(`\nobserved  ${m.passed}/${m.n} passed  (pass@1 ${pct(m.passAt1)}, 95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)})`);
   for (const kk of ks) console.log(`pass^${kk}${" ".repeat(Math.max(1, 6 - String(kk).length))}${pct(m.passPowK[kk] ?? 0)} estimated, lower bound ${pct(m.passPowKLower[kk] ?? 0)}`);
-  if (m.errored || m.skipped) console.log(`end-to-end ${m.passed}/${m.requested} (${m.errored} infra error${m.errored === 1 ? "" : "s"}, ${m.skipped} skipped for budget)`);
+  if (m.errored || m.skipped) console.log(`end-to-end ${m.passed}/${m.requested} (lost: ${m.lost.solari} desktop, ${m.lost.provider} provider, ${m.lost.verifier} verifier; ${m.skipped} skipped for budget)`);
   console.log(`steps     median ${m.medianSteps}, p95 ${m.p95Steps}, range ${m.minSteps}–${m.maxSteps}`);
   console.log(`cost      $${m.totalCostUsd.toFixed(2)} total${m.costPerSuccessUsd !== null ? `, $${m.costPerSuccessUsd.toFixed(3)} per success` : ""}`);
   for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause} (${f.confidence} confidence${f.divergenceStep !== null ? `, diverges @${f.divergenceStep}` : ""}) — ${f.explanation}`);

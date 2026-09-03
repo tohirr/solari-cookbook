@@ -14277,6 +14277,11 @@
     "n": 26,
     "passed": 23,
     "errored": 4,
+    "lost": {
+      "solari": 4,
+      "provider": 0,
+      "verifier": 0
+    },
     "skipped": 0,
     "passAt1": 0.8846153846153846,
     "passAt1Lower": 0.7102370691310167,
@@ -14535,5 +14540,6 @@
       ]
     },
     "budgetUsd": 2
-  }
+  },
+  "status": "complete"
 }

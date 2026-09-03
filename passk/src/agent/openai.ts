@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { config } from "../config.js";
 import { sleep, withReconnect } from "../desktop.js";
-import { dataUrl, openai } from "../llm.js";
+import { dataUrl, isProviderError, openai, withProviderRetry } from "../llm.js";
 import type { TraceStep } from "../types.js";
 import { DEFAULT_SYSTEM, type AgentRunOptions, type AgentRunOutput } from "./index.js";
 
@@ -111,16 +111,16 @@ export async function runOpenAIAgent(opts: AgentRunOptions): Promise<AgentRunOut
 
     let response: OpenAI.Responses.Response;
     try {
-      response = await client.responses.create({
+      response = await withProviderRetry(() => client.responses.create({
         model: config.model,
         instructions: opts.systemPrompt ?? DEFAULT_SYSTEM,
         tools: [{ type: "computer" }],
         input,
         previous_response_id: previousResponseId,
         truncation: "auto",
-      });
+      }));
     } catch (err) {
-      return { steps, finalMessage: "", usage, stoppedBy: "error", error: (err as Error).message };
+      return { steps, finalMessage: "", usage, stoppedBy: "error", error: (err as Error).message, errorKind: isProviderError(err) ? "provider" : "agent" };
     }
     previousResponseId = response.id;
     usage.inputTokens += response.usage?.input_tokens ?? 0;
@@ -132,6 +132,14 @@ export async function runOpenAIAgent(opts: AgentRunOptions): Promise<AgentRunOut
 
     input = [];
     for (const call of calls) {
+      // The model flagged this batch as potentially consequential. Inside a
+      // disposable VM that is noise; anywhere else it must stop the run. The
+      // default is to stop, so an operator has to opt in per environment.
+      if (call.pending_safety_checks?.length && config.safety !== "allow") {
+        const what = call.pending_safety_checks.map((c) => `${c.code ?? c.id}: ${c.message ?? ""}`).join("; ");
+        console.warn(`safety check raised and PASSK_SAFETY is not "allow"; stopping run: ${what}`);
+        return { steps, finalMessage: "", usage, stoppedBy: "safety_check", error: `safety check not acknowledged: ${what}` };
+      }
       const actions: Action[] = call.actions?.length ? call.actions : call.action ? [call.action] : [];
       let failed: string | undefined;
 

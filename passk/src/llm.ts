@@ -40,7 +40,7 @@ export async function structured<S extends z.ZodTypeAny>(req: StructuredRequest<
     return (canned[req.name] as z.infer<S>) ?? null;
   }
   if (config.provider === "openai") {
-    const res = await openai().responses.parse({
+    const res = await withProviderRetry(() => openai().responses.parse({
       model: config.model,
       max_output_tokens: req.maxTokens ?? 3000,
       input: [{
@@ -51,11 +51,11 @@ export async function structured<S extends z.ZodTypeAny>(req: StructuredRequest<
         ],
       }],
       text: { format: zodTextFormat(req.schema, req.name) },
-    });
+    }));
     return (res.output_parsed as z.infer<S> | null) ?? null;
   }
 
-  const res = await anthropic().messages.parse({
+  const res = await withProviderRetry(() => anthropic().messages.parse({
     model: config.model,
     max_tokens: req.maxTokens ?? 3000,
     messages: [{
@@ -66,8 +66,35 @@ export async function structured<S extends z.ZodTypeAny>(req: StructuredRequest<
       ],
     }],
     output_config: { format: zodOutputFormat(req.schema) },
-  });
+  }));
   return (res.parsed_output as z.infer<S> | null) ?? null;
+}
+
+/**
+ * Is this error the model provider's fault (rate limit, outage, network) rather
+ * than a bad request? Both SDKs expose typed errors; a status code is the
+ * fallback for anything wrapped.
+ */
+export function isProviderError(err: unknown): boolean {
+  if (err instanceof Anthropic.RateLimitError || err instanceof Anthropic.InternalServerError || err instanceof Anthropic.APIConnectionError) return true;
+  if (err instanceof OpenAI.RateLimitError || err instanceof OpenAI.InternalServerError || err instanceof OpenAI.APIConnectionError) return true;
+  const status = (err as { status?: number })?.status;
+  if (status === 429 || (status !== undefined && status >= 500)) return true;
+  return /ECONNRESET|ETIMEDOUT|socket hang up|fetch failed|Connection error/i.test(String((err as Error)?.message));
+}
+
+/** Bounded retries with exponential backoff and jitter, for provider-side failures only. */
+export async function withProviderRetry<T>(fn: () => Promise<T>, attempts = 4): Promise<T> {
+  for (let i = 1; ; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (!isProviderError(err) || i >= attempts) throw err;
+      const wait = Math.min(30_000, 1500 * 2 ** (i - 1)) * (0.75 + Math.random() * 0.5);
+      console.warn(`provider error (${(err as Error).message.slice(0, 80)}); retry ${i}/${attempts - 1} in ${Math.round(wait / 1000)}s`);
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
 }
 
 export const b64 = (png: Uint8Array) => Buffer.from(png).toString("base64");

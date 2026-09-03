@@ -23,8 +23,14 @@ export function exportBench(srcDir: string, outDir: string): { bench: BenchResul
   const copy = (run: number, file: string) => {
     const from = path.join(srcDir, runDir(run), file);
     if (!fs.existsSync(from)) return false;
-    fs.mkdirSync(path.join(outDir, runDir(run)), { recursive: true });
-    fs.copyFileSync(from, path.join(outDir, runDir(run), file));
+    const destDir = path.join(outDir, runDir(run));
+    fs.mkdirSync(destDir, { recursive: true });
+    // If a compressed copy already exists from an earlier export, keep it: JPEG
+    // encoding is not byte-stable, and re-encoding every screenshot on every
+    // refresh would churn megabytes of history for identical images.
+    const jpg = path.join(destDir, file.replace(/\.png$/, ".jpg"));
+    if (fs.existsSync(jpg)) { files++; return true; }
+    fs.copyFileSync(from, path.join(destDir, file));
     files++; bytes += fs.statSync(from).size;
     return true;
   };

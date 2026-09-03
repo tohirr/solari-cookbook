@@ -103,9 +103,14 @@ export function scale(min: number, max: number) {
 }
 
 /** A row of outcome dots, one per run. */
-export function dotsHtml(runs: { status: string; runIndex: number; steps: number }[], skipped = 0, cls = ""): string {
-  const dots = runs.map((r) =>
-    `<span class="dot ${r.status} ${cls}" data-tip="run ${r.runIndex}: ${r.status}${r.status === "errored" && r.steps === 0 ? " (infrastructure)" : ` in ${r.steps} steps`}">${r.status === "errored" ? "!" : ""}</span>`);
+export function dotsHtml(runs: { status: string; runIndex: number; steps: number; errorKind?: string; stoppedBy?: string }[], skipped = 0, cls = ""): string {
+  const glyph: Record<string, string> = { solari: "!", provider: "M", verifier: "?", agent: "" };
+  const dots = runs.map((r) => {
+    const lost = r.status === "errored" ? (r.errorKind ?? (r.steps === 0 ? "solari" : "agent")) : null;
+    const tip = lost ? `run ${r.runIndex}: lost to ${lost === "solari" ? "desktop infrastructure" : lost === "provider" ? "the model provider" : lost === "verifier" ? "a checker crash" : "an agent error"}`
+      : `run ${r.runIndex}: ${r.status} in ${r.steps} steps${r.stoppedBy === "safety_check" ? " (stopped on a safety check)" : ""}`;
+    return `<span class="dot ${r.status} ${cls}" data-tip="${esc(tip)}">${lost ? glyph[lost] ?? "!" : ""}</span>`;
+  });
   for (let i = 0; i < skipped; i++) dots.push(`<span class="dot skipped" data-tip="skipped: budget reached"></span>`);
   return `<div class="dots">${dots.join("")}</div>`;
 }
