@@ -9,10 +9,10 @@
 > and traces. The Claude agent loop is written but unexercised for want of a
 > working key; the OpenAI loop produced everything here.
 
-<p align="center"><a href="evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="docs/compare-ticket-queue.jpg" alt="Three prompts, one snapshot: 47/50, 47/49, 49/49" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="docs/compare-ticket-queue.jpg" alt="Three prompts, one snapshot: 47/50, 47/49, 49/49" width="100%"></a></p>
 
-**Start here:** [`evidence/index.html`](evidence/index.html) is the showcase, with every
-number read from the bench files. `sh demo.sh` runs the whole pipeline in forty
+**Start here:** [the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html), with every
+number read from the bench files (rendered by GitHub Pages; the source is in [`evidence/`](evidence/)). `sh demo.sh` runs the whole pipeline in forty
 seconds with no API spend.
 
 **Who it's for.** passk is for teams shipping computer-use agents. An engineer
@@ -43,21 +43,55 @@ Built on Solari because it is the only place this is cheap: `snapshot()` once,
 `createDesktop({ fromSnapshot })` k times, every fork boots byte-identical in
 about a second.
 
-## Quick start
+## Setup
+
+You need Node 20 or newer, a Solari account, and one model key.
 
 ```bash
-cd passk
+git clone https://github.com/tohirr/solari-cookbook.git
+cd solari-cookbook/passk
 npm install
-cp .env.example .env        # SOLARI_API_KEY + ANTHROPIC_API_KEY or OPENAI_API_KEY
+cp .env.example .env
+```
 
-npm run passk prepare tasks/notes.yaml         # boot → setup → snapshot
-npm run passk probe   tasks/notes.yaml         # what would the agent ask?
-npm run passk run     tasks/notes.yaml -- --k 5
+Open `.env` and fill in:
+
+| Variable | Where it comes from |
+|---|---|
+| `SOLARI_API_KEY` | [console.getsolari.com](https://console.getsolari.com) → API keys. The free tier allows 1 concurrent desktop; Starter allows 2 and includes $20 of credit. |
+| `OPENAI_API_KEY` **or** `ANTHROPIC_API_KEY` | Your model provider. With both set, Claude is used unless `PASSK_PROVIDER=openai`. |
+| `PASSK_MODEL` | Optional. `gpt-5.6-luna` is the budget tier every result here was produced on; leave unset for the provider's default. |
+| `PASSK_SAFETY=allow` | Set this for benches: it lets the OpenAI loop acknowledge its own safety checks inside the disposable VM. Never set it anywhere real. |
+| `PASSK_CONCURRENCY` | Optional. Defaults to 2. Match your Solari plan. |
+
+Then confirm everything talks to everything:
+
+```bash
+npm run passk doctor
+```
+
+It checks the keys, reaches Solari, boots and kills one desktop, sends the
+model a one-token request, and prints what a run would use. Fix anything it
+marks ✗ before going further. The commands in these docs are written as
+`passk …`; run them as `npm run passk -- …` or set `alias passk="npx tsx src/cli.ts"`
+inside the `passk/` folder.
+
+Results land in `runs/<task>-<timestamp>/` (ignored by git); the curated,
+committed copies live in [`evidence/`](evidence/).
+
+## Quick start
+
+After [Setup](#setup):
+
+```bash
+npm run passk prepare  tasks/notes.yaml        # boot → setup → snapshot → kill
+npm run passk validate tasks/notes.yaml        # prove the checks fail before and pass after the golden steps
+npm run passk probe    tasks/notes.yaml        # what would the agent ask before acting?
+npm run passk run      tasks/notes.yaml -- --k 5
 open runs/notes-*/report.html
 ```
 
-Concurrency defaults to 2 (the Starter plan's sandbox limit). Professional
-allows 10: `PASSK_CONCURRENCY=10`.
+Then the gates and budget:
 
 ```bash
 npm run passk run tasks/notes.yaml -- --k 10 --budget 0.50     # stop launching runs at $0.50 of model spend
@@ -83,40 +117,11 @@ run       fork ×k from snapshot ──▶ agent loop on each ──▶ checks �
 - `src/classify.ts` — divergence point + cause classification.
 - `src/probe.ts` — the ambiguity dry-run.
 
-## Writing a task
-
-```yaml
-id: notes
-name: Save a note in Mousepad
-template: default          # default | office | code | your custom template
-setup:                      # runs once, before the snapshot
-  - open: mousepad
-  - wait: 4
-prompt: >                   # exactly what a user would type
-  Type "hello" and save it as notes.txt in Documents.
-checks:                     # evaluated INSIDE the desktop after the agent stops
-  - type: file_contains
-    path: /home/user/Documents/notes.txt
-    text: hello
-```
-
-Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
-`write` (text to a guest path), `upload` (local file to a guest path), `click`
-(x, y), `press` (a key or "+"-joined chord), `type` (literal text), `wait`
-(seconds). Everything runs once, before the snapshot, so forks pay none of it.
-
-Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
-stdout), `screenshot_judge` (the model grades the final screen against a rubric).
-
-<p align="center"><a href="evidence/invoice-entry/report.html"><img src="docs/report-invoice-entry.jpg" alt="Invoice entry report: 23/26, every run a dot, effort per run, filmstrips" width="100%"></a></p>
-
 ## Tasks that ship
 
-Every task carries a `golden` block, the recipe for a correct outcome with
-no agent involved, so `passk validate` can prove its checks fail before and
-pass after. Status is one of **validated** (live runs published in
-`evidence/`), **ready** (validated verifier, no published runs), or
-**illustrative** (a sketch). An unrun task is never presented as evidence.
+Every task is **validated**: its verifier proved sound by `passk validate`
+and its live runs published in `evidence/`. The format and the status
+convention are in [the operator's manual](docs/TASKS.md).
 
 | Task | Template | Status | What it exercises |
 |---|---|---|---|
@@ -136,39 +141,6 @@ consequential action that must not happen.
 The ticket queue is the shape of task Pinetree describes: a proprietary
 dashboard with no API. Because the app lives in the snapshot, fifty runs cost
 about a dollar on a budget model.
-
-## Benching your own agent
-
-The bundled loops are one Claude loop and one OpenAI loop, chosen by
-`PASSK_PROVIDER`. A team with its own agent writes a third file in
-`src/agent/` implementing the same interface (`AgentRunOptions →
-AgentRunOutput` in `src/agent/index.ts`): it receives a live desktop handle,
-the prompt, a step budget and an output directory, and returns the trace of
-actions it took, its token usage, and how it stopped. Two rules make the
-bench honest and are not negotiable: the agent never sees the task's checks,
-and the agent's own claim of success is recorded but never graded. The
-scripted agent in `src/agent/scripted.ts` is the smallest example.
-
-## First run
-
-```bash
-npm run passk doctor
-npm run passk validate tasks/notes.yaml
-```
-
-`validate` forks the task's snapshot and proves the verifier is sound: the
-checks fail on the untouched state, agree with themselves when run twice,
-and pass after the task's `golden` steps. One desktop boot, no model calls.
-Run it on every new task before spending a cent on an agent; it is the
-command that would have caught both verifier bugs found during this work.
-`doctor`
-
-checks the keys, reaches Solari, boots and kills one desktop, sends the
-model a one-token request, and prints what a run would use: provider, model,
-concurrency, and the safety setting. `npm run passk sweep` kills anything
-tagged passk that an interrupted bench left running. Task files carry a
-`yaml-language-server` schema hint; with the YAML extension in VS Code you
-get completion and validation from `schema/task.schema.json`.
 
 ## Evidence
 
@@ -195,225 +167,28 @@ success, and Fisher's exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
 
-## How many runs, and what to change
-
-Both are yours to decide. passk's job is to make each choice legible before
-you pay for it, and to keep the experiment honest afterwards.
-
-**How many runs.** Every run is one execution; a *condition* is k runs with
-nothing changed between them. What an all-pass condition can establish:
-
-| Runs per condition | Lower bound if every run passes | Good for |
-|---:|---:|---|
-| 3 | 44% | does the task work at all |
-| 5 | 57% | choosing between two interventions |
-| 10 | 72% | the configuration you keep |
-| 35 | 90% | a "90% reliable" claim |
-| 73 | 95% | a "95% reliable" claim |
-
-`passk run` prints this for the k you chose, and with `--require-lower` it
-refuses to start a sample that could not meet the requirement even if every
-run passed. Start small, then extend: `--resume` with a larger `--k` adds
-runs to a finished bench on the same snapshot.
-
-**What to change.** Exactly one thing per experiment, on the same snapshot
-with the same checks: a prompt, an environment detail, a model, a plan. The
-failure evidence from the last bench says which. `passk recommend
-runs/<dir>` reads a finished bench and suggests the category of the next
-experiment with what to keep fixed; it is a recommendation, not a diagnosis,
-and it will never rewrite your prompt or switch your model. Roughly:
-
-| The evidence shows | Try next |
-|---|---|
-| failures reported success anyway | a verification step that reads state back, not a screenshot |
-| runs interpreted the task differently | one clarification at a time (`passk probe` lists candidates) |
-| same plan, environment flinched | an environment change, not a prompt change |
-| same goal, different routes | a prompt that names the short strategy; compare effort and cost |
-| every failure hit the step cap | a higher cap before blaming the agent |
-| losses to infrastructure or the verifier | fix that first; the agent is not the variable |
-
-**The loop that produced the results in `evidence/`:** validate the
-verifier; run a baseline at k=3; read the failed runs; choose one
-intervention; run A against B at k=5 each; compare pass rate, interval,
-effort and cost; decide; run k=10 or more only for the configuration you
-keep, and save it as the regression baseline. Nothing stops automatically:
-the planned k and the completed count are both recorded, and stopping is
-your call.
-
-**Who decides what.** You: which workflow matters, what counts as success,
-acceptable risk, budget, k, which change to test, whether to ship. passk:
-equivalent runs, whether checks passed, intervals, whether a comparison
-changed more than one thing, whether a claim exceeds the evidence, a
-failure hypothesis, a suggested next experiment, and whether a gate passes.
-Never passk: rewriting a prompt, switching a model, declaring anything safe
-for production, or ignoring a failed check.
-
-## Reading the numbers honestly
-
-Ten passes out of ten is an observation, not a proof of 100% reliability. Every
-bench reports the observed count, a 95% Wilson interval on the pass rate (10/10
-puts the lower bound near 72%), and pass^k both as a point estimate and as that
-lower bound raised to the k. Two denominators are kept: **pass@1** is passes
-over runs the agent actually attempted, and **end-to-end** is passes over the
-runs you asked for, so a fork that never booted counts against the
-infrastructure but not against the agent. Failure causes are labelled as
-hypotheses with a confidence, and when no run passed there is nothing to
-diverge from, so they are capped at low confidence. Every `bench.json` carries
-the full task definition, a hash of it, and the model, package and commit
-versions that produced it.
-
 ## Not a model benchmark
 
 A benchmark asks which model is best across a fixed public task set and ends
 in a score. passk asks whether *your* agent is dependable enough on *your*
 workflow, and whether your latest change helped, and ends in a decision.
 Every comparison in [`evidence/`](evidence/) holds the model fixed and
-changes something else: a folder, a sentence, a verification instruction.
-The tasks that ship are examples of the format, not a canonical suite, and
-there is no leaderboard. passk can compare two models on one snapshot the
-way a test suite can compare two compilers; that is incidental, not the
-point.
+changes something else. The shipped tasks are examples of the format, not a
+suite, and there is no leaderboard. The full argument is in
+[Method](docs/METHOD.md#not-a-model-benchmark).
 
-## Who gets blamed for what
+## Scope, in three lines
 
-A run that does not complete normally is put in one of four bins, and only
-the first is scored against the agent:
+Supported: anything whose state lives inside the desktop, which is what a
+snapshot isolates. Experimental: the Claude loop, model comparison, long
+workflows. Unsupported: anything whose state lives outside the VM, real
+payments or messages, regulated data, irreversible actions. The reasoning
+and the proposed extension point for external state are in
+[the operator's manual](docs/TASKS.md#what-passk-can-and-cannot-do-today).
 
-| Kind | Meaning | Scored? |
-|---|---|---|
-| `agent` | the agent's own doing: gave up, malformed action, crashed on its own logic | yes, as a failure |
-| `provider` | the model API failed after bounded retries (429, 5xx, connection) | no, listed as lost |
-| `solari` | the desktop never came up, or its channel was lost | no, listed as lost |
-| `verifier` | the checker itself could not run; the outcome is unknown | no, listed as lost |
+## Docs
 
-Model calls retry up to three times with exponential backoff and jitter on
-provider-side errors before a run is written off. A checker that cannot reach
-the VM marks its check `errored`, and that run is a verifier loss, never an
-agent failure. All lost runs count in end-to-end completion, so the report
-always shows what the user got as well as what the agent did.
-
-## Safety checks
-
-OpenAI's computer tool flags some actions as potentially consequential and
-asks the caller to acknowledge them. passk **stops the run by default**
-(`stoppedBy: "safety_check"`, scored as a failure with its reason). Set
-`PASSK_SAFETY=allow` or pass `--safety allow` to acknowledge automatically.
-That is only defensible inside a disposable VM with no route to real
-systems, which is what every bench in this repo is, and nowhere else.
-
-## When a bench dies halfway
-
-Every run writes its own `run.json` the moment it finishes, and the bench's
-`bench.json` is written before the first fork and rewritten after every run,
-with `status: "running"` until the end. If the process dies at run 43 of 50
-(laptop sleep, network loss, a provider outage), the 43 verified runs are on
-disk and:
-
-```bash
-npm run passk run tasks/ticket-queue.yaml -- --k 50 --resume
-```
-
-finds the newest unfinished bench for that task and executes only the
-missing indices. Nothing runs twice; infrastructure losses are recorded at
-their index so a resume does not quietly retry them and shift the sample.
-`report`, `gate` and `compare` work on a partial bench at any time.
-
-## Testing the harness without a VM or a model
-
-`PASSK_PROVIDER=scripted` swaps in an in-memory desktop and a scripted agent
-whose behavior per run comes from `PASSK_SCRIPT`:
-
-```bash
-PASSK_PROVIDER=scripted PASSK_SCRIPT="pass*15,fail*3,hang,claim_only" \
-  npm run passk run tasks/fake.yaml -- --k 20
-```
-
-Behaviors: `pass`, `fail` (wrong state, claims success), `claim_only`
-(no state change, claims success), `hang` (runs to the step cap),
-`provider_err` (the model API fails), `crash_after` (task done, agent dies),
-`slow`. The real runner, checker, metrics, persistence and report run
-unchanged, so `test/resume.test.ts` can kill a 20-run bench halfway and
-resume it, prove no index ran twice, check every stop reason is accounted
-for, enforce a budget, and push 200 runs through at concurrency 16 in a few
-seconds, all for no money.
-
-## What passk can and cannot do today
-
-**Supported.** Anything whose meaningful state lives inside the desktop, because
-that is what a Solari snapshot isolates and a fork resets: LibreOffice and
-other desktop applications, PDFs and files, local web tools served from the
-VM, multi-application workflows across the three templates, custom templates,
-benches of 50+ runs, and controlled comparisons of prompts on one snapshot.
-Every result in [`evidence/`](evidence/) is one of these.
-
-**Experimental.** Written but not exercised: the Claude agent loop (no working
-key during development). Architecturally supported but not demonstrated:
-comparing two models on one snapshot. Likely to work with care: longer
-workflows of 60 to 100 steps (raise `max_steps`, expect context growth and
-higher cost per run), and local instances of heavier software such as an
-Odoo container (longer boot, more memory).
-
-**Unsupported.** Anything where the state the agent changes lives outside the
-desktop. A snapshot resets the VM; it does not reset Gmail, Shopify, GitHub,
-Salesforce, or a shared test database. Five forks told to "create an invoice
-for Acme" against a live SaaS account will create five invoices, and the
-checker cannot see any of them. Also out of scope: real payments, messages,
-bookings or publishing; regulated or customer data; production enterprise
-systems; multi-hour unattended tasks; adversarial task definitions; and
-anything where a wrong action is irreversible.
-
-**External state, if you need it.** The extension point is documented, not
-built. A task that touches an external system would declare it and supply
-lifecycle hooks:
-
-```yaml
-isolation: external          # default is "snapshot"
-before_each:                 # reset or seed external state; runs on the host, not in the VM
-  - exec: ./scripts/reset-test-tenant.sh
-after_each:
-  - exec: ./scripts/delete-test-records.sh --run ${RUN_ID}
-checks:
-  - type: http_json          # a verifier that queries the system from outside the agent's desktop
-    url: ${LEDGER_TEST_API}/invoices/NOS-1047
-    expect: { status: pending_review, total: 1333.0 }
-```
-
-The principle that must hold for any of it: verification runs from passk's
-host process with credentials the agent never sees, and each run acts on
-records it can identify as its own. Until those hooks exist, passk should not
-be pointed at a system that other people can see.
-
-## Gotchas learned on a live VM
-
-- **Key chords must be one string.** `keyboard.press(["ctrl", "s"])` presses
-  ctrl, then s, and you get a literal "s". `keyboard.press("ctrl+s")` is the
-  chord. `keyboard.hotkey("ctrl", "s")` has the same bug. `down`/`up` do hold
-  modifiers correctly. Key names are xdotool's: `Return`, `BackSpace`,
-  `Page_Down` — not `enter`.
-- **Home is `/home/desktop`, and GUI apps run as root.** Mousepad shows a red
-  root warning; file dialogs default to `/home/desktop`. `exec` runs with an
-  empty `$HOME`, so use absolute paths in setup and checks.
-- **The SDK's `mouse.scroll` has no direction.** X11 scroll is buttons 4–7 and
-  the typed `MouseButton` can't express them, so passk scrolls through
-  `xdotool click 4|5|6|7`, which the default template ships.
-- **`sandboxes.createDesktop`, not `desktops.create`, for forks.** Only the
-  sandbox-flavoured route accepts `fromSnapshot`.
-- **Lowercase the letters in chords.** `ctrl+A` reaches xdotool as
-  ctrl+shift+a, which in Chrome opens the tab-search panel and silently
-  swallows everything typed next. One capital letter cost a whole run.
-- **The control channel can drop right after a fork** on the office template:
-  up for `connect()` and `health()`, gone by the first action. passk reconnects
-  once and retries the action instead of failing the run.
-- **Chrome will not upload a file from `/root`.** A form with a file input
-  chosen from under `/root` fails with `ERR_ACCESS_DENIED` on submit and never
-  reaches the server; the same file under `/home/desktop` or `/tmp` uploads
-  fine. Put task inputs the agent must attach under the desktop user's home.
-- **Verify the verifier.** An `exec` check that ran `cat` on two candidate
-  paths failed with exit 1 whenever the first path was missing, even though the
-  second printed the right text. Two real passes were scored as failures until
-  the forensics in the report showed the file sitting exactly where it should
-  be. `exec` checks with `stdout_contains` now judge output only unless an
-  `exit_code` is given.
-- **Clipboard readback is empty** (`xclip -o` exits 1) even after a real copy.
-  Verify results through the filesystem instead.
-
+- [Writing and running tasks](docs/TASKS.md): the task format, `validate`, benching your own agent, scope.
+- [Method](docs/METHOD.md): intervals, who gets blamed for what, how many runs, resume, testing the harness, safety.
+- [Notes from building on Solari](docs/SOLARI-NOTES.md): the gotchas, for Solari's team as much as for users.
+- [Evidence](evidence/README.md): every bench, every comparison, every screenshot that carries proof.

@@ -47,9 +47,9 @@ bench explains why the middle one changed nothing. An accounts-payable entry
 task (PDF → mock ERP, with a duplicate trap and forbidden buttons) scored
 23/26 for 2.4 cents a run. Every number is in
 [`passk/evidence/`](passk/evidence/) with screenshots and traces; start at
-[`passk/evidence/index.html`](passk/evidence/index.html).
+[`passk/evidence/index.html`](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html).
 
-<p align="center"><a href="passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="passk/docs/compare-ticket-queue.jpg" alt="passk comparison: three prompts on one snapshot" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="passk/docs/compare-ticket-queue.jpg" alt="passk comparison: three prompts on one snapshot" width="100%"></a></p>
 
 ## Running an example
 

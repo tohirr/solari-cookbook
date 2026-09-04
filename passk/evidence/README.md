@@ -1,5 +1,8 @@
 # Evidence
 
+Rendered pages: **[tohirr.github.io/solari-cookbook/passk/evidence](https://tohirr.github.io/solari-cookbook/passk/evidence/)**.
+GitHub shows HTML files as source, so use that link (or a local clone) to open reports; the JSON files read fine here.
+
 Every bench here was run against the real Solari API and graded inside the VM. Each folder holds `bench.json` (every run, every action, every check, provenance and a task hash), `report.html`, the final screenshot of every run, and every screenshot of every failed run plus the shortest passing run. Comparison folders hold `compare.json` and `compare.html`. Open the HTML files locally; GitHub shows the JSON.
 
 Numbers are observed counts with a 95% Wilson interval. Runs lost to infrastructure before the agent acted are listed but not scored. Failure causes are hypotheses, not verdicts.
