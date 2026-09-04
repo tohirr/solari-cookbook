@@ -7,13 +7,18 @@ import { createHash } from "node:crypto";
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { config } from "./config.js";
-import type { Provenance, Task } from "./types.js";
+import type { Check, Provenance, Task } from "./types.js";
 
 const require = createRequire(import.meta.url);
 
-/** Stable hash of a task: keys sorted, so formatting changes don't count. */
+/** Stable hash of a task: keys sorted, so formatting changes don't count; check names dropped, so labelling a check doesn't either. */
 export function taskHash(task: Task): string {
-  return createHash("sha256").update(canonical(task)).digest("hex").slice(0, 16);
+  return createHash("sha256").update(canonical({ ...task, checks: unlabelled(task.checks) })).digest("hex").slice(0, 16);
+}
+
+/** Checks without their display names: what grading actually depends on. */
+export function unlabelled(checks: Check[]): Check[] {
+  return checks.map(({ name: _name, ...c }) => c as Check);
 }
 
 function canonical(v: unknown): string {

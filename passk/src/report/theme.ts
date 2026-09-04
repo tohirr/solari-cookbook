@@ -38,10 +38,28 @@ h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-
 .kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
 .kpi span{color:var(--ink-3);font-size:12px;display:block}
 .kpi .sub{color:var(--ink-2)}
-.dots{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:var(--bg);font-family:var(--mono)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:10px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--mono);text-decoration:none;line-height:1}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1px}
 .dot.passed{background:var(--good)}.dot.failed{background:var(--crit)}.dot.errored{background:transparent;border-color:var(--ink-3);color:var(--ink-3)}
 .dot.skipped{background:transparent;border-color:var(--line-2);color:var(--ink-3)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.headline span{color:var(--ink-2);font-size:13px}
+.runrow{margin:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 20px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12px}
+.runrow[open]>summary{border-bottom:1px solid var(--line)}
+.runrow>.card{border:0;border-radius:0 0 var(--radius) var(--radius)}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 22px;font-size:15px;max-width:820px;line-height:1.6}
+.diff del{background:var(--crit-dim);color:var(--crit);text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
 .legend{display:flex;gap:16px;color:var(--ink-3);font-size:12px;margin-top:10px;flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 .range{position:relative;height:10px;background:var(--surface-2);border-radius:5px;margin:14px 0 6px}
@@ -102,17 +120,58 @@ export function scale(min: number, max: number) {
   return (v: number) => ((v - min) / span) * 100;
 }
 
-/** A row of outcome dots, one per run. */
-export function dotsHtml(runs: { status: string; runIndex: number; steps: number; errorKind?: string; stoppedBy?: string }[], skipped = 0, cls = ""): string {
-  const glyph: Record<string, string> = { solari: "!", provider: "M", verifier: "?", agent: "" };
+/**
+ * Outcome dots, one per run. Pass and fail are told apart by glyph as well as
+ * colour; lost runs carry a letter for what lost them. Past ten runs the dots
+ * wrap into rows of ten with the row's first index in the margin, so a
+ * failure at run 27 is found by eye. With `href`, every dot links to its run.
+ */
+export function dotsHtml(runs: { status: string; runIndex: number; steps: number; errorKind?: string; stoppedBy?: string }[], skipped = 0, cls = "", href?: (runIndex: number) => string): string {
+  const glyph: Record<string, string> = { passed: "✓", failed: "×", solari: "!", provider: "M", verifier: "?", agent: "×" };
   const dots = runs.map((r) => {
     const lost = r.status === "errored" ? (r.errorKind ?? (r.steps === 0 ? "solari" : "agent")) : null;
     const tip = lost ? `run ${r.runIndex}: lost to ${lost === "solari" ? "desktop infrastructure" : lost === "provider" ? "the model provider" : lost === "verifier" ? "a checker crash" : "an agent error"}`
       : `run ${r.runIndex}: ${r.status} in ${r.steps} steps${r.stoppedBy === "safety_check" ? " (stopped on a safety check)" : ""}`;
-    return `<span class="dot ${r.status} ${cls}" data-tip="${esc(tip)}">${lost ? glyph[lost] ?? "!" : ""}</span>`;
+    const g = lost ? glyph[lost] ?? "!" : glyph[r.status] ?? "";
+    const attrs = `class="dot ${r.status} ${cls}" data-tip="${esc(tip)}" aria-label="${esc(tip)}"`;
+    return href ? `<a ${attrs} href="${esc(href(r.runIndex))}">${g}</a>` : `<span ${attrs}>${g}</span>`;
   });
-  for (let i = 0; i < skipped; i++) dots.push(`<span class="dot skipped" data-tip="skipped: budget reached"></span>`);
-  return `<div class="dots">${dots.join("")}</div>`;
+  for (let i = 0; i < skipped; i++) dots.push(`<span class="dot skipped" data-tip="skipped: budget reached" aria-label="skipped: budget reached"></span>`);
+  if (dots.length <= 10) return `<div class="dots"><div class="dotrow">${dots.join("")}</div></div>`;
+  const rows: string[] = [];
+  for (let i = 0; i < dots.length; i += 10) rows.push(`<div class="dotrow"><em>${i}</em>${dots.slice(i, i + 10).join("")}</div>`);
+  return `<div class="dots">${rows.join("")}</div>`;
+}
+
+/**
+ * Which tail statistic a sample can honestly carry. A p95 of five runs is the
+ * maximum wearing a costume; below ten runs show the range, below twenty a
+ * p90, and a p95 only from twenty on.
+ */
+export function tailStat(n: number): { label: string; p: number } | null {
+  if (n < 10) return null;
+  return n < 20 ? { label: "p90", p: 0.9 } : { label: "p95", p: 0.95 };
+}
+
+/** Word-level diff of two short texts as HTML with <del> and <ins>, so "one thing changed" is visible rather than asserted. */
+export function wordDiffHtml(a: string, b: string): string {
+  const A = a.trim().split(/\s+/), B = b.trim().split(/\s+/);
+  const L = Array.from({ length: A.length + 1 }, () => new Array<number>(B.length + 1).fill(0));
+  for (let i = A.length - 1; i >= 0; i--) for (let j = B.length - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const out: string[] = [];
+  let i = 0, j = 0, del: string[] = [], ins: string[] = [];
+  const flush = () => {
+    if (del.length) out.push(`<del>${esc(del.join(" "))}</del>`);
+    if (ins.length) out.push(`<ins>${esc(ins.join(" "))}</ins>`);
+    del = []; ins = [];
+  };
+  while (i < A.length || j < B.length) {
+    if (i < A.length && j < B.length && A[i] === B[j]) { flush(); out.push(esc(A[i])); i++; j++; }
+    else if (j < B.length && (i >= A.length || L[i][j + 1] >= L[i + 1][j])) ins.push(B[j++]);
+    else del.push(A[i++]);
+  }
+  flush();
+  return out.join(" ");
 }
 
 /** Runs as points on a shared numeric axis (steps or seconds), with a median marker. */

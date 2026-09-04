@@ -8,7 +8,8 @@
 import path from "node:path";
 import type { Comparison } from "../compare.js";
 import type { BenchResult } from "../types.js";
-import { CSS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, usd } from "./theme.js";
+import { percentile } from "../metrics.js";
+import { CSS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, tailStat, usd, wordDiffHtml } from "./theme.js";
 
 const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 
@@ -52,17 +53,27 @@ export function renderCompare(c: Comparison, A: BenchResult, B: BenchResult, out
     return `Changing only the <b>${esc(changedLabel)}</b>: ${parts.join("; ")}. ${sig}.`;
   })();
 
-  const side = (label: "A" | "B", b: BenchResult, cls: "a" | "b") => `
+  // A tail statistic only if the smaller side can carry it; both sides get the same one so the row compares like with like.
+  const tail = tailStat(Math.min(m.n, n.n));
+  const stepsOf = (b: BenchResult) => b.runs.filter((r) => r.status !== "errored" || r.steps.length > 0).map((r) => r.steps.length).sort((x, y) => x - y);
+  const tailA = tail ? Math.round(percentile(stepsOf(A), tail.p)) : null, tailB = tail ? Math.round(percentile(stepsOf(B), tail.p)) : null;
+  const tailText = (b: BenchResult, v: number | null) => (tail && v !== null ? `${tail.label} ${v}` : `range ${b.metrics.minSteps}–${b.metrics.maxSteps}`);
+
+  const side = (label: "A" | "B", b: BenchResult, cls: "a" | "b", dir: string, tailV: number | null) => `
     <div class="card">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span class="pill ${cls}">${label}</span><b>${esc(b.taskName)}</b></div>
-      <div class="prompt" style="margin:0 0 14px;font-size:14px">${esc(b.prompt.trim())}</div>
-      ${dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length })), b.metrics.skipped)}
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="pill ${cls}">${label}</span><b>${esc(b.taskName)}</b><a href="${rel(dir)}/report.html" style="margin-left:auto;color:var(--ink-3);font-size:12px;white-space:nowrap">full report</a></div>
+      ${dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped, "", (i) => `${rel(dir)}/report.html#run-${i}`)}
       <div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">
         <div class="kpi"><b>${b.metrics.passed}/${b.metrics.n}</b><span>passed · ${pct(b.metrics.passAt1Lower)}–${pct(b.metrics.passAt1Upper)}</span></div>
-        <div class="kpi"><b>${b.metrics.medianSteps}</b><span>median steps · p95 ${b.metrics.p95Steps}</span></div>
+        <div class="kpi"><b>${b.metrics.medianSteps}</b><span>median steps · ${tailText(b, tailV)}</span></div>
         <div class="kpi"><b>${usd(b.metrics.costPerSuccessUsd)}</b><span>per success</span></div>
       </div>
     </div>`;
+
+  // The prompt once, not twice: as a word diff when it is what changed, so the reader sees the one edit rather than re-reading two paragraphs.
+  const promptBlock = c.changed.includes("prompt")
+    ? `<div class="diff"><div style="color:var(--ink-3);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">prompt · <del>A</del> → <ins>B</ins></div>${wordDiffHtml(A.prompt, B.prompt)}</div>`
+    : `<blockquote class="prompt">${esc(A.prompt.trim())}</blockquote>`;
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -73,7 +84,8 @@ export function renderCompare(c: Comparison, A: BenchResult, B: BenchResult, out
 <p class="verdict">${headline}</p>
 ${c.warnings.map((w) => `<div class="note" style="color:var(--warn)">⚠ ${esc(w)}</div>`).join("")}
 
-<div class="two" style="margin-top:22px">${side("A", A, "a")}${side("B", B, "b")}</div>
+${promptBlock}
+<div class="two">${side("A", A, "a", c.a.dir, tailA)}${side("B", B, "b", c.b.dir, tailB)}</div>
 
 <h2>Effort on one axis</h2>
 <div class="card">
@@ -89,9 +101,11 @@ ${c.warnings.map((w) => `<div class="note" style="color:var(--warn)">⚠ ${esc(w
 <tr><th></th><th class="num">A</th><th class="num">B</th><th class="num">Δ B − A</th></tr>
 <tr><td>passed</td><td class="num">${m.passed}/${m.n}</td><td class="num">${n.passed}/${n.n}</td><td class="num">${delta(n.passed - m.passed, "up", (x) => String(x))}</td></tr>
 <tr><td>pass rate (95% interval)</td><td class="num">${pct(m.passAt1)} (${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)})</td><td class="num">${pct(n.passAt1)} (${pct(n.passAt1Lower)}–${pct(n.passAt1Upper)})</td><td class="num">${delta(Math.round(c.delta.passAt1 * 100), "up", (x) => `${x} pts`)}</td></tr>
-<tr><td>pass^5 estimated</td><td class="num">${pct(m.passPowK[Math.min(5, m.n)] ?? 0)}</td><td class="num">${pct(n.passPowK[Math.min(5, n.n)] ?? 0)}</td><td class="num"></td></tr>
+<tr><td>pass^${c.powK} estimated</td><td class="num">${pct(m.passPowK[c.powK] ?? 0)}</td><td class="num">${pct(n.passPowK[c.powK] ?? 0)}</td><td class="num">${delta(Math.round(c.delta.passPowK * 100), "up", (x) => `${x} pts`)}</td></tr>
 <tr><td>median steps</td><td class="num">${m.medianSteps}</td><td class="num">${n.medianSteps}</td><td class="num">${delta(c.delta.medianSteps, "down", (x) => String(x))}</td></tr>
-<tr><td>p95 steps</td><td class="num">${m.p95Steps}</td><td class="num">${n.p95Steps}</td><td class="num">${delta(Math.round(c.delta.p95Steps * 10) / 10, "down", (x) => String(x))}</td></tr>
+${tail && tailA !== null && tailB !== null
+  ? `<tr><td>${tail.label} steps</td><td class="num">${tailA}</td><td class="num">${tailB}</td><td class="num">${delta(tailB - tailA, "down", (x) => String(x))}</td></tr>`
+  : `<tr><td>step range</td><td class="num">${m.minSteps}–${m.maxSteps}</td><td class="num">${n.minSteps}–${n.maxSteps}</td><td class="num"><span class="delta flat">too few runs for a percentile</span></td></tr>`}
 <tr><td>median duration</td><td class="num">${secs(m.medianDurationMs)}</td><td class="num">${secs(n.medianDurationMs)}</td><td class="num">${delta(Math.round(c.delta.medianDurationMs / 1000), "down", (x) => `${x}s`)}</td></tr>
 <tr><td>cost per success</td><td class="num">${usd(m.costPerSuccessUsd)}</td><td class="num">${usd(n.costPerSuccessUsd)}</td><td class="num">${c.delta.costPerSuccessUsd === null ? "" : delta(Math.round(c.delta.costPerSuccessUsd * 1000) / 1000, "down", (x) => `$${x.toFixed(3)}`)}</td></tr>
 <tr><td>Fisher exact p (pass/fail)</td><td class="num" colspan="3" style="text-align:left">${c.fisherP.toFixed(3)} — ${c.fisherP < 0.05 ? "unlikely to be noise" : "consistent with noise at this sample size; effort and cost may still be informative"}</td></tr>

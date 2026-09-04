@@ -11,3 +11,12 @@ test("task hash is stable under key order and changes when a check changes", () 
   const stricter: Task = { ...task, checks: [{ type: "file_contains", path: "/tmp/x", text: "y" }] };
   assert.notEqual(taskHash(task), taskHash(stricter));
 });
+
+test("naming a check changes neither the task hash nor 'checks held fixed'", async () => {
+  const { taskHash, unlabelled } = await import("../src/provenance.js");
+  const base = { id: "t", name: "t", prompt: "p", checks: [{ type: "file_exists" as const, path: "/a" }] };
+  const named = { ...base, checks: [{ type: "file_exists" as const, path: "/a", name: "The file exists" }] };
+  assert.equal(taskHash(named), taskHash(base));
+  assert.notEqual(taskHash({ ...base, checks: [{ type: "file_exists" as const, path: "/b" }] }), taskHash(base));
+  assert.deepEqual(unlabelled(named.checks), base.checks);
+});

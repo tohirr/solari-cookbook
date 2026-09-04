@@ -48,7 +48,8 @@ golden:
   - exec: sh
     args: ["-c", "curl -s -o /dev/null -F vendor_id=V-104 -F invoice_number=NOS-1047 -F invoice_date=2026-08-28 -F subtotal=1240.00 -F tax=93.00 -F total=1333.00 -F currency=USD -F 'terms=Net 30' -F status=pending_review -F attachment=@/home/desktop/Documents/Incoming/northstar-NOS-1047.pdf http://127.0.0.1:8081/api/invoices"]
 checks:
-  - type: exec
+  - name: Invoice NOS-1047 entered correctly, attached, pending review, nothing paid
+    type: exec
     cmd: python3
     args: ["/root/ledgerdesk/check.py"]
     stdout_contains: "ALL_OK"

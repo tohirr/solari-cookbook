@@ -122,8 +122,10 @@
     "snapshot"
   ],
   "warnings": [],
+  "powK": 5,
   "delta": {
     "passAt1": 0.6,
+    "passPowK": 1,
     "medianSteps": -21,
     "p95Steps": -23.6,
     "medianDurationMs": -35523,

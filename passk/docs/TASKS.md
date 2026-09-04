@@ -34,8 +34,11 @@ Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
 
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
+Any check may carry a `name` ("Invoice was created"); reports show it in
+place of the raw path or command, which stays available for audit. Naming a
+check changes neither grading nor the task hash.
 
-<p align="center"><a href="evidence/invoice-entry/report.html"><img src="docs/report-invoice-entry.jpg" alt="Invoice entry report: 23/26, every run a dot, effort per run, filmstrips" width="100%"></a></p>
+<p align="center"><a href="evidence/invoice-entry/report.html"><img src="docs/report-invoice-entry.jpg" alt="Invoice entry report: 23/26 passed, every run a dot in rows of ten, the numbers, effort per run" width="100%"></a></p>
 
 ## First run
 

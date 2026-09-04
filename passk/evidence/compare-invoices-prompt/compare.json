@@ -122,8 +122,10 @@
     "prompt"
   ],
   "warnings": [],
+  "powK": 5,
   "delta": {
     "passAt1": 0,
+    "passPowK": 0,
     "medianSteps": 5,
     "p95Steps": 14.799999999999997,
     "medianDurationMs": 8345,

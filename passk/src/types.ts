@@ -10,8 +10,10 @@
  * `invariant: true` marks a guard that must hold before AND after the agent
  * acts (the data survived) rather than a goal that must become true. Both
  * grade the run; `passk validate` treats them differently.
+ * `name` is a human label for reports ("Invoice was created"); it never
+ * affects grading or the task hash.
  */
-export type Check = ({ invariant?: boolean }) & (
+export type Check = ({ invariant?: boolean; name?: string }) & (
   | { type: "file_exists"; path: string }
   | { type: "file_contains"; path: string; text: string }
   | { type: "file_equals"; path: string; text: string }

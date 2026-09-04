@@ -7,6 +7,19 @@ import type { Desktop } from "@solarisdk/sdk";
 import { structured } from "./llm.js";
 import type { Check, CheckResult } from "./types.js";
 
+/** What a report calls a check: its `name` if the task gave one, else the type and its path or command. */
+export function checkLabel(check: Check): string {
+  if (check.name) return check.name;
+  const what = "path" in check ? check.path : "cmd" in check ? `${check.cmd} ${(check.args ?? []).join(" ")}`.trim() : "";
+  return `${check.type} ${what}`.trim();
+}
+
+/** The raw assertion behind a check, for audit next to its label. */
+export function checkRaw(check: Check): string {
+  const { name: _name, invariant: _inv, ...rest } = check as Check & { name?: string };
+  return JSON.stringify(rest);
+}
+
 const Judgement = z.object({
   passed: z.boolean(),
   reason: z.string(),

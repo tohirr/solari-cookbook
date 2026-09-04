@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
+import { unlabelled } from "./provenance.js";
 import type { BenchMetrics, BenchResult } from "./types.js";
 
 export interface Comparison {
@@ -20,8 +21,11 @@ export interface Comparison {
   heldFixed: string[];
   changed: string[];
   warnings: string[];
+  /** The k used for the pass^k row: 5, or fewer when a side attempted fewer runs, so both sides are estimated at the same k. */
+  powK: number;
   delta: {
     passAt1: number;
+    passPowK: number;
     medianSteps: number;
     p95Steps: number;
     medianDurationMs: number;
@@ -53,7 +57,7 @@ export function loadBench(dir: string): BenchResult {
 }
 
 function side(dir: string, b: BenchResult): Side {
-  const checks = JSON.stringify(b.provenance?.task?.checks ?? null);
+  const checks = JSON.stringify(b.provenance?.task?.checks ? unlabelled(b.provenance.task.checks) : null);
   return {
     dir, taskId: b.taskId, taskName: b.taskName, prompt: b.prompt.trim(), model: b.model, snapshotId: b.snapshotId,
     taskHash: b.provenance?.taskHash ?? null, checks, metrics: b.metrics,
@@ -75,10 +79,12 @@ export function compareBenches(dirA: string, dirB: string): Comparison {
   if (A.metrics.n < 5 || B.metrics.n < 5) warnings.push("fewer than 5 attempted runs on a side; treat the delta as a hint, not a result");
 
   const m = A.metrics, n = B.metrics;
+  const powK = Math.max(1, Math.min(5, m.n, n.n));
   return {
-    a: A, b: B, heldFixed, changed, warnings,
+    a: A, b: B, heldFixed, changed, warnings, powK,
     delta: {
       passAt1: n.passAt1 - m.passAt1,
+      passPowK: (n.passPowK[powK] ?? 0) - (m.passPowK[powK] ?? 0),
       medianSteps: n.medianSteps - m.medianSteps,
       p95Steps: n.p95Steps - m.p95Steps,
       medianDurationMs: n.medianDurationMs - m.medianDurationMs,
@@ -121,7 +127,7 @@ export function formatComparison(c: Comparison): string {
     row("", "A", "B", "Δ (B − A)"),
     row("passed", `${m.passed}/${m.n}`, `${n.passed}/${n.n}`, sign(n.passed - m.passed)),
     row("pass@1", `${pct(m.passAt1)} (${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)})`, `${pct(n.passAt1)} (${pct(n.passAt1Lower)}–${pct(n.passAt1Upper)})`, sign(Math.round(c.delta.passAt1 * 100), " pts")),
-    row("pass^5 est.", pct(m.passPowK[Math.min(5, m.n)] ?? 0), pct(n.passPowK[Math.min(5, n.n)] ?? 0)),
+    row(`pass^${c.powK} est.`, pct(m.passPowK[c.powK] ?? 0), pct(n.passPowK[c.powK] ?? 0), sign(Math.round(c.delta.passPowK * 100), " pts")),
     row("median steps", String(m.medianSteps), String(n.medianSteps), sign(c.delta.medianSteps)),
     row("p95 steps", String(m.p95Steps), String(n.p95Steps), sign(c.delta.p95Steps)),
     row("median time", `${(m.medianDurationMs / 1000).toFixed(0)}s`, `${(n.medianDurationMs / 1000).toFixed(0)}s`, sign(Math.round(c.delta.medianDurationMs / 1000), "s")),

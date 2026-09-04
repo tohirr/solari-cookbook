@@ -28,10 +28,28 @@ h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-
 .kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
 .kpi span{color:var(--ink-3);font-size:12px;display:block}
 .kpi .sub{color:var(--ink-2)}
-.dots{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:var(--bg);font-family:var(--mono)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:10px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--mono);text-decoration:none;line-height:1}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1px}
 .dot.passed{background:var(--good)}.dot.failed{background:var(--crit)}.dot.errored{background:transparent;border-color:var(--ink-3);color:var(--ink-3)}
 .dot.skipped{background:transparent;border-color:var(--line-2);color:var(--ink-3)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.headline span{color:var(--ink-2);font-size:13px}
+.runrow{margin:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 20px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12px}
+.runrow[open]>summary{border-bottom:1px solid var(--line)}
+.runrow>.card{border:0;border-radius:0 0 var(--radius) var(--radius)}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 22px;font-size:15px;max-width:820px;line-height:1.6}
+.diff del{background:var(--crit-dim);color:var(--crit);text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
 .legend{display:flex;gap:16px;color:var(--ink-3);font-size:12px;margin-top:10px;flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 .range{position:relative;height:10px;background:var(--surface-2);border-radius:5px;margin:14px 0 6px}
@@ -85,19 +103,19 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 <p class="verdict"><b>5 of 5 passed</b>. Same outcome every time, but the effort varied from 15 to 36 steps: the pass rate hides how differently each run got there.</p>
 
 <div class="card">
-  <div class="dots"><span class="dot passed " data-tip="run 0: passed in 20 steps"></span><span class="dot passed " data-tip="run 1: passed in 21 steps"></span><span class="dot passed " data-tip="run 2: passed in 30 steps"></span><span class="dot passed " data-tip="run 3: passed in 36 steps"></span><span class="dot passed " data-tip="run 4: passed in 15 steps"></span></div>
-  <div class="legend"><span><i style="background:var(--good)"></i>passed</span><span><i style="background:var(--crit)"></i>failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span></div>
+  <div class="headline"><b>5/5 passed</b><span>pass@1 100% · 95% interval 57%–100%</span></div>
+  <div class="dots"><div class="dotrow"><a class="dot passed " data-tip="run 0: passed in 20 steps" aria-label="run 0: passed in 20 steps" href="#run-0">✓</a><a class="dot passed " data-tip="run 1: passed in 21 steps" aria-label="run 1: passed in 21 steps" href="#run-1">✓</a><a class="dot passed " data-tip="run 2: passed in 30 steps" aria-label="run 2: passed in 30 steps" href="#run-2">✓</a><a class="dot passed " data-tip="run 3: passed in 36 steps" aria-label="run 3: passed in 36 steps" href="#run-3">✓</a><a class="dot passed " data-tip="run 4: passed in 15 steps" aria-label="run 4: passed in 15 steps" href="#run-4">✓</a></div></div>
+  <div class="legend"><span><i style="background:var(--good)"></i>✓ passed</span><span><i style="background:var(--crit)"></i>× failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span><span>click a dot for the run</span></div>
   <div class="range" data-tip="observed 100%, 95% Wilson interval 57%–100%"><i style="left:56.5508505247919%;right:0%"></i><b style="left:100%"></b></div>
-  <div class="range-labels"><span>0%</span><span>pass rate: observed 100%, plausible range 57%–100%</span><span>100%</span></div>
+  <div class="range-labels"><span>0%</span><span>where the true pass rate plausibly sits (95% Wilson interval)</span><span>100%</span></div>
 </div>
 
 <h2>Numbers</h2>
 <div class="kpis">
-  <div class="card kpi"><b>5/5</b><span>observed passes</span><span class="sub">pass@1 100% · interval 57%–100%</span></div>
   <div class="card kpi"><b>100%</b><span>pass^5 · all 5 in a row</span><span class="sub">lower bound 6%</span></div>
-  <div class="card kpi"><b>5/5</b><span>end-to-end</span><span class="sub">no runs lost</span></div>
-  <div class="card kpi"><b>21</b><span>median steps</span><span class="sub">p95 34.8 · range 15–36</span></div>
-  <div class="card kpi"><b>146s</b><span>median duration</span><span class="sub">p95 282s</span></div>
+  
+  <div class="card kpi"><b>21</b><span>median steps</span><span class="sub">range 15–36</span></div>
+  <div class="card kpi"><b>146s</b><span>median duration</span><span class="sub">range 136s–301s</span></div>
   <div class="card kpi"><b>$0.020</b><span>per successful run</span><span class="sub">$0.10 total model spend</span></div>
 </div>
 
@@ -121,7 +139,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 </div>
 
 <h2>Runs</h2>
-<div class="runs"><div class="card run">
+<div class="runs"><div class="card run" id="run-0">
     <div class="id"><b>Run 0</b><span class="pill passed">passed</span> <div style="margin-top:8px">20 steps · 146s · $0.025</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec sh -c ls /root/Documents/invoices/archive | grep -c invoice</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt</div></div>
@@ -149,7 +167,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:87,&quot;y&quot;:151}
 19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ALT&quot;,&quot;UP&quot;]}</pre></details>
     </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-1">
     <div class="id"><b>Run 1</b><span class="pill passed">passed</span> <div style="margin-top:8px">21 steps · 207s · $0.019</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec sh -c ls /root/Documents/invoices/archive | grep -c invoice</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt</div></div>
@@ -178,7 +196,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 19  wait             {&quot;type&quot;:&quot;wait&quot;}
 20  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ALT&quot;,&quot;ARROWUP&quot;]}</pre></details>
     </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-2">
     <div class="id"><b>Run 2</b><span class="pill passed">passed</span> <div style="margin-top:8px">30 steps · 301s · $0.022</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec sh -c ls /root/Documents/invoices/archive | grep -c invoice</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt</div></div>
@@ -216,7 +234,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 28  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ALT&quot;,&quot;UP&quot;]}
 29  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-3">
     <div class="id"><b>Run 3</b><span class="pill passed">passed</span> <div style="margin-top:8px">36 steps · 136s · $0.022</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec sh -c ls /root/Documents/invoices/archive | grep -c invoice</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt</div></div>
@@ -260,7 +278,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 34  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:247,&quot;y&quot;:204}
 35  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-4">
     <div class="id"><b>Run 4</b><span class="pill passed">passed</span> <div style="margin-top:8px">15 steps · 146s · $0.013</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec sh -c ls /root/Documents/invoices/archive | grep -c invoice</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt</div><div><span class="ok">✓</span> file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt</div></div>
@@ -298,5 +316,8 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 <div class="tip" id="tip"></div>
 <script>
 (function(){var t=document.getElementById('tip');document.addEventListener('mousemove',function(e){var el=e.target.closest&&e.target.closest('[data-tip]');if(!el){t.style.opacity=0;return;}t.textContent=el.getAttribute('data-tip');t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';t.style.opacity=1;});})();
+</script>
+<script>
+(function(){function open(){var id=location.hash.slice(1),el=id&&document.getElementById(id);if(el&&el.tagName==='DETAILS'){el.open=true;el.scrollIntoView();}}addEventListener('hashchange',open);open();})();
 </script>
 </main></body></html>

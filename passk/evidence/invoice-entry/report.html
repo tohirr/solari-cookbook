@@ -28,10 +28,28 @@ h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-
 .kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
 .kpi span{color:var(--ink-3);font-size:12px;display:block}
 .kpi .sub{color:var(--ink-2)}
-.dots{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:10px;font-weight:700;color:var(--bg);font-family:var(--mono)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:10px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--mono);text-decoration:none;line-height:1}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1px}
 .dot.passed{background:var(--good)}.dot.failed{background:var(--crit)}.dot.errored{background:transparent;border-color:var(--ink-3);color:var(--ink-3)}
 .dot.skipped{background:transparent;border-color:var(--line-2);color:var(--ink-3)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.headline span{color:var(--ink-2);font-size:13px}
+.runrow{margin:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 20px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12px}
+.runrow[open]>summary{border-bottom:1px solid var(--line)}
+.runrow>.card{border:0;border-radius:0 0 var(--radius) var(--radius)}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 22px;font-size:15px;max-width:820px;line-height:1.6}
+.diff del{background:var(--crit-dim);color:var(--crit);text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
 .legend{display:flex;gap:16px;color:var(--ink-3);font-size:12px;margin-top:10px;flex-wrap:wrap}
 .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
 .range{position:relative;height:10px;background:var(--surface-2);border-radius:5px;margin:14px 0 6px}
@@ -85,19 +103,19 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 <p class="verdict"><b>23 of 26 passed</b>, 4 lost to desktop infrastructure. Observed pass rate 88% (95% interval 71%–96%); the chance that 5 runs in a row all pass is about 51%.</p>
 
 <div class="card">
-  <div class="dots"><span class="dot passed " data-tip="run 0: passed in 35 steps"></span><span class="dot passed " data-tip="run 1: passed in 40 steps"></span><span class="dot passed " data-tip="run 2: passed in 37 steps"></span><span class="dot passed " data-tip="run 3: passed in 38 steps"></span><span class="dot passed " data-tip="run 4: passed in 37 steps"></span><span class="dot passed " data-tip="run 5: passed in 38 steps"></span><span class="dot passed " data-tip="run 6: passed in 39 steps"></span><span class="dot passed " data-tip="run 7: passed in 69 steps"></span><span class="dot passed " data-tip="run 8: passed in 39 steps"></span><span class="dot passed " data-tip="run 9: passed in 40 steps"></span><span class="dot passed " data-tip="run 10: passed in 41 steps"></span><span class="dot passed " data-tip="run 11: passed in 42 steps"></span><span class="dot failed " data-tip="run 12: failed in 71 steps"></span><span class="dot passed " data-tip="run 13: passed in 39 steps"></span><span class="dot failed " data-tip="run 14: failed in 72 steps"></span><span class="dot passed " data-tip="run 15: passed in 40 steps"></span><span class="dot passed " data-tip="run 16: passed in 38 steps"></span><span class="dot failed " data-tip="run 17: failed in 71 steps"></span><span class="dot passed " data-tip="run 18: passed in 42 steps"></span><span class="dot errored " data-tip="run 19: lost to desktop infrastructure">!</span><span class="dot errored " data-tip="run 20: lost to desktop infrastructure">!</span><span class="dot errored " data-tip="run 21: lost to desktop infrastructure">!</span><span class="dot errored " data-tip="run 22: lost to desktop infrastructure">!</span><span class="dot passed " data-tip="run 23: passed in 42 steps"></span><span class="dot passed " data-tip="run 24: passed in 41 steps"></span><span class="dot passed " data-tip="run 25: passed in 42 steps"></span><span class="dot passed " data-tip="run 26: passed in 43 steps"></span><span class="dot passed " data-tip="run 27: passed in 42 steps"></span><span class="dot passed " data-tip="run 28: passed in 42 steps"></span><span class="dot passed " data-tip="run 29: passed in 44 steps"></span></div>
-  <div class="legend"><span><i style="background:var(--good)"></i>passed</span><span><i style="background:var(--crit)"></i>failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span></div>
+  <div class="headline"><b>23/26 passed</b><span>pass@1 88% · 95% interval 71%–96% · 4 of 30 requested runs lost before they could be scored</span></div>
+  <div class="dots"><div class="dotrow"><em>0</em><a class="dot passed " data-tip="run 0: passed in 35 steps" aria-label="run 0: passed in 35 steps" href="#run-0">✓</a><a class="dot passed " data-tip="run 1: passed in 40 steps" aria-label="run 1: passed in 40 steps" href="#run-1">✓</a><a class="dot passed " data-tip="run 2: passed in 37 steps" aria-label="run 2: passed in 37 steps" href="#run-2">✓</a><a class="dot passed " data-tip="run 3: passed in 38 steps" aria-label="run 3: passed in 38 steps" href="#run-3">✓</a><a class="dot passed " data-tip="run 4: passed in 37 steps" aria-label="run 4: passed in 37 steps" href="#run-4">✓</a><a class="dot passed " data-tip="run 5: passed in 38 steps" aria-label="run 5: passed in 38 steps" href="#run-5">✓</a><a class="dot passed " data-tip="run 6: passed in 39 steps" aria-label="run 6: passed in 39 steps" href="#run-6">✓</a><a class="dot passed " data-tip="run 7: passed in 69 steps" aria-label="run 7: passed in 69 steps" href="#run-7">✓</a><a class="dot passed " data-tip="run 8: passed in 39 steps" aria-label="run 8: passed in 39 steps" href="#run-8">✓</a><a class="dot passed " data-tip="run 9: passed in 40 steps" aria-label="run 9: passed in 40 steps" href="#run-9">✓</a></div><div class="dotrow"><em>10</em><a class="dot passed " data-tip="run 10: passed in 41 steps" aria-label="run 10: passed in 41 steps" href="#run-10">✓</a><a class="dot passed " data-tip="run 11: passed in 42 steps" aria-label="run 11: passed in 42 steps" href="#run-11">✓</a><a class="dot failed " data-tip="run 12: failed in 71 steps" aria-label="run 12: failed in 71 steps" href="#run-12">×</a><a class="dot passed " data-tip="run 13: passed in 39 steps" aria-label="run 13: passed in 39 steps" href="#run-13">✓</a><a class="dot failed " data-tip="run 14: failed in 72 steps" aria-label="run 14: failed in 72 steps" href="#run-14">×</a><a class="dot passed " data-tip="run 15: passed in 40 steps" aria-label="run 15: passed in 40 steps" href="#run-15">✓</a><a class="dot passed " data-tip="run 16: passed in 38 steps" aria-label="run 16: passed in 38 steps" href="#run-16">✓</a><a class="dot failed " data-tip="run 17: failed in 71 steps" aria-label="run 17: failed in 71 steps" href="#run-17">×</a><a class="dot passed " data-tip="run 18: passed in 42 steps" aria-label="run 18: passed in 42 steps" href="#run-18">✓</a><a class="dot errored " data-tip="run 19: lost to desktop infrastructure" aria-label="run 19: lost to desktop infrastructure" href="#run-19">!</a></div><div class="dotrow"><em>20</em><a class="dot errored " data-tip="run 20: lost to desktop infrastructure" aria-label="run 20: lost to desktop infrastructure" href="#run-20">!</a><a class="dot errored " data-tip="run 21: lost to desktop infrastructure" aria-label="run 21: lost to desktop infrastructure" href="#run-21">!</a><a class="dot errored " data-tip="run 22: lost to desktop infrastructure" aria-label="run 22: lost to desktop infrastructure" href="#run-22">!</a><a class="dot passed " data-tip="run 23: passed in 42 steps" aria-label="run 23: passed in 42 steps" href="#run-23">✓</a><a class="dot passed " data-tip="run 24: passed in 41 steps" aria-label="run 24: passed in 41 steps" href="#run-24">✓</a><a class="dot passed " data-tip="run 25: passed in 42 steps" aria-label="run 25: passed in 42 steps" href="#run-25">✓</a><a class="dot passed " data-tip="run 26: passed in 43 steps" aria-label="run 26: passed in 43 steps" href="#run-26">✓</a><a class="dot passed " data-tip="run 27: passed in 42 steps" aria-label="run 27: passed in 42 steps" href="#run-27">✓</a><a class="dot passed " data-tip="run 28: passed in 42 steps" aria-label="run 28: passed in 42 steps" href="#run-28">✓</a><a class="dot passed " data-tip="run 29: passed in 44 steps" aria-label="run 29: passed in 44 steps" href="#run-29">✓</a></div></div>
+  <div class="legend"><span><i style="background:var(--good)"></i>✓ passed</span><span><i style="background:var(--crit)"></i>× failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span><span>click a dot for the run</span></div>
   <div class="range" data-tip="observed 88%, 95% Wilson interval 71%–96%"><i style="left:71.02370691310168%;right:4.003171821149493%"></i><b style="left:88.46153846153845%"></b></div>
-  <div class="range-labels"><span>0%</span><span>pass rate: observed 88%, plausible range 71%–96%</span><span>100%</span></div>
+  <div class="range-labels"><span>0%</span><span>where the true pass rate plausibly sits (95% Wilson interval)</span><span>100%</span></div>
 </div>
 
 <h2>Numbers</h2>
 <div class="kpis">
-  <div class="card kpi"><b>23/26</b><span>observed passes</span><span class="sub">pass@1 88% · interval 71%–96%</span></div>
   <div class="card kpi"><b>51%</b><span>pass^5 · all 5 in a row</span><span class="sub">lower bound 18%</span></div>
   <div class="card kpi"><b>23/30</b><span>end-to-end</span><span class="sub">4 desktop lost</span></div>
   <div class="card kpi"><b>41</b><span>median steps</span><span class="sub">p95 71 · range 35–72</span></div>
-  <div class="card kpi"><b>123s</b><span>median duration</span><span class="sub">p95 226s</span></div>
+  <div class="card kpi"><b>123s</b><span>median duration</span><span class="sub">p95 226s · range 87s–249s</span></div>
   <div class="card kpi"><b>$0.024</b><span>per successful run</span><span class="sub">$0.79 total model spend</span></div>
 </div>
 
@@ -120,599 +138,8 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
   <div class="note">Every point is one run from the same snapshot. A wide spread on a task that always passes is behavior variability: same result, different routes, different cost.</div>
 </div>
 
-<h2>Runs</h2>
-<div class="runs"><div class="card run">
-    <div class="id"><b>Run 0</b><span class="pill passed">passed</span> <div style="margin-top:8px">35 steps · 87s · $0.023</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-00/step-000.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-000.jpg" alt="step 0"><em>0</em></a><a href="run-00/step-002.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-002.jpg" alt="step 2"><em>2</em></a><a href="run-00/step-004.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-004.jpg" alt="step 4"><em>4</em></a><a href="run-00/step-007.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-007.jpg" alt="step 7"><em>7</em></a><a href="run-00/step-026.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-026.jpg" alt="step 26"><em>26</em></a><a href="run-00/step-027.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-027.jpg" alt="step 27"><em>27</em></a><a href="run-00/step-028.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-028.jpg" alt="step 28"><em>28</em></a><a href="run-00/step-029.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-029.jpg" alt="step 29"><em>29</em></a><a href="run-00/step-031.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-031.jpg" alt="step 31"><em>31</em></a><a href="run-00/step-032.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-032.jpg" alt="step 32"><em>32</em></a><a href="run-00/step-033.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-033.jpg" alt="step 33"><em>33</em></a><a href="run-00/step-034.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-034.jpg" alt="step 34"><em>34</em></a><a href="run-00/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-00/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered in LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (35 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:913,&quot;y&quot;:42}
- 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1162,&quot;y&quot;:43}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:400,&quot;y&quot;:12}
- 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:445,&quot;y&quot;:204}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1190,&quot;y&quot;:49}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:115,&quot;y&quot;:12}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:76,&quot;y&quot;:306}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:362}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:190,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:492,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:131,&quot;y&quot;:488}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:352,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:568,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:493,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:93,&quot;y&quot;:612}
-28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:269,&quot;y&quot;:181}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:157}
-30  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:313,&quot;y&quot;:204}
-31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1204,&quot;y&quot;:49}
-32  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:534,&quot;x&quot;:738,&quot;y&quot;:674}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:93,&quot;y&quot;:650}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:58,&quot;y&quot;:336}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 1</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 115s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-01/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-01/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies into LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:448,&quot;y&quot;:210}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
- 5  wait             {&quot;type&quot;:&quot;wait&quot;}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:307}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:452,&quot;y&quot;:361}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:303,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:263,&quot;y&quot;:488}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:469,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:674,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:628,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:613}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:268,&quot;y&quot;:181}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:157}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:205}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1200,&quot;y&quot;:49}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:566,&quot;x&quot;:1004,&quot;y&quot;:674}
-37  wait             {&quot;type&quot;:&quot;wait&quot;}
-38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:214,&quot;y&quot;:648}
-39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 2</b><span class="pill passed">passed</span> <div style="margin-top:8px">37 steps · 108s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-02/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-02/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies with its PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (37 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:449,&quot;y&quot;:212}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:196,&quot;y&quot;:307}
- 6  wait             {&quot;type&quot;:&quot;wait&quot;}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:459,&quot;y&quot;:360}
- 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
- 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:423}
-11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:607,&quot;y&quot;:423}
-13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:252,&quot;y&quot;:488}
-15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:479,&quot;y&quot;:488}
-18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:681,&quot;y&quot;:488}
-21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:638,&quot;y&quot;:550}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:521,&quot;y&quot;:600}
-25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:613}
-26  wait             {&quot;type&quot;:&quot;wait&quot;}
-27  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:271,&quot;y&quot;:181}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:253,&quot;y&quot;:157}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:297,&quot;y&quot;:205}
-32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1199,&quot;y&quot;:49}
-33  wait             {&quot;type&quot;:&quot;wait&quot;}
-34  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:545,&quot;x&quot;:978,&quot;y&quot;:675}
-35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:647}
-36  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 3</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 99s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-03/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-03/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered for Northstar Office Supplies with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:215}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:619,&quot;y&quot;:44}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:305}
- 6  wait             {&quot;type&quot;:&quot;wait&quot;}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:426,&quot;y&quot;:363}
- 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
- 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:423}
-11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:623,&quot;y&quot;:423}
-13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:488}
-15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:476,&quot;y&quot;:488}
-18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:686,&quot;y&quot;:488}
-21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:550}
-24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:208,&quot;y&quot;:612}
-27  wait             {&quot;type&quot;:&quot;wait&quot;}
-28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:181}
-29  wait             {&quot;type&quot;:&quot;wait&quot;}
-30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:158}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:307,&quot;y&quot;:206}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1201,&quot;y&quot;:50}
-34  wait             {&quot;type&quot;:&quot;wait&quot;}
-35  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:531,&quot;x&quot;:1005,&quot;y&quot;:677}
-36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:649}
-37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 4</b><span class="pill passed">passed</span> <div style="margin-top:8px">37 steps · 111s · $0.026</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-04/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-04/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies into LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (37 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:218}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:306}
- 6  wait             {&quot;type&quot;:&quot;wait&quot;}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:457,&quot;y&quot;:362}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:282,&quot;y&quot;:439}
- 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:298,&quot;y&quot;:423}
-10  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:628,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:261,&quot;y&quot;:487}
-14  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:462,&quot;y&quot;:487}
-17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-19  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:684,&quot;y&quot;:487}
-20  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-21  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:639,&quot;y&quot;:550}
-23  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;N&quot;]}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:528,&quot;y&quot;:602}
-25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:208,&quot;y&quot;:613}
-26  wait             {&quot;type&quot;:&quot;wait&quot;}
-27  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:259,&quot;y&quot;:181}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:252,&quot;y&quot;:157}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:302,&quot;y&quot;:204}
-32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
-33  wait             {&quot;type&quot;:&quot;wait&quot;}
-34  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:527,&quot;x&quot;:1003,&quot;y&quot;:675}
-35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:648}
-36  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 5</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 142s · $0.016</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-05/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-05/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered Northstar Office Supplies invoice NOS-1047 into LedgerDesk with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:446,&quot;y&quot;:214}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1256,&quot;y&quot;:50}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1161,&quot;y&quot;:44}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:78,&quot;y&quot;:306}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:361,&quot;y&quot;:361}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:488,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:137,&quot;y&quot;:489}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:349,&quot;y&quot;:489}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:564,&quot;y&quot;:489}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:506,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:95,&quot;y&quot;:611}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:270,&quot;y&quot;:182}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:158}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:311,&quot;y&quot;:205}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1203,&quot;y&quot;:50}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:94,&quot;y&quot;:718}
-37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 6</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 97s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-06/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-06/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Newest unpaid Northstar Office Supplies invoice NOS-1047 was entered into LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:445,&quot;y&quot;:211}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ALT&quot;,&quot;F4&quot;]}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1160,&quot;y&quot;:44}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:77,&quot;y&quot;:306}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:363}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:182,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:481,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:141,&quot;y&quot;:488}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:348,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:567,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:510,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:94,&quot;y&quot;:613}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:267,&quot;y&quot;:181}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:158}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:306,&quot;y&quot;:205}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:530,&quot;x&quot;:743,&quot;y&quot;:672}
-37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:96,&quot;y&quot;:651}
-38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 7</b><span class="pill passed">passed</span> <div style="margin-top:8px">69 steps · 209s · $0.079</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-07/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-07/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered with its PDF attached and saved as **Pending review**; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (69 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:452,&quot;y&quot;:208}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1198,&quot;y&quot;:43}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:47,&quot;y&quot;:12}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:69,&quot;y&quot;:144}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:839,&quot;y&quot;:415}
- 9  wait             {&quot;type&quot;:&quot;wait&quot;}
-10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:919,&quot;y&quot;:645}
-11  wait             {&quot;type&quot;:&quot;wait&quot;}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:552,&quot;y&quot;:587}
-13  wait             {&quot;type&quot;:&quot;wait&quot;}
-14  wait             {&quot;type&quot;:&quot;wait&quot;}
-15  wait             {&quot;type&quot;:&quot;wait&quot;}
-16  wait             {&quot;type&quot;:&quot;wait&quot;}
-17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;L&quot;]}
-18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;http://127.0.0.1:8081&quot;}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-20  wait             {&quot;type&quot;:&quot;wait&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1180,&quot;y&quot;:191}
-22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1156,&quot;y&quot;:85}
-23  wait             {&quot;type&quot;:&quot;wait&quot;}
-24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;R&quot;]}
-25  wait             {&quot;type&quot;:&quot;wait&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;L&quot;]}
-27  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;http://127.0.0.1:8081/&quot;}
-28  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-29  wait             {&quot;type&quot;:&quot;wait&quot;}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;H&quot;]}
-34  wait             {&quot;type&quot;:&quot;wait&quot;}
-35  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:554,&quot;y&quot;:380}
-36  wait             {&quot;type&quot;:&quot;wait&quot;}
-37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:72,&quot;y&quot;:266}
-38  wait             {&quot;type&quot;:&quot;wait&quot;}
-39  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:340,&quot;y&quot;:321}
-40  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-41  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-42  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:186,&quot;y&quot;:382}
-43  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-44  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:480,&quot;y&quot;:382}
-45  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-46  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:132,&quot;y&quot;:447}
-47  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-48  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-49  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:338,&quot;y&quot;:447}
-50  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-51  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-52  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:570,&quot;y&quot;:447}
-53  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-54  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-55  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:510,&quot;y&quot;:509}
-56  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-57  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-58  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:85,&quot;y&quot;:572}
-59  wait             {&quot;type&quot;:&quot;wait&quot;}
-60  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:259,&quot;y&quot;:181}
-61  wait             {&quot;type&quot;:&quot;wait&quot;}
-62  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:157}
-63  wait             {&quot;type&quot;:&quot;wait&quot;}
-64  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:206}
-65  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1203,&quot;y&quot;:49}
-66  wait             {&quot;type&quot;:&quot;wait&quot;}
-67  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:88,&quot;y&quot;:681}
-68  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 8</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 92s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-08/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-08/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered in LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:210}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:545,&quot;y&quot;:43}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1160,&quot;y&quot;:42}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:79,&quot;y&quot;:306}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:348,&quot;y&quot;:361}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:183,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:514,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:136,&quot;y&quot;:488}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:350,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:553,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:517,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:92,&quot;y&quot;:613}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:182}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:257,&quot;y&quot;:158}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:316,&quot;y&quot;:206}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1207,&quot;y&quot;:50}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:510,&quot;x&quot;:744,&quot;y&quot;:678}
-37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:92,&quot;y&quot;:651}
-38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 9</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 93s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-09/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-09/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Invoice NOS-1047 from Northstar Office Supplies was entered as INV-0219 with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:800,&quot;y&quot;:44}
- 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1161,&quot;y&quot;:43}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:397,&quot;y&quot;:12}
- 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:204}
- 5  wait             {&quot;type&quot;:&quot;wait&quot;}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1246,&quot;y&quot;:49}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:80,&quot;y&quot;:302}
- 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:343,&quot;y&quot;:362}
-10  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:189,&quot;y&quot;:423}
-13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:504,&quot;y&quot;:423}
-15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:140,&quot;y&quot;:488}
-17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-19  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:356,&quot;y&quot;:488}
-20  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-21  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:571,&quot;y&quot;:488}
-23  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:502,&quot;y&quot;:550}
-26  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-27  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-28  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:91,&quot;y&quot;:611}
-29  wait             {&quot;type&quot;:&quot;wait&quot;}
-30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:181}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:251,&quot;y&quot;:158}
-33  wait             {&quot;type&quot;:&quot;wait&quot;}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:313,&quot;y&quot;:205}
-35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1204,&quot;y&quot;:49}
-36  wait             {&quot;type&quot;:&quot;wait&quot;}
-37  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:567,&quot;x&quot;:738,&quot;y&quot;:677}
-38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:90,&quot;y&quot;:650}
-39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 10</b><span class="pill passed">passed</span> <div style="margin-top:8px">41 steps · 116s · $0.022</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-10/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-10/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered the newest Northstar Office Supplies invoice (NOS-1047) in LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (41 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:451,&quot;y&quot;:210}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1258,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1190,&quot;y&quot;:11}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:800,&quot;y&quot;:300}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:12}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:199,&quot;y&quot;:307}
- 9  wait             {&quot;type&quot;:&quot;wait&quot;}
-10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:475,&quot;y&quot;:363}
-11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:315,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:423}
-16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:266,&quot;y&quot;:488}
-18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:465,&quot;y&quot;:488}
-21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:675,&quot;y&quot;:488}
-24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:632,&quot;y&quot;:549}
-27  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-28  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-29  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:182}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:257,&quot;y&quot;:158}
-34  wait             {&quot;type&quot;:&quot;wait&quot;}
-35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:314,&quot;y&quot;:206}
-36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1206,&quot;y&quot;:50}
-37  wait             {&quot;type&quot;:&quot;wait&quot;}
-38  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:528,&quot;x&quot;:1004,&quot;y&quot;:672}
-39  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:648}
-40  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 11</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 116s · $0.023</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-11/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-11/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered Northstar Office Supplies invoice NOS-1047 in LedgerDesk as Pending review with the PDF attached; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (42 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:206}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:337,&quot;y&quot;:204}
- 5  wait             {&quot;type&quot;:&quot;wait&quot;}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:619,&quot;y&quot;:44}
- 8  wait             {&quot;type&quot;:&quot;wait&quot;}
- 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:306}
-10  wait             {&quot;type&quot;:&quot;wait&quot;}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:471,&quot;y&quot;:362}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-13  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:311,&quot;y&quot;:423}
-15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:633,&quot;y&quot;:423}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:263,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:473,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:674,&quot;y&quot;:488}
-25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-26  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:636,&quot;y&quot;:550}
-28  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-29  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-30  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:180}
-33  wait             {&quot;type&quot;:&quot;wait&quot;}
-34  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:258,&quot;y&quot;:157}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:320,&quot;y&quot;:206}
-37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
-38  wait             {&quot;type&quot;:&quot;wait&quot;}
-39  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:528,&quot;x&quot;:1005,&quot;y&quot;:666}
-40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:649}
-41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
+<h2>Runs needing attention (7)</h2>
+<div class="runs"><div class="card run" id="run-12">
     <div class="id"><b>Run 12</b><span class="pill failed">failed</span> <span class="pill neutral">hit step cap</span><div style="margin-top:8px">71 steps · 232s · $0.072</div></div>
     <div>
       <div class="checks"><div><span class="bad">✗</span> exec python3 /root/ledgerdesk/check.py<div class="detail">exit 0, stdout &quot;MISMATCH: expected exactly 1 new invoice, found 0\n&quot;</div></div></div>
@@ -791,54 +218,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 69  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1204,&quot;y&quot;:50}
 70  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 13</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 147s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-13/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-13/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies in LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:210}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
- 5  wait             {&quot;type&quot;:&quot;wait&quot;}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:196,&quot;y&quot;:306}
- 7  wait             {&quot;type&quot;:&quot;wait&quot;}
- 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:464,&quot;y&quot;:362}
- 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
-10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:306,&quot;y&quot;:423}
-12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:488}
-16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:466,&quot;y&quot;:488}
-19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:688,&quot;y&quot;:488}
-22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:634,&quot;y&quot;:550}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:210,&quot;y&quot;:612}
-28  wait             {&quot;type&quot;:&quot;wait&quot;}
-29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:269,&quot;y&quot;:180}
-30  wait             {&quot;type&quot;:&quot;wait&quot;}
-31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:158}
-32  wait             {&quot;type&quot;:&quot;wait&quot;}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:314,&quot;y&quot;:205}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
-35  wait             {&quot;type&quot;:&quot;wait&quot;}
-36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:531,&quot;x&quot;:840,&quot;y&quot;:670}
-37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:648}
-38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-14">
     <div class="id"><b>Run 14</b><span class="pill failed">failed</span> <span class="pill neutral">hit step cap</span><div style="margin-top:8px">72 steps · 249s · $0.085</div></div>
     <div>
       <div class="checks"><div><span class="bad">✗</span> exec python3 /root/ledgerdesk/check.py<div class="detail">exit 0, stdout &quot;MISMATCH: expected exactly 1 new invoice, found 0\n&quot;</div></div></div>
@@ -918,101 +298,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 70  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:62,&quot;y&quot;:144}
 71  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 15</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 125s · $0.026</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-15/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-15/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered in LedgerDesk with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
-      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:454,&quot;y&quot;:205}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
- 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:338,&quot;y&quot;:205}
- 5  wait             {&quot;type&quot;:&quot;wait&quot;}
- 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
- 8  wait             {&quot;type&quot;:&quot;wait&quot;}
- 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:195,&quot;y&quot;:305}
-10  wait             {&quot;type&quot;:&quot;wait&quot;}
-11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:485,&quot;y&quot;:362}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:437}
-13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:300,&quot;y&quot;:423}
-14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
-16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:488}
-18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:470,&quot;y&quot;:488}
-21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:683,&quot;y&quot;:488}
-24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:650,&quot;y&quot;:550}
-27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:518,&quot;y&quot;:601}
-28  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
-29  wait             {&quot;type&quot;:&quot;wait&quot;}
-30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:181}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:157}
-33  wait             {&quot;type&quot;:&quot;wait&quot;}
-34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:312,&quot;y&quot;:206}
-35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1206,&quot;y&quot;:49}
-36  wait             {&quot;type&quot;:&quot;wait&quot;}
-37  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:539,&quot;x&quot;:1000,&quot;y&quot;:665}
-38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:214,&quot;y&quot;:649}
-39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 16</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 145s · $0.019</div></div>
-    <div>
-      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
-      <div class="film"><a href="run-16/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-16/final.jpg" alt="final"><em>final</em></a></div>
-      
-      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered in LedgerDesk as INV-0219 with the PDF attached and status set to Pending review.” — not used for grading.</div>
-      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
- 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:204}
- 2  wait             {&quot;type&quot;:&quot;wait&quot;}
- 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
- 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
- 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:306}
- 6  wait             {&quot;type&quot;:&quot;wait&quot;}
- 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:471,&quot;y&quot;:362}
- 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
- 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:308,&quot;y&quot;:423}
-11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
-12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:423}
-13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
-14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:265,&quot;y&quot;:488}
-15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
-17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:463,&quot;y&quot;:488}
-18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
-20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:681,&quot;y&quot;:488}
-21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
-22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
-23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:632,&quot;y&quot;:549}
-24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
-25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
-26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:210,&quot;y&quot;:612}
-27  wait             {&quot;type&quot;:&quot;wait&quot;}
-28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:271,&quot;y&quot;:181}
-29  wait             {&quot;type&quot;:&quot;wait&quot;}
-30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:250,&quot;y&quot;:157}
-31  wait             {&quot;type&quot;:&quot;wait&quot;}
-32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:297,&quot;y&quot;:205}
-33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1200,&quot;y&quot;:50}
-34  wait             {&quot;type&quot;:&quot;wait&quot;}
-35  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:548,&quot;x&quot;:1003,&quot;y&quot;:681}
-36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:649}
-37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
-    </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-17">
     <div class="id"><b>Run 17</b><span class="pill failed">failed</span> <span class="pill neutral">hit step cap</span><div style="margin-top:8px">71 steps · 206s · $0.078</div></div>
     <div>
       <div class="checks"><div><span class="bad">✗</span> exec python3 /root/ledgerdesk/check.py<div class="detail">exit 0, stdout &quot;MISMATCH: expected exactly 1 new invoice, found 0\n&quot;</div></div></div>
@@ -1091,7 +377,777 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 69  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:255,&quot;y&quot;:158}
 70  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div><div class="card run" id="run-19">
+    <div class="id"><b>Run 19</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 122s · $0.000</div></div>
+    <div>
+      <div class="checks"><div class="bad">Control channel closed (1006)</div></div>
+      
+      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Control channel closed (1006)). Not an agent failure; excluded from pass estimates.</div></div>
+      
+      <details><summary>trace (0 actions)</summary><pre></pre></details>
+    </div>
+  </div><div class="card run" id="run-20">
+    <div class="id"><b>Run 20</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 142s · $0.000</div></div>
+    <div>
+      <div class="checks"><div class="bad">WebSocket error</div></div>
+      
+      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (WebSocket error). Not an agent failure; excluded from pass estimates.</div></div>
+      
+      <details><summary>trace (0 actions)</summary><pre></pre></details>
+    </div>
+  </div><div class="card run" id="run-21">
+    <div class="id"><b>Run 21</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 77s · $0.000</div></div>
+    <div>
+      <div class="checks"><div class="bad">Too many concurrent sessions</div></div>
+      
+      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Too many concurrent sessions). Not an agent failure; excluded from pass estimates.</div></div>
+      
+      <details><summary>trace (0 actions)</summary><pre></pre></details>
+    </div>
+  </div><div class="card run" id="run-22">
+    <div class="id"><b>Run 22</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 77s · $0.000</div></div>
+    <div>
+      <div class="checks"><div class="bad">Too many concurrent sessions</div></div>
+      
+      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Too many concurrent sessions). Not an agent failure; excluded from pass estimates.</div></div>
+      
+      <details><summary>trace (0 actions)</summary><pre></pre></details>
+    </div>
+  </div></div>
+<h2>Passed runs (23)</h2>
+<div class="runs"><details class="runrow" id="run-0"><summary><b>Run 0</b><span class="pill passed">passed</span> <span>35 steps</span><span>87s</span><span>$0.023</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 0</b><span class="pill passed">passed</span> <div style="margin-top:8px">35 steps · 87s · $0.023</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-00/step-000.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-000.jpg" alt="step 0"><em>0</em></a><a href="run-00/step-002.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-002.jpg" alt="step 2"><em>2</em></a><a href="run-00/step-004.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-004.jpg" alt="step 4"><em>4</em></a><a href="run-00/step-007.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-007.jpg" alt="step 7"><em>7</em></a><a href="run-00/step-026.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-026.jpg" alt="step 26"><em>26</em></a><a href="run-00/step-027.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-027.jpg" alt="step 27"><em>27</em></a><a href="run-00/step-028.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-028.jpg" alt="step 28"><em>28</em></a><a href="run-00/step-029.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-029.jpg" alt="step 29"><em>29</em></a><a href="run-00/step-031.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-031.jpg" alt="step 31"><em>31</em></a><a href="run-00/step-032.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-032.jpg" alt="step 32"><em>32</em></a><a href="run-00/step-033.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-033.jpg" alt="step 33"><em>33</em></a><a href="run-00/step-034.jpg" target="_blank" class=""><img loading="lazy" src="run-00/step-034.jpg" alt="step 34"><em>34</em></a><a href="run-00/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-00/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered in LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (35 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:913,&quot;y&quot;:42}
+ 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1162,&quot;y&quot;:43}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:400,&quot;y&quot;:12}
+ 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:445,&quot;y&quot;:204}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1190,&quot;y&quot;:49}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:115,&quot;y&quot;:12}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:76,&quot;y&quot;:306}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:362}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:190,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:492,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:131,&quot;y&quot;:488}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:352,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:568,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:493,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:93,&quot;y&quot;:612}
+28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:269,&quot;y&quot;:181}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:157}
+30  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:313,&quot;y&quot;:204}
+31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1204,&quot;y&quot;:49}
+32  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:534,&quot;x&quot;:738,&quot;y&quot;:674}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:93,&quot;y&quot;:650}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:58,&quot;y&quot;:336}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-1"><summary><b>Run 1</b><span class="pill passed">passed</span> <span>40 steps</span><span>115s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 1</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 115s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-01/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-01/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies into LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:448,&quot;y&quot;:210}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
+ 5  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:307}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:452,&quot;y&quot;:361}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:303,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:263,&quot;y&quot;:488}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:469,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:674,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:628,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:613}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:268,&quot;y&quot;:181}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:157}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:205}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1200,&quot;y&quot;:49}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:566,&quot;x&quot;:1004,&quot;y&quot;:674}
+37  wait             {&quot;type&quot;:&quot;wait&quot;}
+38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:214,&quot;y&quot;:648}
+39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-2"><summary><b>Run 2</b><span class="pill passed">passed</span> <span>37 steps</span><span>108s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 2</b><span class="pill passed">passed</span> <div style="margin-top:8px">37 steps · 108s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-02/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-02/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies with its PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (37 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:449,&quot;y&quot;:212}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:196,&quot;y&quot;:307}
+ 6  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:459,&quot;y&quot;:360}
+ 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+ 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:423}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:607,&quot;y&quot;:423}
+13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:252,&quot;y&quot;:488}
+15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:479,&quot;y&quot;:488}
+18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:681,&quot;y&quot;:488}
+21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:638,&quot;y&quot;:550}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:521,&quot;y&quot;:600}
+25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:613}
+26  wait             {&quot;type&quot;:&quot;wait&quot;}
+27  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:271,&quot;y&quot;:181}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:253,&quot;y&quot;:157}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:297,&quot;y&quot;:205}
+32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1199,&quot;y&quot;:49}
+33  wait             {&quot;type&quot;:&quot;wait&quot;}
+34  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:545,&quot;x&quot;:978,&quot;y&quot;:675}
+35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:647}
+36  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-3"><summary><b>Run 3</b><span class="pill passed">passed</span> <span>38 steps</span><span>99s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 3</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 99s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-03/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-03/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered for Northstar Office Supplies with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:215}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:619,&quot;y&quot;:44}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:305}
+ 6  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:426,&quot;y&quot;:363}
+ 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+ 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:305,&quot;y&quot;:423}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:623,&quot;y&quot;:423}
+13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:488}
+15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:476,&quot;y&quot;:488}
+18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:686,&quot;y&quot;:488}
+21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:550}
+24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:208,&quot;y&quot;:612}
+27  wait             {&quot;type&quot;:&quot;wait&quot;}
+28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:181}
+29  wait             {&quot;type&quot;:&quot;wait&quot;}
+30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:158}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:307,&quot;y&quot;:206}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1201,&quot;y&quot;:50}
+34  wait             {&quot;type&quot;:&quot;wait&quot;}
+35  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:531,&quot;x&quot;:1005,&quot;y&quot;:677}
+36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:649}
+37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-4"><summary><b>Run 4</b><span class="pill passed">passed</span> <span>37 steps</span><span>111s</span><span>$0.026</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 4</b><span class="pill passed">passed</span> <div style="margin-top:8px">37 steps · 111s · $0.026</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-04/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-04/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies into LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (37 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:218}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:306}
+ 6  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:457,&quot;y&quot;:362}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:282,&quot;y&quot;:439}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:298,&quot;y&quot;:423}
+10  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:628,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:261,&quot;y&quot;:487}
+14  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:462,&quot;y&quot;:487}
+17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+19  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:684,&quot;y&quot;:487}
+20  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+21  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:639,&quot;y&quot;:550}
+23  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;N&quot;]}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:528,&quot;y&quot;:602}
+25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:208,&quot;y&quot;:613}
+26  wait             {&quot;type&quot;:&quot;wait&quot;}
+27  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:259,&quot;y&quot;:181}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:252,&quot;y&quot;:157}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:302,&quot;y&quot;:204}
+32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
+33  wait             {&quot;type&quot;:&quot;wait&quot;}
+34  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:527,&quot;x&quot;:1003,&quot;y&quot;:675}
+35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:648}
+36  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-5"><summary><b>Run 5</b><span class="pill passed">passed</span> <span>38 steps</span><span>142s</span><span>$0.016</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 5</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 142s · $0.016</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-05/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-05/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered Northstar Office Supplies invoice NOS-1047 into LedgerDesk with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:446,&quot;y&quot;:214}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1256,&quot;y&quot;:50}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1161,&quot;y&quot;:44}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:78,&quot;y&quot;:306}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:361,&quot;y&quot;:361}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:488,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:137,&quot;y&quot;:489}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:349,&quot;y&quot;:489}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:564,&quot;y&quot;:489}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:506,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:95,&quot;y&quot;:611}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:270,&quot;y&quot;:182}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:158}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:311,&quot;y&quot;:205}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1203,&quot;y&quot;:50}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:94,&quot;y&quot;:718}
+37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-6"><summary><b>Run 6</b><span class="pill passed">passed</span> <span>39 steps</span><span>97s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 6</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 97s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-06/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-06/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Newest unpaid Northstar Office Supplies invoice NOS-1047 was entered into LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:445,&quot;y&quot;:211}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ALT&quot;,&quot;F4&quot;]}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1160,&quot;y&quot;:44}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:77,&quot;y&quot;:306}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:363}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:182,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:481,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:141,&quot;y&quot;:488}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:348,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:567,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:510,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:94,&quot;y&quot;:613}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:267,&quot;y&quot;:181}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:158}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:306,&quot;y&quot;:205}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:530,&quot;x&quot;:743,&quot;y&quot;:672}
+37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:96,&quot;y&quot;:651}
+38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-7"><summary><b>Run 7</b><span class="pill passed">passed</span> <span>69 steps</span><span>209s</span><span>$0.079</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 7</b><span class="pill passed">passed</span> <div style="margin-top:8px">69 steps · 209s · $0.079</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-07/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-07/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered with its PDF attached and saved as **Pending review**; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (69 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:452,&quot;y&quot;:208}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1198,&quot;y&quot;:43}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:47,&quot;y&quot;:12}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:69,&quot;y&quot;:144}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:839,&quot;y&quot;:415}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:919,&quot;y&quot;:645}
+11  wait             {&quot;type&quot;:&quot;wait&quot;}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:552,&quot;y&quot;:587}
+13  wait             {&quot;type&quot;:&quot;wait&quot;}
+14  wait             {&quot;type&quot;:&quot;wait&quot;}
+15  wait             {&quot;type&quot;:&quot;wait&quot;}
+16  wait             {&quot;type&quot;:&quot;wait&quot;}
+17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;L&quot;]}
+18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;http://127.0.0.1:8081&quot;}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+20  wait             {&quot;type&quot;:&quot;wait&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1180,&quot;y&quot;:191}
+22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1156,&quot;y&quot;:85}
+23  wait             {&quot;type&quot;:&quot;wait&quot;}
+24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;R&quot;]}
+25  wait             {&quot;type&quot;:&quot;wait&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;L&quot;]}
+27  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;http://127.0.0.1:8081/&quot;}
+28  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+29  wait             {&quot;type&quot;:&quot;wait&quot;}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;H&quot;]}
+34  wait             {&quot;type&quot;:&quot;wait&quot;}
+35  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:554,&quot;y&quot;:380}
+36  wait             {&quot;type&quot;:&quot;wait&quot;}
+37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:72,&quot;y&quot;:266}
+38  wait             {&quot;type&quot;:&quot;wait&quot;}
+39  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:340,&quot;y&quot;:321}
+40  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+41  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+42  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:186,&quot;y&quot;:382}
+43  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+44  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:480,&quot;y&quot;:382}
+45  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+46  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:132,&quot;y&quot;:447}
+47  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+48  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+49  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:338,&quot;y&quot;:447}
+50  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+51  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+52  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:570,&quot;y&quot;:447}
+53  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+54  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+55  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:510,&quot;y&quot;:509}
+56  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+57  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+58  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:85,&quot;y&quot;:572}
+59  wait             {&quot;type&quot;:&quot;wait&quot;}
+60  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:259,&quot;y&quot;:181}
+61  wait             {&quot;type&quot;:&quot;wait&quot;}
+62  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:256,&quot;y&quot;:157}
+63  wait             {&quot;type&quot;:&quot;wait&quot;}
+64  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:331,&quot;y&quot;:206}
+65  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1203,&quot;y&quot;:49}
+66  wait             {&quot;type&quot;:&quot;wait&quot;}
+67  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:88,&quot;y&quot;:681}
+68  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-8"><summary><b>Run 8</b><span class="pill passed">passed</span> <span>39 steps</span><span>92s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 8</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 92s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-08/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-08/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Newest unpaid Northstar invoice NOS-1047 was entered in LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:210}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:545,&quot;y&quot;:43}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1160,&quot;y&quot;:42}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:79,&quot;y&quot;:306}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:348,&quot;y&quot;:361}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:183,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:514,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:136,&quot;y&quot;:488}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:350,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:553,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:517,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:92,&quot;y&quot;:613}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:182}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:257,&quot;y&quot;:158}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:316,&quot;y&quot;:206}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1207,&quot;y&quot;:50}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:510,&quot;x&quot;:744,&quot;y&quot;:678}
+37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:92,&quot;y&quot;:651}
+38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-9"><summary><b>Run 9</b><span class="pill passed">passed</span> <span>40 steps</span><span>93s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 9</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 93s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-09/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-09/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Invoice NOS-1047 from Northstar Office Supplies was entered as INV-0219 with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:800,&quot;y&quot;:44}
+ 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1161,&quot;y&quot;:43}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:397,&quot;y&quot;:12}
+ 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:204}
+ 5  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1246,&quot;y&quot;:49}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:44}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:80,&quot;y&quot;:302}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:343,&quot;y&quot;:362}
+10  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:189,&quot;y&quot;:423}
+13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:504,&quot;y&quot;:423}
+15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:140,&quot;y&quot;:488}
+17  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+18  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+19  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:356,&quot;y&quot;:488}
+20  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+21  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+22  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:571,&quot;y&quot;:488}
+23  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+25  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:502,&quot;y&quot;:550}
+26  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+27  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+28  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:91,&quot;y&quot;:611}
+29  wait             {&quot;type&quot;:&quot;wait&quot;}
+30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:181}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:251,&quot;y&quot;:158}
+33  wait             {&quot;type&quot;:&quot;wait&quot;}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:313,&quot;y&quot;:205}
+35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1204,&quot;y&quot;:49}
+36  wait             {&quot;type&quot;:&quot;wait&quot;}
+37  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:567,&quot;x&quot;:738,&quot;y&quot;:677}
+38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:90,&quot;y&quot;:650}
+39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-10"><summary><b>Run 10</b><span class="pill passed">passed</span> <span>41 steps</span><span>116s</span><span>$0.022</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 10</b><span class="pill passed">passed</span> <div style="margin-top:8px">41 steps · 116s · $0.022</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-10/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-10/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered the newest Northstar Office Supplies invoice (NOS-1047) in LedgerDesk with its PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (41 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:451,&quot;y&quot;:210}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1258,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1190,&quot;y&quot;:11}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:800,&quot;y&quot;:300}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:12}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:199,&quot;y&quot;:307}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:475,&quot;y&quot;:363}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:315,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:423}
+16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:266,&quot;y&quot;:488}
+18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:465,&quot;y&quot;:488}
+21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:675,&quot;y&quot;:488}
+24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:632,&quot;y&quot;:549}
+27  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+28  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+29  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:182}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:257,&quot;y&quot;:158}
+34  wait             {&quot;type&quot;:&quot;wait&quot;}
+35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:314,&quot;y&quot;:206}
+36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1206,&quot;y&quot;:50}
+37  wait             {&quot;type&quot;:&quot;wait&quot;}
+38  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:528,&quot;x&quot;:1004,&quot;y&quot;:672}
+39  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:648}
+40  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-11"><summary><b>Run 11</b><span class="pill passed">passed</span> <span>42 steps</span><span>116s</span><span>$0.023</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 11</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 116s · $0.023</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-11/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-11/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered Northstar Office Supplies invoice NOS-1047 in LedgerDesk as Pending review with the PDF attached; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (42 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:206}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:337,&quot;y&quot;:204}
+ 5  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:619,&quot;y&quot;:44}
+ 8  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:198,&quot;y&quot;:306}
+10  wait             {&quot;type&quot;:&quot;wait&quot;}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:471,&quot;y&quot;:362}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+13  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:311,&quot;y&quot;:423}
+15  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+16  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:633,&quot;y&quot;:423}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:263,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:473,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:674,&quot;y&quot;:488}
+25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+26  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:636,&quot;y&quot;:550}
+28  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+29  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+30  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:180}
+33  wait             {&quot;type&quot;:&quot;wait&quot;}
+34  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:258,&quot;y&quot;:157}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:320,&quot;y&quot;:206}
+37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
+38  wait             {&quot;type&quot;:&quot;wait&quot;}
+39  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:528,&quot;x&quot;:1005,&quot;y&quot;:666}
+40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:649}
+41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-13"><summary><b>Run 13</b><span class="pill passed">passed</span> <span>39 steps</span><span>147s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 13</b><span class="pill passed">passed</span> <div style="margin-top:8px">39 steps · 147s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-13/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-13/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Entered invoice NOS-1047 from Northstar Office Supplies in LedgerDesk with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (39 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:447,&quot;y&quot;:210}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:49}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
+ 5  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:196,&quot;y&quot;:306}
+ 7  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:464,&quot;y&quot;:362}
+ 9  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:306,&quot;y&quot;:423}
+12  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:488}
+16  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+17  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+18  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:466,&quot;y&quot;:488}
+19  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+20  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+21  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:688,&quot;y&quot;:488}
+22  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+23  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+24  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:634,&quot;y&quot;:550}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+26  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:210,&quot;y&quot;:612}
+28  wait             {&quot;type&quot;:&quot;wait&quot;}
+29  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:269,&quot;y&quot;:180}
+30  wait             {&quot;type&quot;:&quot;wait&quot;}
+31  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:158}
+32  wait             {&quot;type&quot;:&quot;wait&quot;}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:314,&quot;y&quot;:205}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1202,&quot;y&quot;:49}
+35  wait             {&quot;type&quot;:&quot;wait&quot;}
+36  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:531,&quot;x&quot;:840,&quot;y&quot;:670}
+37  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:648}
+38  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-15"><summary><b>Run 15</b><span class="pill passed">passed</span> <span>40 steps</span><span>125s</span><span>$0.026</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 15</b><span class="pill passed">passed</span> <div style="margin-top:8px">40 steps · 125s · $0.026</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-15/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-15/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered in LedgerDesk with the PDF attached and status set to Pending review; it was not approved or paid.” — not used for grading.</div>
+      <details><summary>trace (40 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:454,&quot;y&quot;:205}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
+ 4  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:338,&quot;y&quot;:205}
+ 5  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
+ 8  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:195,&quot;y&quot;:305}
+10  wait             {&quot;type&quot;:&quot;wait&quot;}
+11  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:485,&quot;y&quot;:362}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:272,&quot;y&quot;:437}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:300,&quot;y&quot;:423}
+14  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+15  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:423}
+16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:260,&quot;y&quot;:488}
+18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:470,&quot;y&quot;:488}
+21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:683,&quot;y&quot;:488}
+24  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+25  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:650,&quot;y&quot;:550}
+27  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:518,&quot;y&quot;:601}
+28  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:612}
+29  wait             {&quot;type&quot;:&quot;wait&quot;}
+30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:264,&quot;y&quot;:181}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:262,&quot;y&quot;:157}
+33  wait             {&quot;type&quot;:&quot;wait&quot;}
+34  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:312,&quot;y&quot;:206}
+35  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1206,&quot;y&quot;:49}
+36  wait             {&quot;type&quot;:&quot;wait&quot;}
+37  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:539,&quot;x&quot;:1000,&quot;y&quot;:665}
+38  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:214,&quot;y&quot;:649}
+39  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-16"><summary><b>Run 16</b><span class="pill passed">passed</span> <span>38 steps</span><span>145s</span><span>$0.019</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
+    <div class="id"><b>Run 16</b><span class="pill passed">passed</span> <div style="margin-top:8px">38 steps · 145s · $0.019</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
+      <div class="film"><a href="run-16/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-16/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Invoice NOS-1047 was entered in LedgerDesk as INV-0219 with the PDF attached and status set to Pending review.” — not used for grading.</div>
+      <details><summary>trace (38 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:450,&quot;y&quot;:204}
+ 2  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1257,&quot;y&quot;:50}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:620,&quot;y&quot;:43}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:194,&quot;y&quot;:306}
+ 6  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:471,&quot;y&quot;:362}
+ 8  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Northstar Office Supplies&quot;}
+ 9  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:308,&quot;y&quot;:423}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;NOS-1047&quot;}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:625,&quot;y&quot;:423}
+13  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;08/28/2026&quot;}
+14  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:265,&quot;y&quot;:488}
+15  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+16  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1240.00&quot;}
+17  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:463,&quot;y&quot;:488}
+18  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+19  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;93.00&quot;}
+20  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:681,&quot;y&quot;:488}
+21  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;CTRL&quot;,&quot;A&quot;]}
+22  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;1333.00&quot;}
+23  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:632,&quot;y&quot;:549}
+24  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Net 30&quot;}
+25  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+26  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:210,&quot;y&quot;:612}
+27  wait             {&quot;type&quot;:&quot;wait&quot;}
+28  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:271,&quot;y&quot;:181}
+29  wait             {&quot;type&quot;:&quot;wait&quot;}
+30  double_click     {&quot;type&quot;:&quot;double_click&quot;,&quot;keys&quot;:null,&quot;x&quot;:250,&quot;y&quot;:157}
+31  wait             {&quot;type&quot;:&quot;wait&quot;}
+32  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:297,&quot;y&quot;:205}
+33  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1200,&quot;y&quot;:50}
+34  wait             {&quot;type&quot;:&quot;wait&quot;}
+35  scroll           {&quot;type&quot;:&quot;scroll&quot;,&quot;keys&quot;:null,&quot;scroll_x&quot;:0,&quot;scroll_y&quot;:548,&quot;x&quot;:1003,&quot;y&quot;:681}
+36  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:649}
+37  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></details><details class="runrow" id="run-18"><summary><b>Run 18</b><span class="pill passed">passed</span> <span>42 steps</span><span>123s</span><span>$0.023</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 18</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 123s · $0.023</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1141,43 +1197,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:649}
 41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 19</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 122s · $0.000</div></div>
-    <div>
-      <div class="checks"><div class="bad">Control channel closed (1006)</div></div>
-      
-      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Control channel closed (1006)). Not an agent failure; excluded from pass estimates.</div></div>
-      
-      <details><summary>trace (0 actions)</summary><pre></pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 20</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 142s · $0.000</div></div>
-    <div>
-      <div class="checks"><div class="bad">WebSocket error</div></div>
-      
-      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (WebSocket error). Not an agent failure; excluded from pass estimates.</div></div>
-      
-      <details><summary>trace (0 actions)</summary><pre></pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 21</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 77s · $0.000</div></div>
-    <div>
-      <div class="checks"><div class="bad">Too many concurrent sessions</div></div>
-      
-      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Too many concurrent sessions). Not an agent failure; excluded from pass estimates.</div></div>
-      
-      <details><summary>trace (0 actions)</summary><pre></pre></details>
-    </div>
-  </div><div class="card run">
-    <div class="id"><b>Run 22</b><span class="pill errored">errored</span> <div style="margin-top:8px">0 steps · 77s · $0.000</div></div>
-    <div>
-      <div class="checks"><div class="bad">Too many concurrent sessions</div></div>
-      
-      <div class="hyp"><b>Hypothesis: unknown</b> · high confidence<div style="margin-top:4px">Infrastructure error before the agent acted (Too many concurrent sessions). Not an agent failure; excluded from pass estimates.</div></div>
-      
-      <details><summary>trace (0 actions)</summary><pre></pre></details>
-    </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-23"><summary><b>Run 23</b><span class="pill passed">passed</span> <span>42 steps</span><span>141s</span><span>$0.026</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 23</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 141s · $0.026</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1227,7 +1247,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:214,&quot;y&quot;:649}
 41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-24"><summary><b>Run 24</b><span class="pill passed">passed</span> <span>41 steps</span><span>191s</span><span>$0.022</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 24</b><span class="pill passed">passed</span> <div style="margin-top:8px">41 steps · 191s · $0.022</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1276,7 +1296,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 39  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:649}
 40  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-25"><summary><b>Run 25</b><span class="pill passed">passed</span> <span>42 steps</span><span>103s</span><span>$0.026</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 25</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 103s · $0.026</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1326,7 +1346,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:212,&quot;y&quot;:648}
 41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-26"><summary><b>Run 26</b><span class="pill passed">passed</span> <span>43 steps</span><span>130s</span><span>$0.023</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 26</b><span class="pill passed">passed</span> <div style="margin-top:8px">43 steps · 130s · $0.023</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1377,7 +1397,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 41  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:93,&quot;y&quot;:650}
 42  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-27"><summary><b>Run 27</b><span class="pill passed">passed</span> <span>42 steps</span><span>155s</span><span>$0.023</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 27</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 155s · $0.023</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1427,7 +1447,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:213,&quot;y&quot;:648}
 41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-28"><summary><b>Run 28</b><span class="pill passed">passed</span> <span>42 steps</span><span>123s</span><span>$0.022</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 28</b><span class="pill passed">passed</span> <div style="margin-top:8px">42 steps · 123s · $0.022</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1477,7 +1497,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 40  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:211,&quot;y&quot;:648}
 41  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div><div class="card run">
+  </div></details><details class="runrow" id="run-29"><summary><b>Run 29</b><span class="pill passed">passed</span> <span>44 steps</span><span>109s</span><span>$0.026</span><span class="more">screenshots, checks, trace</span></summary><div class="card run">
     <div class="id"><b>Run 29</b><span class="pill passed">passed</span> <div style="margin-top:8px">44 steps · 109s · $0.026</div></div>
     <div>
       <div class="checks"><div><span class="ok">✓</span> exec python3 /root/ledgerdesk/check.py</div></div>
@@ -1529,7 +1549,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 42  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:209,&quot;y&quot;:648}
 43  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
     </div>
-  </div></div>
+  </div></details></div>
 
 <div class="foot">
   <div>Grading: a run passes only if every check passes when evaluated inside the desktop after the agent stops. The agent's own report of success is shown but never counted.</div>
@@ -1542,5 +1562,8 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
 <div class="tip" id="tip"></div>
 <script>
 (function(){var t=document.getElementById('tip');document.addEventListener('mousemove',function(e){var el=e.target.closest&&e.target.closest('[data-tip]');if(!el){t.style.opacity=0;return;}t.textContent=el.getAttribute('data-tip');t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';t.style.opacity=1;});})();
+</script>
+<script>
+(function(){function open(){var id=location.hash.slice(1),el=id&&document.getElementById(id);if(el&&el.tagName==='DETAILS'){el.open=true;el.scrollIntoView();}}addEventListener('hashchange',open);open();})();
 </script>
 </main></body></html>

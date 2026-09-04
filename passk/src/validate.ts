@@ -12,7 +12,7 @@
  * have caught the exit-code bug and the /root upload refusal on day one.
  */
 import type { Desktop } from "@solarisdk/sdk";
-import { runChecks } from "./checker.js";
+import { checkLabel, runChecks } from "./checker.js";
 import { readSnapshots } from "./config.js";
 import { destroyDesktop, forkDesktop, isFake } from "./desktop.js";
 import { runSetupStep } from "./prepare.js";
@@ -26,7 +26,7 @@ export interface ValidationReport {
   golden: CheckResult[] | null;
 }
 
-const label = (c: CheckResult) => `${c.check.type} ${"path" in c.check ? c.check.path : "cmd" in c.check ? c.check.cmd : ""}`.trim();
+const label = (c: CheckResult) => checkLabel(c.check);
 
 export async function validateTask(task: Task, snapshotId = readSnapshots()[task.id] ?? (isFake() ? "snap_fake" : "")): Promise<ValidationReport> {
   if (!snapshotId) throw new Error(`no snapshot for task "${task.id}" — run \`passk prepare\` first`);
