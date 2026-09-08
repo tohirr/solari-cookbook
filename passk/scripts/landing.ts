@@ -41,7 +41,7 @@ const allFailures = all.flatMap(([, b]) => b.failures);
 const dots = (b: BenchResult, dir: string) => dotsHtml(
   b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })),
   b.metrics.skipped, "", (i) => `evidence/${dir}/report.html#run-${i}`);
-const bars = (b: BenchResult, dir: string, h = 120) => stepBars(b, 520, h, (i) => `evidence/${dir}/report.html#run-${i}`);
+const bars = (b: BenchResult, dir: string, h = 120, w = 520) => stepBars(b, w, h, (i) => `evidence/${dir}/report.html#run-${i}`);
 
 const pow = (m: BenchResult["metrics"], k: number) => (m.passPowK as unknown as Record<string, number>)[String(k)] ?? 0;
 const dp = Math.round(reload.delta.passAt1 * 100);
@@ -236,7 +236,7 @@ h2{margin:0 0 18px}
   <div class="card finding" style="margin-top:14px">
     <h3>The workflow Pinetree describes: accounts payable, with a duplicate trap and buttons that must not be pressed</h3>
     <div class="big">${I.passed}/${I.n} <small>passed · ${pct(I.passAt1Lower)}–${pct(I.passAt1Upper)} plausible · ${usd(I.costPerSuccessUsd)} per success · ${I.minSteps}–${I.maxSteps} steps</small></div>
-    ${bars(inv, "invoice-entry", 130)}
+    ${bars(inv, "invoice-entry", 150, 1060)}
     <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. No run approved, paid or duplicated anything. The failures are the tall red bars: detours that ran out of step budget with the form already filled.${I.errored ? ` ${I.errored} runs were lost to infrastructure and are reported, not scored.` : ""}</p>
     <div class="actions"><a class="btn sm" href="evidence/invoice-entry/report.html">See the report</a></div>
   </div>

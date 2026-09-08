@@ -114,7 +114,7 @@ export function stepBars(b: BenchResult, w = 520, h = 120, href?: (runIndex: num
   return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="steps per run">
     <text x="${L - 6}" y="${T + 4}" text-anchor="end">${max}</text><text x="${L - 6}" y="${T + ih}" text-anchor="end">0</text>
     <line class="axis" x1="${L}" x2="${w - R}" y1="${T + ih}" y2="${T + ih}"/>
-    <line class="med" x1="${L}" x2="${w - R}" y1="${y(med)}" y2="${y(med)}"/><text x="${w - R}" y="${y(med) - 4}" text-anchor="end">median ${med}</text>
+    <line class="med" x1="${L}" x2="${w - R}" y1="${y(med)}" y2="${y(med)}"/><text x="${L + 4}" y="${T + 9}">median ${med} steps ┈</text>
     ${bars}
     <text x="${L}" y="${h - 6}">${runs.length} runs, sorted by steps</text><text x="${w - R}" y="${h - 6}" text-anchor="end">${runs[0].steps.length}–${max} steps</text>
   </svg>`;

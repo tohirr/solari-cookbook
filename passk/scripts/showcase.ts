@@ -28,7 +28,7 @@ const all = fs.readdirSync(EV).filter((d) => fs.existsSync(path.join(EV, d, "ben
 const allFailures = all.flatMap(([, b]) => b.failures);
 
 const dots = (b: BenchResult, dir: string) => dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped, "", (i) => `${dir}/report.html#run-${i}`);
-const bars = (b: BenchResult, dir: string, h = 120) => stepBars(b, 520, h, (i) => `${dir}/report.html#run-${i}`);
+const bars = (b: BenchResult, dir: string, h = 120, w = 520) => stepBars(b, w, h, (i) => `${dir}/report.html#run-${i}`);
 const pow = (m: BenchResult["metrics"], k: number) => (m.passPowK as unknown as Record<string, number>)[String(k)] ?? 0;
 const A = env.a.metrics, B = env.b.metrics, R0 = reload.a.metrics, R1 = reload.b.metrics, V = verify.metrics, S = sheet.metrics, I = inv.metrics;
 const featured = base.failures.find((f) => f.divergenceStep !== null) ?? base.failures[0];
@@ -128,7 +128,7 @@ const html = `<!doctype html>
 <div class="card finding" style="max-width:none">
   <h3>Accounts payable: PDF → mock ERP, with a duplicate trap and buttons that must not be pressed</h3>
   <div class="big">${I.passed}/${I.n} <small>passed · ${pct(I.passAt1Lower)}–${pct(I.passAt1Upper)} · ${usd(I.costPerSuccessUsd)} per success · ${I.minSteps}–${I.maxSteps} steps</small></div>
-  ${bars(inv, "invoice-entry", 130)}
+  ${bars(inv, "invoice-entry", 150, 1060)}
   <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. No run approved, paid, or duplicated anything. The failures are the tall red bars: detours that ran out of step budget with the form already filled. ${I.errored ? `${I.errored} runs were lost to infrastructure and are reported, not scored.` : ""}</p>
   <a class="btn" href="invoice-entry/report.html">See the report</a>
 </div>
