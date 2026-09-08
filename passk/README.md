@@ -11,7 +11,7 @@
 
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="docs/compare-ticket-queue.jpg" alt="Three prompts, one snapshot: 47/50, 47/49, 49/49" width="100%"></a></p>
 
-**Start here:** [the studio](https://tohirr.github.io/solari-cookbook/passk/studio/), a browser front for every task, experiment and comparison with a planner that says what k runs can prove and cost, or [the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html), with every
+**Start here:** [the front page](https://tohirr.github.io/solari-cookbook/passk/), then [the studio](https://tohirr.github.io/solari-cookbook/passk/studio/), a browser front for every task, experiment and comparison with a planner that says what k runs can prove and cost, or [the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html), with every
 number read from the bench files (rendered by GitHub Pages; the source is in [`evidence/`](evidence/)). `sh demo.sh` runs the whole pipeline in forty
 seconds with no API spend.
 

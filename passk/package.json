@@ -16,7 +16,10 @@
     "studio:data": "tsx scripts/studio-data.ts",
     "studio:build": "npm run studio:data && vite build --config studio/vite.config.ts",
     "studio:dev": "npm run studio:data && vite --config studio/vite.config.ts",
-    "typecheck:studio": "tsc -p studio/app/tsconfig.json"
+    "typecheck:studio": "tsc -p studio/app/tsconfig.json",
+    "showcase": "tsx scripts/showcase.ts",
+    "landing": "tsx scripts/landing.ts",
+    "site:build": "npm run studio:build && npm run showcase && npm run landing"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
