@@ -1,454 +1,151 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · does your computer-use agent pass twice?</title>
-<meta name="description" content="Reliability regression testing for computer-use agents. Fork one Solari desktop snapshot k times, run the same agent on every fork, verify inside the VM, and learn why runs diverge.">
-<meta property="og:title" content="passk · does your computer-use agent pass twice?">
-<meta property="og:description" content="Reliability regression testing for computer-use agents, with 210 verified runs published as evidence.">
+<title>passk · which model can actually do your computer task, reliably?</title>
+<meta name="description" content="A leaderboard of computer-use agents by task shape: every row is k forks of one desktop snapshot, graded inside the VM. Pass rate with its interval, pass^5, steps and cost per success.">
+<meta property="og:title" content="passk · which model can actually do your computer task, reliably?">
+<meta property="og:description" content="210 verified runs across 5 task shapes. Pick yours, compare models on the chance it works every time.">
 <meta property="og:image" content="https://tohirr.github.io/solari-cookbook/passk/docs/compare-ticket-queue.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2322c55e'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='%230e0f12' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0e0f12;--surface:#15171c;--surface-2:#1b1e25;--line:#262a33;--line-2:#333845;
-  --ink:#eceef2;--ink-2:#a3a9b7;--ink-3:#6b7180;
-  --good:#22c55e;--good-dim:rgba(34,197,94,.22);--crit:#e5484d;--crit-dim:rgba(229,72,77,.22);--warn:#f5a524;
-  --a:#3987e5;--a-dim:rgba(57,135,229,.22);--b:#eb6834;--b-dim:rgba(235,104,52,.22);
-  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
-  --radius:14px;--radius-s:8px;
-}
+:root{--bg:#0e0f12;--surface:#15171c;--surface-2:#1b1e25;--line:#262a33;--line-2:#333845;--ink:#eceef2;--ink-2:#a3a9b7;--ink-3:#6b7180;--good:#22c55e;--good-dim:rgba(34,197,94,.22);--crit:#e5484d;--warn:#f5a524;--accent:#f5c518;--accent-ink:#141306;
+--sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 *{box-sizing:border-box}
 html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
-a{color:inherit}
-main{max-width:1120px;margin:0 auto;padding:48px 28px 80px}
-h1{font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px;font-weight:650}
-h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:40px 0 14px}
-.brand{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:22px}
-.brand b{color:var(--ink);font-weight:700;letter-spacing:0;text-transform:none;font-size:13px}
-.meta{color:var(--ink-3);font-size:13px;margin-bottom:22px}.meta code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
-.prompt{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 26px;font-size:15px;max-width:820px}
-.verdict{font-size:20px;line-height:1.35;letter-spacing:-.01em;margin:0 0 26px;max-width:820px}
-.verdict b{font-weight:650}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
-.kpi span{color:var(--ink-3);font-size:12px;display:block}
-.kpi .sub{color:var(--ink-2)}
-.dots{display:grid;gap:6px}
-.dotrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.dotrow em{width:26px;flex:none;font:10px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
-.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--mono);text-decoration:none;line-height:1}
-a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1px}
-.dot.passed{background:var(--good)}.dot.failed{background:var(--crit)}.dot.errored{background:transparent;border-color:var(--ink-3);color:var(--ink-3)}
-.dot.skipped{background:transparent;border-color:var(--line-2);color:var(--ink-3)}
-.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
-.headline b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.headline span{color:var(--ink-2);font-size:13px}
-.runrow{margin:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
-.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 20px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
-.runrow>summary::-webkit-details-marker{display:none}
-.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
-.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12px}
-.runrow[open]>summary{border-bottom:1px solid var(--line)}
-.runrow>.card{border:0;border-radius:0 0 var(--radius) var(--radius)}
-.runrow.attention>summary{cursor:default}
-.diff{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 22px;font-size:15px;max-width:820px;line-height:1.6}
-.diff del{background:var(--crit-dim);color:var(--crit);text-decoration:line-through;border-radius:3px;padding:0 2px}
-.diff ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 2px}
-.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
-.legend{display:flex;gap:16px;color:var(--ink-3);font-size:12px;margin-top:10px;flex-wrap:wrap}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
-.range{position:relative;height:10px;background:var(--surface-2);border-radius:5px;margin:14px 0 6px}
-.range i{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--good-dim)}
-.range b{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:var(--good);border:3px solid var(--surface);transform:translateX(-50%)}
-.range-labels{display:flex;justify-content:space-between;color:var(--ink-3);font-size:11px;font-family:var(--mono)}
-.strip{position:relative;height:44px;margin:6px 0 2px}
-.strip .axis{position:absolute;left:0;right:0;top:22px;height:1px;background:var(--line-2)}
-.strip .tick{position:absolute;top:28px;transform:translateX(-50%);color:var(--ink-3);font-size:11px;font-family:var(--mono)}
-.strip .pt{position:absolute;top:14px;width:16px;height:16px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--surface);cursor:default}
-.strip .pt.passed{background:var(--good)}.strip .pt.failed{background:var(--crit)}
-.strip .pt.a{background:var(--a)}.strip .pt.b{background:var(--b)}
-.strip .pt.hollow{background:transparent!important;border:2.5px solid;box-shadow:inset 0 0 0 2px var(--surface)}.strip .pt.a.hollow{border-color:var(--a)}.strip .pt.b.hollow{border-color:var(--b)}
-.strip .med{position:absolute;top:8px;width:2px;height:28px;background:var(--ink);opacity:.7;transform:translateX(-50%)}
-.strip .med.a{background:var(--a);opacity:1}.strip .med.b{background:var(--b);opacity:1}.strip .med.b:after{top:auto;bottom:-16px}
-.strip .med:after{content:attr(data-label);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--ink-2);font-family:var(--mono);white-space:nowrap}
-.runs{display:grid;gap:12px}
-.run{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start}.run>div{min-width:0}
-.run .id{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
-.run .id b{display:block;font-size:15px;color:var(--ink);font-family:var(--sans);font-weight:600;margin-bottom:2px}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em}
-.pill.passed{background:var(--good-dim);color:var(--good)}.pill.failed{background:var(--crit-dim);color:var(--crit)}.pill.errored{background:var(--surface-2);color:var(--ink-2)}
-.pill.a{background:var(--a-dim);color:var(--a)}.pill.b{background:var(--b-dim);color:var(--b)}
-.pill.neutral{background:var(--surface-2);color:var(--ink-2)}
-.checks{display:flex;flex-direction:column;gap:3px;font-size:12px;font-family:var(--mono);color:var(--ink-2)}
-.checks .ok{color:var(--good)}.checks .bad{color:var(--crit)}
-.checks .detail{color:var(--ink-3);white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto}
-.film{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:thin}
-.film a{flex:none;position:relative}
-.film img{height:84px;border-radius:6px;border:1px solid var(--line);display:block;background:#000}
-.film a.final img{border-color:var(--good)}.film a.diverge img{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn)}
-.film em{position:absolute;left:4px;bottom:4px;font:10px var(--mono);font-style:normal;background:rgba(0,0,0,.65);color:#fff;padding:1px 5px;border-radius:4px}
-.hyp{overflow-wrap:anywhere;margin-top:10px;padding:10px 12px;background:var(--surface-2);border-radius:var(--radius-s);font-size:13px;color:var(--ink-2)}
-.hyp b{color:var(--ink);font-weight:600}
-details{margin-top:8px}summary{cursor:pointer;color:var(--ink-3);font-size:12px}
-pre{white-space:pre-wrap;font:12px/1.5 var(--mono);color:var(--ink-2);margin:8px 0 0}
-.foot{color:var(--ink-3);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:760px){.two{grid-template-columns:1fr}.run{grid-template-columns:1fr}}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:9px 10px;text-align:left;border-top:1px solid var(--line);vertical-align:top;font-size:13px}th{color:var(--ink-3);font-weight:500;border-top:0;font-size:12px}
-td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
-.delta.up{color:var(--good)}.delta.down{color:var(--crit)}.delta.flat{color:var(--ink-3)}
-.note{color:var(--ink-3);font-size:12.5px;margin-top:8px}
-.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font:12px var(--mono);padding:5px 8px;border-radius:6px;transform:translate(-50%,-130%);opacity:0;transition:opacity .08s;white-space:nowrap;z-index:9}
-
-.chart{display:block;width:100%;height:auto;font-family:var(--mono);font-size:10.5px}
-.chart text{fill:var(--ink-3)}
-.chart .axis{stroke:var(--line-2);stroke-width:1}
-.chart .grid{stroke:var(--line);stroke-width:1}
-.chart .ln{fill:none;stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}
-.chart .ln.lower{stroke-width:1.25;stroke-dasharray:3 4;opacity:.8}
-.chart .s-a{stroke:var(--a)}.chart .s-b{stroke:var(--b)}.chart .s-g{stroke:var(--good)}
-.chart .lbl{font-size:11px;font-weight:600}
-.chart .lbl.a{fill:var(--a)}.chart .lbl.b{fill:var(--b)}.chart .lbl.g{fill:var(--good)}
-.chart .bar.passed{fill:var(--good);opacity:.45}.chart .bar.failed{fill:var(--crit)}.chart .bar.errored{fill:var(--ink-3);opacity:.5}
-.chart .bar:hover{opacity:1}
-.chart .med{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
-.chart .whisker{stroke:var(--ink-2);stroke-width:1.5}
-.chart .rate{fill:var(--good);opacity:.4}.chart .rate.a{fill:var(--a);opacity:.85}.chart .rate.b{fill:var(--b);opacity:.85}.chart .rate.n{fill:var(--ink-2);opacity:.55}
-.chart .big{font-size:13px;font-weight:600;fill:var(--ink);font-family:var(--sans)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
-.tile{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
-.tile .l{font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
-.tile .v{font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05}
-.tile .v small{font-size:12px;color:var(--ink-3);font-weight:500;letter-spacing:0;margin-left:6px}
-.tile .d{font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
-.tile .d.up{color:var(--good)}.tile .d.down{color:var(--crit)}.tile .d.flat{color:var(--ink-3)}
-.causebar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--surface-2);margin:8px 0 10px}
-.causebar i{display:block;height:100%}
-.causekey{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
-.causekey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.c-behavior_variability{background:var(--b)}.c-task_ambiguity{background:var(--a)}.c-stochastic_execution{background:var(--warn)}.c-unknown{background:var(--ink-3)}
-.trace{display:grid;gap:14px}
-.trace .lane{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}
-@media(max-width:640px){.trace .lane{grid-template-columns:1fr;gap:6px}}
-.trace .who{font-size:13px;color:var(--ink-2)}.trace .who b{display:block;color:var(--ink);font-weight:600;font-size:14px}
-.trace .who .pill{margin-top:4px}
-.trace .tl{position:relative;height:34px;background:var(--surface-2);border-radius:8px;overflow:hidden}
-.trace .tl i{position:absolute;top:6px;bottom:6px;border-radius:3px;min-width:3px;opacity:.85}
-.trace .tl i:hover{opacity:1;outline:1px solid var(--ink)}
-.trace .tl i.click{background:var(--a)}.trace .tl i.keypress{background:#8b5cf6}.trace .tl i.type{background:#14b8a6}.trace .tl i.wait{background:var(--ink-3)}.trace .tl i.screenshot{background:var(--line-2)}.trace .tl i.scroll{background:#0ea5e9}.trace .tl i.other{background:var(--warn)}
-.trace .tl i.div{outline:2px solid var(--crit);outline-offset:-1px;z-index:1}
-.trace .tl em{position:absolute;right:8px;top:9px;font:10.5px var(--mono);font-style:normal;color:var(--ink-3)}
-.trace .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.trace .chips span{font:11px var(--mono);color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
-.trace .chips span.div{border-color:var(--crit);color:var(--crit)}
-.trace .chips span.same{opacity:.55}
-.tracekey{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);margin-top:4px}
-.tracekey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.said{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
-@media(max-width:760px){.said{grid-template-columns:1fr}}
-.said>div{min-width:0}
-.said .cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
-.said img{width:100%;border-radius:8px;border:1px solid var(--line);display:block;background:#000;aspect-ratio:16/9;object-fit:cover}
-.said blockquote{margin:8px 0 0;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.45}
-.said .agent{background:var(--surface-2);color:var(--ink-2)}
-.said .vm{background:var(--crit-dim);color:var(--crit);font-family:var(--mono);font-size:12px}
-.said .vm.ok{background:var(--good-dim);color:var(--good)}
-
-.dot{width:15px;height:15px;font-size:8px;border-width:1.5px}
-.dotrow{gap:5px}.dots{gap:5px}.dotrow em{width:20px;font-size:9px}
-.dot.passed{background:rgba(34,197,94,.28);color:var(--good);border-color:rgba(34,197,94,.35)}
-.dot.failed{background:var(--crit);color:#fff}
-
-:root{--sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--accent:#f5c518;--accent-ink:#141306}
-body{font-size:15px;line-height:1.55}
-main{padding:0 28px 80px}
-.wrap{max-width:1120px;margin:0 auto}
-h2{margin:0 0 18px}
-.sec{padding:80px 0 0}
-.sec .lead{font-size:26px;line-height:1.25;letter-spacing:-.02em;font-weight:600;max-width:760px;margin:0 0 10px}
-.sec .lead+p{color:var(--ink-2);max-width:680px;margin:0 0 28px;font-size:15.5px}
-.bar{position:sticky;top:0;z-index:5;background:rgba(14,15,18,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.bar .in{max-width:1120px;margin:0 auto;padding:0 28px;height:58px;display:flex;align-items:center;gap:22px}
-.bar .logo{font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:9px}
-.bar .logo i{width:12px;height:12px;border-radius:50%;background:var(--good);display:inline-block}
-.bar nav{display:flex;gap:2px;margin-left:6px}
-.bar nav a{color:var(--ink-2);text-decoration:none;font-size:13.5px;padding:6px 10px;border-radius:8px;white-space:nowrap}
-.bar nav a:hover{color:var(--ink);background:var(--surface-2)}
-.bar .right{margin-left:auto;display:flex;gap:8px}
-@media(max-width:760px){.bar nav{display:none}}
-.btn{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);background:transparent;padding:10px 16px;border-radius:10px;cursor:pointer;font-family:var(--sans);line-height:1}
-.btn:hover{background:var(--surface-2)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--ink-2)}a:hover{color:var(--ink)}
+code{font:12.5px var(--mono);color:var(--ink-2)}
+.bar{border-bottom:1px solid var(--line)}
+.bar .in{max-width:1120px;margin:0 auto;padding:0 28px;height:58px;display:flex;align-items:center;gap:14px}
+.logo{font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo i{width:12px;height:12px;border-radius:50%;background:var(--good);display:inline-block}
+.bar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);background:transparent;padding:7px 12px;border-radius:10px;cursor:pointer;font-family:var(--sans);line-height:1;white-space:nowrap}
+.btn:hover{background:var(--surface-2);color:var(--ink)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.06)}
-.btn.sm{font-size:13px;padding:7px 12px}
-.btn code{font:13px var(--mono);color:inherit}
-.hero{padding:96px 0 56px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:56px;align-items:center}
-@media(max-width:960px){.hero{grid-template-columns:1fr;padding-top:56px;gap:36px}}
-.hero>*{min-width:0}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);border:1px solid var(--line-2);border-radius:999px;padding:5px 12px 5px 8px;margin-bottom:22px}
-.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--good);display:inline-block;box-shadow:0 0 0 3px var(--good-dim)}
-.hero h1{font-size:52px;line-height:1.02;letter-spacing:-.035em;font-weight:600;margin:0 0 20px;max-width:560px}
-@media(max-width:560px){.hero h1{font-size:38px}}
-.hero .sub{font-size:17.5px;line-height:1.5;color:var(--ink-2);max-width:520px;margin:0 0 28px}
-.hero .sub b{color:var(--ink);font-weight:600}
-.cta{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
-.fine{color:var(--ink-3);font-size:12.5px}
+.btn.primary:hover{filter:brightness(1.06);color:var(--accent-ink)}
+main{max-width:1120px;margin:0 auto;padding:64px 28px 60px}
+h1{font-size:46px;line-height:1.05;letter-spacing:-.035em;font-weight:600;margin:0 0 14px;max-width:820px}
+@media(max-width:560px){h1{font-size:34px}}
+.sub{font-size:17px;color:var(--ink-2);max-width:640px;margin:0 0 34px}
+.sub b{color:var(--ink);font-weight:600}
+.ask{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 16px;margin-bottom:14px}
+.ask svg{flex:none}
+.ask input{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:15px var(--sans);padding:10px 0;outline:none}
+.ask input::placeholder{color:var(--ink-3)}
+.ask .match{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line-2);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.ask .match b{color:var(--ink);font-weight:600}
+@media(max-width:640px){.ask{flex-wrap:wrap}.ask .match{width:100%;text-align:center}}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.chip{font-size:13px;font-weight:500;color:var(--ink-2);border:1px solid var(--line-2);background:transparent;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
+.chip:hover{color:var(--ink);background:var(--surface-2)}
+.chip.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);font-weight:600}
+.chip.more{color:var(--ink-3);border-style:dashed;text-decoration:none}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.head h2{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0}
+.head .blurb{font-size:13.5px;color:var(--ink-3);max-width:560px}
+.head .k{font-size:13px;color:var(--ink-2);white-space:nowrap}
+.head .k code{color:var(--ink);background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;padding:3px 9px}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:900px}
+th{text-align:left;color:var(--ink-3);font-weight:500;font-size:12px;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:13px 14px;border-top:1px solid var(--line);font-size:13.5px;vertical-align:middle}
+tr:first-child td{border-top:0}
+th.num,td.num{text-align:right;font-family:var(--mono);font-size:12.5px}
+td.dim{color:var(--ink-3)}
+.model{min-width:180px}.model b{font-weight:600;display:block;white-space:nowrap}.model span{font-size:12px;color:var(--ink-3)}
+.rate{display:flex;align-items:center;gap:10px;min-width:230px}
+.rate .track{position:relative;flex:1;height:8px;background:var(--surface-2);border-radius:4px}
+.rate .band{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.28);border-radius:4px}
+.rate .pt{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:var(--good);transform:translateX(-50%)}
+.rate .v{font:12.5px var(--mono);color:var(--ink);width:118px;text-align:right;white-space:nowrap}
+.rate .v span{color:var(--ink-3)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.ok{background:var(--good-dim);color:var(--good)}.pill.no{background:var(--surface-2);color:var(--ink-2)}
+.fails{font-size:12.5px;color:var(--ink-2);min-width:150px;max-width:200px}
+.cmd{display:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:12px/1.6 var(--mono);color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px}
+tr.open .cmd{display:block}
+.note{font-size:12.5px;color:var(--ink-3);margin-top:10px}
+.fine{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .fine a{color:var(--ink-2)}
-.proof{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;box-shadow:0 30px 80px -40px rgba(0,0,0,.8)}
-.proof .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
-.proof .top b{font-size:15px;font-weight:600}
-.proof .top span{font-size:12px;color:var(--ink-3);font-family:var(--mono)}
-.proof .row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:14px 0 4px}
-.proof .row .k{font-size:12.5px;color:var(--ink-2)}.proof .row .k b{display:block;font-size:24px;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05}
-.proof .cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 6px}
-.proof .cap b{color:var(--ink-2);font-weight:600;letter-spacing:0;text-transform:none;font-size:12.5px}
-.proof .key{display:flex;gap:14px;font-size:11.5px;color:var(--ink-3);margin-top:2px}
-.proof .key i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
-.proof .verdict{font-size:13.5px;color:var(--ink-2);margin:16px 0 0;padding-top:14px;border-top:1px solid var(--line);line-height:1.5}
-.proof .verdict b{color:var(--ink);font-weight:600}
-.proof .verdict ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 3px}
-.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);overflow:hidden}
-.totals div{padding:18px 20px;border-left:1px solid var(--line);font-size:12.5px;color:var(--ink-3)}
-.totals div:first-child{border-left:0}
-.totals b{display:block;font-size:28px;font-weight:600;letter-spacing:-.025em;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05;margin-bottom:6px}
-.findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
-.finding{display:flex;flex-direction:column}
-.finding h3{margin:0 0 6px;font-size:16px;font-weight:600;letter-spacing:-.01em}
-.finding .big{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 0;font-size:30px;font-weight:600;letter-spacing:-.025em;line-height:1.1;margin:6px 0 10px;font-variant-numeric:tabular-nums}
-.finding .big.three{font-size:24px}
-.finding .big small{font-size:13px;color:var(--ink-3);font-weight:500;letter-spacing:0;margin-left:10px}
-.finding p{color:var(--ink-2);font-size:14px;margin:12px 0 14px;flex:1}
-.finding .actions{display:flex;gap:8px;flex-wrap:wrap}
-.arrow{color:var(--ink-3);margin:0 8px}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;counter-reset:s}
-.steps div{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;font-size:13.5px;color:var(--ink-2)}
-.steps div:before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--surface-2);color:var(--ink);font-weight:600;font-size:12px;margin-bottom:10px}
-.steps b{display:block;color:var(--ink);margin-bottom:3px;font-size:15px}
-.code{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 20px;font:13px/1.7 var(--mono);color:var(--ink-2);white-space:pre;overflow-x:auto;margin:0}
-.code i{font-style:normal;color:var(--ink-3)}
-.code b{font-weight:500;color:var(--ink)}
-.split>*,.end>*,.prove>*,.hero>*,.two>*{min-width:0}
-@media(max-width:560px){.code{white-space:pre-wrap;overflow-wrap:anywhere}}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-@media(max-width:860px){.split{grid-template-columns:1fr}}
-.prove{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:760px){.prove{grid-template-columns:1fr}}
-.prove .card{padding:0;overflow-x:auto}
-.prove .card>div{padding:14px 18px 4px;font-size:13px;color:var(--ink-2)}
-.prove .card>div b{color:var(--ink)}
-.faq{display:grid;gap:0;border-top:1px solid var(--line)}
-.faq details{margin:0;border-bottom:1px solid var(--line)}
-.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0;font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary:after{content:"+";color:var(--ink-3);font-weight:400;font-size:20px;flex:none}
-.faq details[open] summary:after{content:"−"}
-.faq p{margin:0 0 18px;color:var(--ink-2);font-size:14.5px;max-width:760px}
-.faq code{font:13px var(--mono);color:var(--ink)}
-.end{margin-top:80px;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:44px 40px;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
-@media(max-width:860px){.end{grid-template-columns:1fr;padding:32px 24px}}
-.end h2{font-size:32px;letter-spacing:-.03em;text-transform:none;color:var(--ink);font-weight:600;margin:0 0 12px;line-height:1.1}
-.end p{color:var(--ink-2);margin:0 0 22px;max-width:460px}
-.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:40px}
 </style></head><body>
 <div class="bar"><div class="in">
   <a class="logo" href="./"><i></i>passk</a>
-  <nav><a href="#diverge">Why it failed</a><a href="#proof">Findings</a><a href="#how">How it works</a><a href="#prove">What k proves</a><a href="#faq">FAQ</a><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/METHOD.md">Method</a></nav>
-  <div class="right"><a class="btn sm" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a><a class="btn sm primary" href="studio/">Open the studio</a></div>
+  <div class="right"><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a><a class="btn primary" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup">Run your own task</a></div>
 </div></div>
-<main><div class="wrap">
+<main>
+  <h1>Which model can actually do your computer task, reliably?</h1>
+  <p class="sub">Pick the shape of your task. Every row is <b>k forks of one desktop snapshot</b>, same prompt, and every outcome is graded <b>inside the VM</b>, never by what the agent says. Browsing is free. Running is one command.</p>
 
-<section class="hero">
-  <div>
-    <div class="eyebrow"><i></i>Reliability regression testing for computer-use agents</div>
-    <h1>Your agent passed once. Will it pass twice?</h1>
-    <p class="sub">passk forks one Solari desktop snapshot <b>k</b> times, runs the same agent on every fork, verifies the outcome <b>inside the VM</b> instead of trusting what the agent says, and tells you how reliable it is and why it fails when it does.</p>
-    <div class="cta"><a class="btn primary" href="studio/">Open the studio</a><a class="btn" href="evidence/index.html">Read the evidence</a><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup"><code>sh demo.sh</code> · 40s, no API spend</a></div>
-    <div class="fine">9 tasks · 2 Solari templates · 210 verified runs · $2.36 of model spend in total, all on <code>gpt-5.6-luna</code>. Every number and picture on this page is read from <a href="evidence/">the published bench files</a>.</div>
-  </div>
-  <div class="proof" id="hero-proof">
-    <div class="top"><b>Triage tickets in an internal web tool</b><span>50 forks of one snapshot · gpt-5.6-luna</span></div>
-    <div class="row"><div class="dots"><div class="dotrow"><em>0</em><a class="dot passed " data-tip="run 0: passed in 15 steps" aria-label="run 0: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-0">✓</a><a class="dot passed " data-tip="run 1: passed in 14 steps" aria-label="run 1: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-1">✓</a><a class="dot passed " data-tip="run 2: passed in 17 steps" aria-label="run 2: passed in 17 steps" href="evidence/ticket-queue-baseline/report.html#run-2">✓</a><a class="dot passed " data-tip="run 3: passed in 18 steps" aria-label="run 3: passed in 18 steps" href="evidence/ticket-queue-baseline/report.html#run-3">✓</a><a class="dot passed " data-tip="run 4: passed in 16 steps" aria-label="run 4: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-4">✓</a><a class="dot passed " data-tip="run 5: passed in 14 steps" aria-label="run 5: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-5">✓</a><a class="dot passed " data-tip="run 6: passed in 15 steps" aria-label="run 6: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-6">✓</a><a class="dot passed " data-tip="run 7: passed in 16 steps" aria-label="run 7: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-7">✓</a><a class="dot passed " data-tip="run 8: passed in 13 steps" aria-label="run 8: passed in 13 steps" href="evidence/ticket-queue-baseline/report.html#run-8">✓</a><a class="dot passed " data-tip="run 9: passed in 14 steps" aria-label="run 9: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-9">✓</a></div><div class="dotrow"><em>10</em><a class="dot passed " data-tip="run 10: passed in 12 steps" aria-label="run 10: passed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-10">✓</a><a class="dot failed " data-tip="run 11: failed in 13 steps" aria-label="run 11: failed in 13 steps" href="evidence/ticket-queue-baseline/report.html#run-11">×</a><a class="dot passed " data-tip="run 12: passed in 14 steps" aria-label="run 12: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-12">✓</a><a class="dot passed " data-tip="run 13: passed in 14 steps" aria-label="run 13: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-13">✓</a><a class="dot passed " data-tip="run 14: passed in 13 steps" aria-label="run 14: passed in 13 steps" href="evidence/ticket-queue-baseline/report.html#run-14">✓</a><a class="dot passed " data-tip="run 15: passed in 16 steps" aria-label="run 15: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-15">✓</a><a class="dot passed " data-tip="run 16: passed in 13 steps" aria-label="run 16: passed in 13 steps" href="evidence/ticket-queue-baseline/report.html#run-16">✓</a><a class="dot passed " data-tip="run 17: passed in 12 steps" aria-label="run 17: passed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-17">✓</a><a class="dot passed " data-tip="run 18: passed in 15 steps" aria-label="run 18: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-18">✓</a><a class="dot passed " data-tip="run 19: passed in 15 steps" aria-label="run 19: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-19">✓</a></div><div class="dotrow"><em>20</em><a class="dot passed " data-tip="run 20: passed in 16 steps" aria-label="run 20: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-20">✓</a><a class="dot passed " data-tip="run 21: passed in 12 steps" aria-label="run 21: passed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-21">✓</a><a class="dot passed " data-tip="run 22: passed in 15 steps" aria-label="run 22: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-22">✓</a><a class="dot passed " data-tip="run 23: passed in 17 steps" aria-label="run 23: passed in 17 steps" href="evidence/ticket-queue-baseline/report.html#run-23">✓</a><a class="dot passed " data-tip="run 24: passed in 14 steps" aria-label="run 24: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-24">✓</a><a class="dot passed " data-tip="run 25: passed in 15 steps" aria-label="run 25: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-25">✓</a><a class="dot passed " data-tip="run 26: passed in 15 steps" aria-label="run 26: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-26">✓</a><a class="dot passed " data-tip="run 27: passed in 17 steps" aria-label="run 27: passed in 17 steps" href="evidence/ticket-queue-baseline/report.html#run-27">✓</a><a class="dot passed " data-tip="run 28: passed in 12 steps" aria-label="run 28: passed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-28">✓</a><a class="dot failed " data-tip="run 29: failed in 12 steps" aria-label="run 29: failed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-29">×</a></div><div class="dotrow"><em>30</em><a class="dot passed " data-tip="run 30: passed in 25 steps" aria-label="run 30: passed in 25 steps" href="evidence/ticket-queue-baseline/report.html#run-30">✓</a><a class="dot passed " data-tip="run 31: passed in 21 steps" aria-label="run 31: passed in 21 steps" href="evidence/ticket-queue-baseline/report.html#run-31">✓</a><a class="dot passed " data-tip="run 32: passed in 18 steps" aria-label="run 32: passed in 18 steps" href="evidence/ticket-queue-baseline/report.html#run-32">✓</a><a class="dot passed " data-tip="run 33: passed in 11 steps" aria-label="run 33: passed in 11 steps" href="evidence/ticket-queue-baseline/report.html#run-33">✓</a><a class="dot passed " data-tip="run 34: passed in 14 steps" aria-label="run 34: passed in 14 steps" href="evidence/ticket-queue-baseline/report.html#run-34">✓</a><a class="dot passed " data-tip="run 35: passed in 20 steps" aria-label="run 35: passed in 20 steps" href="evidence/ticket-queue-baseline/report.html#run-35">✓</a><a class="dot passed " data-tip="run 36: passed in 17 steps" aria-label="run 36: passed in 17 steps" href="evidence/ticket-queue-baseline/report.html#run-36">✓</a><a class="dot passed " data-tip="run 37: passed in 16 steps" aria-label="run 37: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-37">✓</a><a class="dot passed " data-tip="run 38: passed in 18 steps" aria-label="run 38: passed in 18 steps" href="evidence/ticket-queue-baseline/report.html#run-38">✓</a><a class="dot passed " data-tip="run 39: passed in 21 steps" aria-label="run 39: passed in 21 steps" href="evidence/ticket-queue-baseline/report.html#run-39">✓</a></div><div class="dotrow"><em>40</em><a class="dot passed " data-tip="run 40: passed in 17 steps" aria-label="run 40: passed in 17 steps" href="evidence/ticket-queue-baseline/report.html#run-40">✓</a><a class="dot passed " data-tip="run 41: passed in 18 steps" aria-label="run 41: passed in 18 steps" href="evidence/ticket-queue-baseline/report.html#run-41">✓</a><a class="dot passed " data-tip="run 42: passed in 16 steps" aria-label="run 42: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-42">✓</a><a class="dot passed " data-tip="run 43: passed in 20 steps" aria-label="run 43: passed in 20 steps" href="evidence/ticket-queue-baseline/report.html#run-43">✓</a><a class="dot failed " data-tip="run 44: failed in 12 steps" aria-label="run 44: failed in 12 steps" href="evidence/ticket-queue-baseline/report.html#run-44">×</a><a class="dot passed " data-tip="run 45: passed in 21 steps" aria-label="run 45: passed in 21 steps" href="evidence/ticket-queue-baseline/report.html#run-45">✓</a><a class="dot passed " data-tip="run 46: passed in 15 steps" aria-label="run 46: passed in 15 steps" href="evidence/ticket-queue-baseline/report.html#run-46">✓</a><a class="dot passed " data-tip="run 47: passed in 31 steps" aria-label="run 47: passed in 31 steps" href="evidence/ticket-queue-baseline/report.html#run-47">✓</a><a class="dot passed " data-tip="run 48: passed in 18 steps" aria-label="run 48: passed in 18 steps" href="evidence/ticket-queue-baseline/report.html#run-48">✓</a><a class="dot passed " data-tip="run 49: passed in 16 steps" aria-label="run 49: passed in 16 steps" href="evidence/ticket-queue-baseline/report.html#run-49">✓</a></div></div><div class="k"><b>47/50</b>passed · 84%–98% plausible</div></div>
-    <div class="cap"><b>pass^k</b> · the chance all k attempts succeed</div>
-    <svg class="chart" viewBox="0 0 520 170" role="img" aria-label="pass^k by k"><line class="grid" x1="36" x2="506" y1="144" y2="144"/><text x="30" y="147.5" text-anchor="end">0%</text><line class="grid" x1="36" x2="506" y1="78" y2="78"/><text x="30" y="81.5" text-anchor="end">50%</text><line class="grid" x1="36" x2="506" y1="12" y2="12"/><text x="30" y="15.5" text-anchor="end">100%</text><text x="36" y="162" text-anchor="middle">k=1</text><text x="134.94736842105263" y="162" text-anchor="middle">k=5</text><text x="258.63157894736844" y="162" text-anchor="middle">k=10</text><text x="382.3157894736842" y="162" text-anchor="middle">k=15</text><text x="506" y="162" text-anchor="middle">k=20</text><line class="axis" x1="36" x2="36" y1="12" y2="144"/><path class="ln lower s-a" d="M36.0,33.4 L60.7,51.3 L85.5,66.4 L110.2,79.0 L134.9,89.5 L159.7,98.3 L184.4,105.7 L209.2,112.0 L233.9,117.1 L258.6,121.5 L283.4,125.2 L308.1,128.2 L332.8,130.8 L357.6,132.9 L382.3,134.7 L407.1,136.2 L431.8,137.5 L456.5,138.5 L481.3,139.4 L506.0,140.2"/><path class="ln s-a" d="M36.0,19.9 L60.7,27.5 L85.5,34.8 L110.2,41.8 L134.9,48.4 L159.7,54.8 L184.4,60.9 L209.2,66.7 L233.9,72.2 L258.6,77.5 L283.4,82.5 L308.1,87.2 L332.8,91.7 L357.6,95.9 L382.3,99.9 L407.1,103.7 L431.8,107.3 L456.5,110.6 L481.3,113.7 L506.0,116.7"><title>baseline prompt</title></path><path class="ln lower s-b" d="M36.0,21.6 L60.7,30.5 L85.5,38.7 L110.2,46.4 L134.9,53.5 L159.7,60.1 L184.4,66.2 L209.2,71.8 L233.9,77.1 L258.6,81.9 L283.4,86.5 L308.1,90.6 L332.8,94.5 L357.6,98.1 L382.3,101.5 L407.1,104.5 L431.8,107.4 L456.5,110.1 L481.3,112.5 L506.0,114.8"/><path class="ln s-b" d="M36.0,12.0 L60.7,12.0 L85.5,12.0 L110.2,12.0 L134.9,12.0 L159.7,12.0 L184.4,12.0 L209.2,12.0 L233.9,12.0 L258.6,12.0 L283.4,12.0 L308.1,12.0 L332.8,12.0 L357.6,12.0 L382.3,12.0 L407.1,12.0 L431.8,12.0 L456.5,12.0 L481.3,12.0 L506.0,12.0"><title>reload-and-confirm prompt</title></path><text class="lbl a" x="506" y="109.65714285714286" text-anchor="end">baseline prompt · pass^10 50%</text><text class="lbl b" x="506" y="24" text-anchor="end">reload-and-confirm prompt · pass^10 100%</text></svg>
-    <div class="key"><span><i style="border-color:var(--a)"></i>A · baseline</span><span><i style="border-color:var(--b)"></i>B · same snapshot, prompt adds “reload and confirm”</span><span><i style="border-top-style:dashed;border-color:var(--ink-3)"></i>95% lower bound</span></div>
-    <div class="cap">What changing the prompt did</div>
-    <div class="tiles"><div class="tile"><div class="l">passed</div><div class="v">49/49<small>from 47/50</small></div><div class="d up">↑ 6 pts</div></div><div class="tile"><div class="l">pass^5</div><div class="v">100%<small>from 72%</small></div><div class="d up">↑ 28 pts</div></div><div class="tile"><div class="l">median steps</div><div class="v">18<small>from 15</small></div><div class="d down">↑ 3</div></div></div>
-    <p class="verdict">A 94% pass rate is a 50% chance of ten clean runs in a row. Adding <ins>reload the page and confirm</ins> to the prompt moved it to <b>49/49</b>, at the cost of +3 median steps. On this many runs the pass/fail split alone is still consistent with noise (p = 0.24). <a href="evidence/compare-ticket-queue-baseline-vs-reload/compare.html">Full comparison ↗</a></p>
-  </div>
-</section>
+  <form class="ask" id="ask" onsubmit="return false">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+    <input id="q" type="text" placeholder="Describe your task, e.g. enter invoices from PDFs into our accounts-payable tool" autocomplete="off">
+    <span class="match" id="match">closest shape: <b>—</b></span>
+  </form>
+  <div class="chips" id="chips"></div>
 
-<div class="totals">
-  <div><b>210</b>verified runs, each graded inside the VM</div>
-  <div><b>9</b>validated tasks across 2 desktop templates</div>
-  <div><b>4</b>controlled comparisons, one thing changed each</div>
-  <div><b>$2.36</b>total model spend for everything on this page</div>
-</div>
-
-<section class="sec" id="diverge">
-  <h2>Why it failed</h2>
-  <p class="lead">Every failing run is diffed against a passing sibling to find the first step where they part ways.</p>
-  <p>Below, run 33 and run 11 of the baseline bench on one time axis. Same snapshot, same prompt, same model. The agent's own report of the outcome sits next to what the checker found in the VM.</p>
-  <div class="card"><div class="trace">
-    <div class="lane"><div class="who"><b>Run 33</b>11 steps · 33s from first action<br><span class="pill passed">passed</span></div><div><div class="tl"><i class="screenshot" style="left:0.00%;width:17.98%" data-tip="step 0: look"></i><i class="click" style="left:17.98%;width:1.34%" data-tip="step 1: click 832,382"></i><i class="keypress" style="left:19.32%;width:1.04%" data-tip="step 2: ⌨ U"></i><i class="click" style="left:20.36%;width:1.51%" data-tip="step 3: click 969,381"></i><i class="keypress" style="left:21.87%;width:14.68%" data-tip="step 4: ⌨ D"></i><i class="click" style="left:36.55%;width:16.29%" data-tip="step 5: click 967,380"></i><i class="click" style="left:52.84%;width:1.53%" data-tip="step 6: click 947,454"></i><i class="click" style="left:54.37%;width:12.68%" data-tip="step 7: click 1117,381"></i><i class="click" style="left:67.05%;width:12.84%" data-tip="step 8: click 931,430"></i><i class="click" style="left:79.89%;width:1.29%" data-tip="step 9: click 946,503"></i><i class="click" style="left:81.18%;width:18.82%" data-tip="step 10: click 1119,430"></i></div><div class="chips"><span class="same" title="step 0">look</span><span class="" title="step 1">click 832,382</span><span class="" title="step 2">⌨ U</span><span class="" title="step 3">click 969,381</span><span class="" title="step 4">⌨ D</span><span class="" title="step 5">click 967,380</span><span class="" title="step 6">click 947,454</span><span class="" title="step 7">click 1117,381</span><span class="" title="step 8">click 931,430</span><span class="" title="step 9">click 946,503</span><span class="" title="step 10">click 1119,430</span></div></div></div>
-    <div class="lane"><div class="who"><b>Run 11</b>13 steps · 21s from first action<br><span class="pill failed">failed</span></div><div><div class="tl"><i class="screenshot" style="left:0.00%;width:17.52%" data-tip="step 0: look"></i><i class="click" style="left:17.52%;width:1.31%" data-tip="step 1: click 833,381"></i><i class="keypress div" style="left:18.82%;width:1.10%" data-tip="step 2: ⌨ HOME"></i><i class="keypress" style="left:19.92%;width:0.99%" data-tip="step 3: ⌨ U"></i><i class="keypress" style="left:20.91%;width:1.05%" data-tip="step 4: ⌨ ENTER"></i><i class="click" style="left:21.96%;width:1.38%" data-tip="step 5: click 972,381"></i><i class="keypress" style="left:23.35%;width:1.13%" data-tip="step 6: ⌨ D"></i><i class="keypress" style="left:24.47%;width:1.03%" data-tip="step 7: ⌨ ENTER"></i><i class="click" style="left:25.50%;width:15.51%" data-tip="step 8: click 1118,381"></i><i class="click" style="left:41.01%;width:1.36%" data-tip="step 9: click 928,430"></i><i class="keypress" style="left:42.37%;width:1.16%" data-tip="step 10: ⌨ D"></i><i class="keypress" style="left:43.53%;width:1.12%" data-tip="step 11: ⌨ ENTER"></i><i class="click" style="left:44.65%;width:20.06%" data-tip="step 12: click 1072,430"></i></div><div class="chips"><span class="same" title="step 0">look</span><span class="" title="step 1">click 833,381</span><span class="div" title="step 2">⌨ HOME</span><span class="div" title="step 3">⌨ U</span><span class="div" title="step 4">⌨ ENTER</span><span class="div" title="step 5">click 972,381</span><span class="div" title="step 6">⌨ D</span><span class="div" title="step 7">⌨ ENTER</span><span class="div" title="step 8">click 1118,381</span><span class="div" title="step 9">click 928,430</span><span class="div" title="step 10">⌨ D</span><span class="div" title="step 11">⌨ ENTER</span><span class="div" title="step 12">click 1072,430</span></div></div></div>
-    <div class="tracekey"><span><i style="background:var(--a)"></i>click</span><span><i style="background:#8b5cf6"></i>key</span><span><i style="background:#14b8a6"></i>type</span><span><i style="background:var(--ink-3)"></i>wait</span><span><i style="background:var(--line-2)"></i>look</span><span><i style="outline:2px solid var(--crit);outline-offset:-1px"></i>first divergent step (2)</span></div>
-  </div>
-  <div class="said">
-    <div><div class="cap">Run 33 · final screen · the VM found</div><a href="evidence/ticket-queue-baseline/run-33/final.jpg" target="_blank"><img loading="lazy" src="evidence/ticket-queue-baseline/run-33/final.jpg" alt="final screenshot of run 33"></a><blockquote class="vm ok">all checks passed</blockquote></div>
-    <div><div class="cap">Run 11 · final screen · the agent said, and the VM found</div><a href="evidence/ticket-queue-baseline/run-11/final.jpg" target="_blank"><img loading="lazy" src="evidence/ticket-queue-baseline/run-11/final.jpg" alt="final screenshot of run 11"></a><blockquote class="agent">“All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent; both changes were saved.”</blockquote><blockquote class="vm">exit 0, stdout &quot;MISMATCH: 102.assignee='Sam' want 'Dana'\n&quot;</blockquote></div>
-  </div>
-  <div class="hyp"><b>behavior variability</b> · high confidence · diverges from run 33 at step 2<div style="margin-top:4px">The failing run used a different interaction strategy for the priority dropdown (HOME, U, ENTER) and then did not successfully change ticket 102's assignee to Dana; it clicked the wrong control/row area and stopped early. The task interpretation was correct, but the execution strategy diverged from the reliable reference sequence.</div></div></div>
-  <div class="card" style="margin-top:14px"><h3 style="margin:0 0 4px;font-size:16px">Every failure in the evidence, by cause</h3>
-    <div style="font-size:13.5px;color:var(--ink-2)">18 failing runs across 9 benches, sorted into Pinetree's three sources of unreliability by a model reading the diff. The label is a hypothesis; the divergence step and the screenshots are the evidence.</div>
-    <div class="causebar"><i class="c-behavior_variability" style="width:66.7%" data-tip="behaviour variability: 12 of 18"></i><i class="c-unknown" style="width:33.3%" data-tip="unclassified: 6 of 18"></i></div><div class="causekey"><span><i class="c-behavior_variability"></i>behaviour variability · 12</span><span><i class="c-unknown"></i>unclassified · 6</span></div></div>
-</section>
-
-<section class="sec" id="proof">
-  <h2>Three things it found</h2>
-  <p class="lead">A single demo tells you an agent <em>can</em> do the task. Fifty forks tell you what it does on a Tuesday.</p>
-  <p>Each finding below is one snapshot, one agent, one thing changed, and every run's outcome checked by a script in the VM rather than by the agent's own report.</p>
-  <div class="findings">
-    <div class="card finding">
-      <h3>One missing folder</h3>
-      <div class="big">2/5<span class="arrow">→</span>5/5</div>
-      <div class="tiles"><div class="tile"><div class="l">median steps</div><div class="v">9<small>from 30</small></div><div class="d up">↓ 21</div></div><div class="tile"><div class="l">$ per success</div><div class="v">$0.005<small>from $0.028</small></div><div class="d up">↓ 0.023</div></div></div>
-      <p>Same agent, same prompt, same checks. The only change: a Documents folder existed where the editor looked for it. When an agent "is flaky", the environment is a suspect.</p>
-      <div class="actions"><a class="btn sm" href="evidence/compare-notes-environment/compare.html">See the comparison</a></div>
-    </div>
-    <div class="card finding">
-      <h3>Telling it to look did nothing. Telling it to reload fixed it.</h3>
-      <svg class="chart" viewBox="0 0 520 190" role="img" aria-label="pass rates with intervals"><line class="grid" x1="36" x2="510" y1="156" y2="156"/><text x="30" y="159.5" text-anchor="end">0%</text><line class="grid" x1="36" x2="510" y1="95" y2="95"/><text x="30" y="98.5" text-anchor="end">50%</text><line class="grid" x1="36" x2="510" y1="34" y2="34"/><text x="30" y="37.5" text-anchor="end">100%</text><g data-tip="baseline: 47/50 · 84%–98% plausible"><rect class="rate a" x="75.5" y="41.32000000000001" width="79" height="114.67999999999999" rx="3"/>
-      <line class="whisker" x1="115" x2="115" y1="36.51498075648492" y2="53.78515891246995"/><line class="whisker" x1="109" x2="121" y1="36.51498075648492" y2="36.51498075648492"/><line class="whisker" x1="109" x2="121" y1="53.78515891246995" y2="53.78515891246995"/>
-      <text class="big" x="115" y="28.514980756484917" text-anchor="middle">47/50</text>
-      <text x="115" y="172" text-anchor="middle">baseline</text><text x="115" y="184" text-anchor="middle">84%–98%</text></g><g data-tip="screenshot + confirm: 47/49 · 86%–99% plausible"><rect class="rate n" x="233.5" y="38.9795918367347" width="79" height="117.0204081632653" rx="3"/>
-      <line class="whisker" x1="273" x2="273" y1="35.37437842520726" y2="50.73020584173396"/><line class="whisker" x1="267" x2="279" y1="35.37437842520726" y2="35.37437842520726"/><line class="whisker" x1="267" x2="279" y1="50.73020584173396" y2="50.73020584173396"/>
-      <text class="big" x="273" y="27.37437842520726" text-anchor="middle">47/49</text>
-      <text x="273" y="172" text-anchor="middle">screenshot + confirm</text><text x="273" y="184" text-anchor="middle">86%–99%</text></g><g data-tip="reload + confirm: 49/49 · 93%–100% plausible"><rect class="rate b" x="391.5" y="34" width="79" height="122" rx="3"/>
-      <line class="whisker" x1="431" x2="431" y1="34.00000000000003" y2="42.86943620178043"/><line class="whisker" x1="425" x2="437" y1="34.00000000000003" y2="34.00000000000003"/><line class="whisker" x1="425" x2="437" y1="42.86943620178043" y2="42.86943620178043"/>
-      <text class="big" x="431" y="26" text-anchor="middle">49/49</text>
-      <text x="431" y="172" text-anchor="middle">reload + confirm</text><text x="431" y="184" text-anchor="middle">93%–100%</text></g></svg>
-      <p>An internal ticket tool, three prompts, one snapshot. Every baseline failure was a Save click that never landed, followed by a confident claim of success. "Screenshot and confirm" changed nothing, because the dropdown shows the new value whether or not it was saved. "Reload and confirm" forced a read from the server.</p>
-      <div class="actions"><a class="btn sm" href="evidence/compare-ticket-queue-baseline-vs-reload/compare.html">Reload</a><a class="btn sm" href="evidence/compare-ticket-queue-baseline-vs-verify/compare.html">Screenshot</a></div>
-    </div>
-    <div class="card finding">
-      <h3>A perfect pass rate hid a 3× cost spread</h3>
-      <div class="big">10/10 <small>passed · 9–29 steps</small></div>
-      <svg class="chart" viewBox="0 0 520 130" role="img" aria-label="steps per run">
-    <text x="24" y="12" text-anchor="end">29</text><text x="24" y="110" text-anchor="end">0</text>
-    <line class="axis" x1="30" x2="514" y1="110" y2="110"/>
-    <line class="med" x1="30" x2="514" y1="69.55172413793103" y2="69.55172413793103"/><text x="34" y="17">median 11.5 steps ┈</text>
-    <a href="evidence/q3-total/report.html#run-1"><rect class="bar passed" x="31.5" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 1: passed in 9 steps, 57s"/></a><a href="evidence/q3-total/report.html#run-3"><rect class="bar passed" x="79.9" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 3: passed in 9 steps, 59s"/></a><a href="evidence/q3-total/report.html#run-4"><rect class="bar passed" x="128.3" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 4: passed in 9 steps, 63s"/></a><a href="evidence/q3-total/report.html#run-5"><rect class="bar passed" x="176.7" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 5: passed in 9 steps, 50s"/></a><a href="evidence/q3-total/report.html#run-7"><rect class="bar passed" x="225.1" y="71.3" width="45.4" height="38.7" rx="1.5" data-tip="run 7: passed in 11 steps, 141s"/></a><a href="evidence/q3-total/report.html#run-6"><rect class="bar passed" x="273.5" y="67.8" width="45.4" height="42.2" rx="1.5" data-tip="run 6: passed in 12 steps, 61s"/></a><a href="evidence/q3-total/report.html#run-2"><rect class="bar passed" x="321.9" y="32.6" width="45.4" height="77.4" rx="1.5" data-tip="run 2: passed in 22 steps, 236s"/></a><a href="evidence/q3-total/report.html#run-9"><rect class="bar passed" x="370.3" y="29.1" width="45.4" height="80.9" rx="1.5" data-tip="run 9: passed in 23 steps, 239s"/></a><a href="evidence/q3-total/report.html#run-0"><rect class="bar passed" x="418.7" y="25.6" width="45.4" height="84.4" rx="1.5" data-tip="run 0: passed in 24 steps, 72s"/></a><a href="evidence/q3-total/report.html#run-8"><rect class="bar passed" x="467.1" y="8.0" width="45.4" height="102.0" rx="1.5" data-tip="run 8: passed in 29 steps, 115s"/></a>
-    <text x="30" y="124">10 runs, sorted by steps</text><text x="514" y="124" text-anchor="end">9–29 steps</text>
-  </svg>
-      <p>LibreOffice Calc: add a total row, save as CSV. Every run got the formula right in three steps. Then some pressed ctrl+S and clicked "keep format", and others thrashed in the save dialog for twenty. Same result, three times the cost.</p>
-      <div class="actions"><a class="btn sm" href="evidence/q3-total/report.html">See the report</a></div>
-    </div>
-  </div>
-  <div class="card finding" style="margin-top:14px">
-    <h3>The workflow Pinetree describes: accounts payable, with a duplicate trap and buttons that must not be pressed</h3>
-    <div class="big">23/26 <small>passed · 71%–96% plausible · $0.024 per success · 35–72 steps</small></div>
-    <svg class="chart" viewBox="0 0 1060 150" role="img" aria-label="steps per run">
-    <text x="24" y="12" text-anchor="end">72</text><text x="24" y="130" text-anchor="end">0</text>
-    <line class="axis" x1="30" x2="1054" y1="130" y2="130"/>
-    <line class="med" x1="30" x2="1054" y1="60.52777777777778" y2="60.52777777777778"/><text x="34" y="17">median 41 steps ┈</text>
-    <a href="evidence/invoice-entry/report.html#run-0"><rect class="bar passed" x="31.5" y="70.7" width="36.4" height="59.3" rx="1.5" data-tip="run 0: passed in 35 steps, 87s"/></a><a href="evidence/invoice-entry/report.html#run-2"><rect class="bar passed" x="70.9" y="67.3" width="36.4" height="62.7" rx="1.5" data-tip="run 2: passed in 37 steps, 108s"/></a><a href="evidence/invoice-entry/report.html#run-4"><rect class="bar passed" x="110.3" y="67.3" width="36.4" height="62.7" rx="1.5" data-tip="run 4: passed in 37 steps, 111s"/></a><a href="evidence/invoice-entry/report.html#run-3"><rect class="bar passed" x="149.7" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 3: passed in 38 steps, 99s"/></a><a href="evidence/invoice-entry/report.html#run-5"><rect class="bar passed" x="189.0" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 5: passed in 38 steps, 142s"/></a><a href="evidence/invoice-entry/report.html#run-16"><rect class="bar passed" x="228.4" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 16: passed in 38 steps, 145s"/></a><a href="evidence/invoice-entry/report.html#run-6"><rect class="bar passed" x="267.8" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 6: passed in 39 steps, 97s"/></a><a href="evidence/invoice-entry/report.html#run-8"><rect class="bar passed" x="307.2" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 8: passed in 39 steps, 92s"/></a><a href="evidence/invoice-entry/report.html#run-13"><rect class="bar passed" x="346.6" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 13: passed in 39 steps, 147s"/></a><a href="evidence/invoice-entry/report.html#run-1"><rect class="bar passed" x="386.0" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 1: passed in 40 steps, 115s"/></a><a href="evidence/invoice-entry/report.html#run-9"><rect class="bar passed" x="425.3" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 9: passed in 40 steps, 93s"/></a><a href="evidence/invoice-entry/report.html#run-15"><rect class="bar passed" x="464.7" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 15: passed in 40 steps, 125s"/></a><a href="evidence/invoice-entry/report.html#run-10"><rect class="bar passed" x="504.1" y="60.5" width="36.4" height="69.5" rx="1.5" data-tip="run 10: passed in 41 steps, 116s"/></a><a href="evidence/invoice-entry/report.html#run-24"><rect class="bar passed" x="543.5" y="60.5" width="36.4" height="69.5" rx="1.5" data-tip="run 24: passed in 41 steps, 191s"/></a><a href="evidence/invoice-entry/report.html#run-11"><rect class="bar passed" x="582.9" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 11: passed in 42 steps, 116s"/></a><a href="evidence/invoice-entry/report.html#run-18"><rect class="bar passed" x="622.3" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 18: passed in 42 steps, 123s"/></a><a href="evidence/invoice-entry/report.html#run-23"><rect class="bar passed" x="661.7" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 23: passed in 42 steps, 141s"/></a><a href="evidence/invoice-entry/report.html#run-25"><rect class="bar passed" x="701.0" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 25: passed in 42 steps, 103s"/></a><a href="evidence/invoice-entry/report.html#run-27"><rect class="bar passed" x="740.4" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 27: passed in 42 steps, 155s"/></a><a href="evidence/invoice-entry/report.html#run-28"><rect class="bar passed" x="779.8" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 28: passed in 42 steps, 123s"/></a><a href="evidence/invoice-entry/report.html#run-26"><rect class="bar passed" x="819.2" y="57.1" width="36.4" height="72.9" rx="1.5" data-tip="run 26: passed in 43 steps, 130s"/></a><a href="evidence/invoice-entry/report.html#run-29"><rect class="bar passed" x="858.6" y="55.4" width="36.4" height="74.6" rx="1.5" data-tip="run 29: passed in 44 steps, 109s"/></a><a href="evidence/invoice-entry/report.html#run-7"><rect class="bar passed" x="898.0" y="13.1" width="36.4" height="116.9" rx="1.5" data-tip="run 7: passed in 69 steps, 209s"/></a><a href="evidence/invoice-entry/report.html#run-12"><rect class="bar failed" x="937.3" y="9.7" width="36.4" height="120.3" rx="1.5" data-tip="run 12: failed in 71 steps, 232s"/></a><a href="evidence/invoice-entry/report.html#run-17"><rect class="bar failed" x="976.7" y="9.7" width="36.4" height="120.3" rx="1.5" data-tip="run 17: failed in 71 steps, 206s"/></a><a href="evidence/invoice-entry/report.html#run-14"><rect class="bar failed" x="1016.1" y="8.0" width="36.4" height="122.0" rx="1.5" data-tip="run 14: failed in 72 steps, 249s"/></a>
-    <text x="30" y="144">26 runs, sorted by steps</text><text x="1054" y="144" text-anchor="end">35–72 steps</text>
-  </svg>
-    <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. No run approved, paid or duplicated anything. The failures are the tall red bars: detours that ran out of step budget with the form already filled. 4 runs were lost to infrastructure and are reported, not scored.</p>
-    <div class="actions"><a class="btn sm" href="evidence/invoice-entry/report.html">See the report</a></div>
-  </div>
-</section>
-
-<section class="sec" id="how">
-  <h2>How it works</h2>
-  <p class="lead">Snapshot once. Fork k times. Verify inside the VM. Diff the failures against a passing sibling.</p>
-  <p>Built on Solari because it is the only place this is cheap: <code>snapshot()</code> once, <code>createDesktop({ fromSnapshot })</code> k times, and every fork boots byte-identical in about a second.</p>
-  <div class="steps">
-    <div><b>Prepare</b>boot a template, run the setup steps, snapshot, kill</div>
-    <div><b>Validate</b>prove the checks fail before the golden steps and pass after</div>
-    <div><b>Probe</b>let the agent look around and list the questions it would ask a human</div>
-    <div><b>Run ×k</b>fork the snapshot, agent loop on each fork, checks graded in the VM</div>
-    <div><b>Report</b>pass@k and pass^k with intervals, effort spread, a cause per failure</div>
-    <div><b>Compare</b>change one thing, fork the same snapshot again, measure the delta</div>
-  </div>
-  <div class="split" style="margin-top:16px">
-    <pre class="code"><i># one task, start to finish</i>
-passk prepare  tasks/notes.yaml      <i># boot → setup → snapshot → kill</i>
-passk validate tasks/notes.yaml      <i># is the verifier sound?</i>
-passk probe    tasks/notes.yaml      <i># what would the agent ask?</i>
-passk run      tasks/notes.yaml --k 10 --budget 0.50 --require-lower 0.7
-open runs/notes-*/report.html</pre>
-    <pre class="code"><i># what the report says</i>
-<b>pass@1</b>   observed pass rate, with a 95% Wilson interval
-<b>pass^k</b>   probability that all k attempts pass: the number a user feels
-<b>effort</b>   steps, seconds and dollars per run, and their spread
-<b>cause</b>    each failure diffed against a passing sibling, then sorted
-         into stochastic execution, task ambiguity or behavior
-         variability (Pinetree, 2026)</pre>
-  </div>
-</section>
-
-<section class="sec" id="prove">
-  <h2>What k can prove</h2>
-  <p class="lead">Ten passes out of ten does not mean 100%. It means at least 72%.</p>
-  <p>passk reports the interval, not just the count, and the studio's planner works this out before you spend anything. The two tables below are the same arithmetic the reports use.</p>
-  <div class="prove">
-    <div class="card"><div>If <b>all k runs pass</b>, the pass rate is at least…</div>
-      <table><tr><th class="num">k</th><th class="num">lower bound (95%)</th><th class="num">pass^5 at that bound</th></tr>
-      <tr><td class="num">5</td><td class="num">57%</td><td class="num">6%</td></tr><tr><td class="num">10</td><td class="num">72%</td><td class="num">20%</td></tr><tr><td class="num">20</td><td class="num">84%</td><td class="num">42%</td></tr><tr><td class="num">30</td><td class="num">89%</td><td class="num">55%</td></tr><tr><td class="num">50</td><td class="num">93%</td><td class="num">69%</td></tr></table></div>
-    <div class="card"><div>To <b>establish a floor</b>, this many runs must all pass</div>
-      <table><tr><th class="num">floor</th><th class="num">runs needed</th><th class="num">the CLI flag</th></tr>
-      <tr><td class="num">70%</td><td class="num">9</td><td class="num"><code>--require-lower 0.7</code></td></tr><tr><td class="num">80%</td><td class="num">16</td><td class="num"><code>--require-lower 0.8</code></td></tr><tr><td class="num">90%</td><td class="num">35</td><td class="num"><code>--require-lower 0.9</code></td></tr><tr><td class="num">95%</td><td class="num">73</td><td class="num"><code>--require-lower 0.95</code></td></tr></table></div>
-  </div>
-</section>
-
-<section class="sec" id="benches">
-  <h2>Every bench</h2>
-  <p class="lead">All of it is published: every action, check, screenshot and provenance record.</p>
-  <div class="card" style="padding:0;overflow-x:auto"><table>
-  <tr><th>Bench</th><th>Model</th><th class="num">Passed</th><th class="num">Pass rate (95%)</th><th class="num">pass^5</th><th class="num">Median steps</th><th class="num">$/success</th><th class="num">Lost</th></tr>
-  <tr><td><a href="evidence/ticket-queue-baseline/report.html">Triage tickets in an internal web tool</a></td><td><code>gpt-5.6-luna</code></td><td class="num">47/50</td><td class="num">94% (84%–98%)</td><td class="num">72%</td><td class="num">15</td><td class="num">$0.007</td><td class="num"></td></tr><tr><td><a href="evidence/ticket-queue-reload/report.html">Triage tickets in an internal web tool (reload-and-confirm prompt)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">49/49</td><td class="num">100% (93%–100%)</td><td class="num">100%</td><td class="num">18</td><td class="num">$0.008</td><td class="num">1</td></tr><tr><td><a href="evidence/ticket-queue-verify/report.html">Triage tickets in an internal web tool (save-and-verify prompt)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">47/49</td><td class="num">96% (86%–99%)</td><td class="num">80%</td><td class="num">15</td><td class="num">$0.007</td><td class="num">1</td></tr><tr><td><a href="evidence/invoice-entry/report.html">Enter a vendor invoice into LedgerDesk</a></td><td><code>gpt-5.6-luna</code></td><td class="num">23/26</td><td class="num">88% (71%–96%)</td><td class="num">51%</td><td class="num">41</td><td class="num">$0.024</td><td class="num">4</td></tr><tr><td><a href="evidence/q3-total/report.html">Total a sales sheet in LibreOffice Calc</a></td><td><code>gpt-5.6-luna</code></td><td class="num">10/10</td><td class="num">100% (72%–100%)</td><td class="num">100%</td><td class="num">11.5</td><td class="num">$0.016</td><td class="num"></td></tr><tr><td><a href="evidence/notes/report.html">Save a note in Mousepad</a></td><td><code>gpt-5.6-luna</code></td><td class="num">5/5</td><td class="num">100% (57%–100%)</td><td class="num">100%</td><td class="num">9</td><td class="num">$0.005</td><td class="num"></td></tr><tr><td><a href="evidence/notes-nodir/report.html">Save a note in Mousepad (no Documents folder)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">2/5</td><td class="num">40% (12%–77%)</td><td class="num">0%</td><td class="num">30</td><td class="num">$0.028</td><td class="num"></td></tr><tr><td><a href="evidence/rename-invoices/report.html">Archive the oldest invoices</a></td><td><code>gpt-5.6-luna</code></td><td class="num">5/5</td><td class="num">100% (57%–100%)</td><td class="num">100%</td><td class="num">16</td><td class="num">$0.014</td><td class="num"></td></tr><tr><td><a href="evidence/rename-invoices-clarified/report.html">Archive the oldest invoices (clarified prompt)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">5/5</td><td class="num">100% (57%–100%)</td><td class="num">100%</td><td class="num">21</td><td class="num">$0.020</td><td class="num"></td></tr>
+  <div class="head"><div><h2 id="sname"></h2><div class="blurb" id="sblurb"></div></div><div class="k" id="sk"></div></div>
+  <div class="board"><table>
+    <thead><tr><th>Model</th><th>passed · pass@1 · 95% interval</th><th class="num">pass^5</th><th class="num">$ / success</th><th>failures</th><th>status</th><th></th></tr></thead>
+    <tbody id="rows"></tbody>
   </table></div>
-  <div class="note">Observed counts with 95% Wilson intervals. Runs lost to infrastructure, the model provider or a checker crash are listed, not scored. <a href="evidence/index.html">The showcase</a> walks through each result; <a href="studio/">the studio</a> lets you browse and plan.</div>
-</section>
+  <div class="note">The bar is the 95% Wilson interval on the pass rate, the dot the observed rate. pass^5 is the chance five attempts in a row all pass. A run estimate is this shape's tokens per run at that model's list price, times k; Solari desktop time is on your plan.</div>
 
-<section class="sec" id="faq">
-  <h2>Questions</h2>
-  <div class="faq">
-    <details><summary>What is pass^k, and why not just pass@1?</summary><p>pass@1 is the chance one attempt succeeds. pass^k is the chance <em>all k</em> attempts succeed, which is what a user who runs the agent five times a day actually experiences. An agent at 80% pass@1 is at 33% pass^5. Both are estimated without bias from the runs, and reported with a lower bound.</p></details>
-    <details><summary>Who is it for?</summary><p>Teams shipping computer-use agents. An engineer defines a task and its success criteria once in a YAML file; passk runs it repeatedly from the same state and produces a report that engineering, product and operations can all read. The operator is an agent or QA engineer. The report reader does not need to know what YAML is.</p></details>
-    <details><summary>Why are the apps mocks?</summary><p>On purpose. A mock lets the bench own the state, plant a trap and verify exactly: the ticket queue and LedgerDesk keep their state in a JSON file a checker script reads inside the VM. What they keep from the real thing is the shape: records to search, a duplicate to avoid, required fields, dropdowns, a file upload, a business rule, and a consequential action that must not happen.</p></details>
-    <details><summary>Which agents can it bench?</summary><p>An OpenAI Responses API loop and a Claude computer-use loop ship in <code>src/agent/</code>; <code>PASSK_PROVIDER</code> picks one. Add a file there to bench your own. Everything published here ran on the OpenAI loop with a budget model; the Claude loop is written but was unexercised for want of a working key at the time.</p></details>
-    <details><summary>What does it cost?</summary><p>Model spend for every number on this page was $2.36. Fifty runs of the ticket queue cost about a dollar on a budget model, because the app lives in the snapshot and every fork boots in about a second. Solari's free tier allows one concurrent desktop; <code>--budget</code> stops a bench at a dollar figure and <code>--require-lower</code> makes it a CI gate.</p></details>
-    <details><summary>What can it not do?</summary><p>It cannot tell you an agent is reliable from five runs; it will tell you that five passes prove at least 57%, and how many runs the floor you want needs. It does not fix the agent. It does not write the verifier for you, and the verifier is the hard part of any task: <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">the operator's manual</a> is about that.</p></details>
+  <div class="fine">
+    <div>210 verified runs · 5 task shapes · 1 model with evidence · $2.36 of model spend in total. Every number on this page is read from <a href="evidence/">the published bench files</a>.</div>
+    <div><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/METHOD.md">How it is measured</a> · <a href="evidence/index.html">Evidence and findings</a> · <a href="studio/">Studio</a> · <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">Write a task</a> · built on <a href="https://getsolari.com">Solari</a></div>
   </div>
-</section>
-
-<section class="end">
-  <div>
-    <h2>Run your own bench.</h2>
-    <p>Node 20, a Solari key, and one model key. The demo runs the whole pipeline on a scripted provider in forty seconds with no VM and no API spend.</p>
-    <div class="cta"><a class="btn primary" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup">Setup guide</a><a class="btn" href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">Write a task</a></div>
-  </div>
-  <pre class="code">git clone https://github.com/tohirr/solari-cookbook.git
-cd solari-cookbook/passk && npm install
-cp .env.example .env         <i># SOLARI_API_KEY + one model key</i>
-sh demo.sh                   <i># the pipeline, no spend</i>
-npm run passk doctor         <i># keys, a desktop, one token</i>
-npm run passk run tasks/notes.yaml -- --k 5</pre>
-</section>
-
-<div class="foot">
-  <div>passk is built on <a href="https://getsolari.com">Solari</a> desktops, for the Solari challenge, by <a href="https://github.com/tohirr">Tohir</a>. The method follows Pinetree's <i>On the Reliability of Computer Use Agents</i> (2026).</div>
-  <div><a href="https://github.com/tohirr/solari-cookbook/tree/main/passk">Source</a> · <a href="evidence/">Evidence</a> · <a href="studio/">Studio</a> · <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/METHOD.md">Method</a></div>
-</div>
-
-<div class="tip" id="tip"></div>
+</main>
 <script>
-(function(){var t=document.getElementById('tip');document.addEventListener('mousemove',function(e){var el=e.target.closest&&e.target.closest('[data-tip]');if(!el){t.style.opacity=0;return;}t.textContent=el.getAttribute('data-tip');t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';t.style.opacity=1;});})();
+const SHAPES = [{"id":"ticket-triage","name":"Ticket triage · web app","blurb":"Find rows in an internal tool, change dropdowns, save each one. One closed ticket must not be touched.","keywords":["ticket","support","queue","crm","dashboard","assign","web app","webapp","internal tool","dropdown","priority","helpdesk","zendesk","jira","rows","saas","portal","admin"],"k":50,"proves":0.9286499658256813,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","verified":true,"passed":47,"n":50,"lower":0.8378265662912299,"upper":0.9793854036353695,"pow5":0.7239795918367347,"steps":15,"perSuccess":0.0072854212765957466,"date":"3 Sept 2026","href":"evidence/ticket-queue-baseline/report.html","failures":"3 · behavior variability","k":50},{"model":"gpt-5.6-luna","condition":"prompt adds “screenshot and confirm”","verified":true,"passed":47,"n":49,"lower":0.8628671652316888,"upper":0.9887346030720716,"pow5":0.8044217687074829,"steps":15,"perSuccess":0.007339382978723405,"date":"3 Sept 2026","href":"evidence/ticket-queue-verify/report.html","failures":"2 · 2 behavior variability, 1 unknown","k":50},{"model":"gpt-5.6-luna","condition":"prompt adds “reload and confirm”","verified":true,"passed":49,"n":49,"lower":0.9272997032640948,"upper":0.9999999999999998,"pow5":1,"steps":18,"perSuccess":0.008250795918367346,"date":"3 Sept 2026","href":"evidence/ticket-queue-reload/report.html","failures":"none · 1 lost to infrastructure","k":50},{"model":"claude-sonnet-5","condition":"baseline prompt","verified":false,"estimate":4.066873469387755,"k":50,"task":"ticket-queue-reload","cmd":"PASSK_MODEL=claude-sonnet-5 npm run passk run tasks/ticket-queue-reload.yaml -- --k 50 --budget 8.25"},{"model":"claude-opus-5","condition":"baseline prompt","verified":false,"estimate":10.167183673469388,"k":50,"task":"ticket-queue-reload","cmd":"PASSK_MODEL=claude-opus-5 npm run passk run tasks/ticket-queue-reload.yaml -- --k 50 --budget 20.5"},{"model":"gpt-5.6","condition":"baseline prompt","verified":false,"estimate":10.313494897959183,"k":50,"task":"ticket-queue-reload","cmd":"PASSK_MODEL=gpt-5.6 npm run passk run tasks/ticket-queue-reload.yaml -- --k 50 --budget 20.75"}],"runs":150,"spend":1.1062816},{"id":"invoice-entry","name":"Invoice entry · PDF to form","blurb":"Read the right PDF of three, skip the one already entered, fill a form, attach the file, save as Pending review. Never approve or pay.","keywords":["invoice","pdf","accounts payable","payable","erp","ledger","data entry","upload","attach","form","vendor","receipt","expense","bill","quickbooks","xero","netsuite","sap"],"k":30,"proves":0.886482908609522,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","verified":true,"passed":23,"n":26,"lower":0.7102370691310167,"upper":0.9599682817885051,"pow5":0.5115384615384615,"steps":41,"perSuccess":0.0243024,"date":"3 Sept 2026","href":"evidence/invoice-entry/report.html","failures":"3 · 3 behavior variability, 4 unknown","k":30},{"model":"claude-sonnet-5","condition":"baseline prompt","verified":false,"estimate":9.094781538461538,"k":30,"task":"invoice-entry","cmd":"PASSK_MODEL=claude-sonnet-5 npm run passk run tasks/invoice-entry.yaml -- --k 30 --budget 18.25"},{"model":"claude-opus-5","condition":"baseline prompt","verified":false,"estimate":22.736953846153845,"k":30,"task":"invoice-entry","cmd":"PASSK_MODEL=claude-opus-5 npm run passk run tasks/invoice-entry.yaml -- --k 30 --budget 45.5"},{"model":"gpt-5.6","condition":"baseline prompt","verified":false,"estimate":22.915869230769232,"k":30,"task":"invoice-entry","cmd":"PASSK_MODEL=gpt-5.6 npm run passk run tasks/invoice-entry.yaml -- --k 30 --budget 46"}],"runs":30,"spend":0.7944168},{"id":"spreadsheet","name":"Spreadsheet edit · Calc","blurb":"Open a sheet, add a total row with a formula, save as CSV through the keep-format dialog.","keywords":["spreadsheet","excel","calc","csv","formula","total","sum","sheet","cells","column","report","numbers","libreoffice","google sheets"],"k":10,"proves":0.7224598312333834,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","verified":true,"passed":10,"n":10,"lower":0.7224598312333834,"upper":1,"pow5":1,"steps":11.5,"perSuccess":0.01640048,"date":"2 Sept 2026","href":"evidence/q3-total/report.html","failures":"none","k":10},{"model":"claude-sonnet-5","condition":"baseline prompt","verified":false,"estimate":1.6224260000000001,"k":10,"task":"q3-total","cmd":"PASSK_MODEL=claude-sonnet-5 npm run passk run tasks/q3-total.yaml -- --k 10 --budget 3.25"},{"model":"claude-opus-5","condition":"baseline prompt","verified":false,"estimate":4.056065,"k":10,"task":"q3-total","cmd":"PASSK_MODEL=claude-opus-5 npm run passk run tasks/q3-total.yaml -- --k 10 --budget 8.25"},{"model":"gpt-5.6","condition":"baseline prompt","verified":false,"estimate":4.1001199999999995,"k":10,"task":"q3-total","cmd":"PASSK_MODEL=gpt-5.6 npm run passk run tasks/q3-total.yaml -- --k 10 --budget 8.25"}],"runs":10,"spend":0.16400479999999998},{"id":"files","name":"File operations · desktop","blurb":"Archive the oldest invoices in a folder with the file manager. Which ones count as oldest is the ambiguity.","keywords":["file","files","rename","folder","archive","move","finder","explorer","organise","organize","sort","directory","downloads","desktop"],"k":5,"proves":0.565508505247919,"rows":[{"model":"gpt-5.6-luna","condition":"ambiguous prompt","verified":true,"passed":5,"n":5,"lower":0.565508505247919,"upper":1,"pow5":1,"steps":16,"perSuccess":0.01362264,"date":"3 Sept 2026","href":"evidence/rename-invoices/report.html","failures":"none","k":5},{"model":"gpt-5.6-luna","condition":"clarified prompt","verified":true,"passed":5,"n":5,"lower":0.565508505247919,"upper":1,"pow5":1,"steps":21,"perSuccess":0.02031328,"date":"3 Sept 2026","href":"evidence/rename-invoices-clarified/report.html","failures":"none","k":5},{"model":"claude-sonnet-5","condition":"baseline prompt","verified":false,"estimate":1.0072,"k":5,"task":"rename-invoices-clarified","cmd":"PASSK_MODEL=claude-sonnet-5 npm run passk run tasks/rename-invoices-clarified.yaml -- --k 5 --budget 2.25"},{"model":"claude-opus-5","condition":"baseline prompt","verified":false,"estimate":2.5180000000000002,"k":5,"task":"rename-invoices-clarified","cmd":"PASSK_MODEL=claude-opus-5 npm run passk run tasks/rename-invoices-clarified.yaml -- --k 5 --budget 5.25"},{"model":"gpt-5.6","condition":"baseline prompt","verified":false,"estimate":2.53916,"k":5,"task":"rename-invoices-clarified","cmd":"PASSK_MODEL=gpt-5.6 npm run passk run tasks/rename-invoices-clarified.yaml -- --k 5 --budget 5.25"}],"runs":10,"spend":0.16967959999999999},{"id":"notes","name":"Save a note · dialogs","blurb":"Type a note in a text editor and save it to a named path through the save dialog.","keywords":["note","notes","text editor","editor","save dialog","dialog","write","document","type","notepad","memo","draft"],"k":5,"proves":0.565508505247919,"rows":[{"model":"gpt-5.6-luna","condition":"Documents folder present","verified":true,"passed":5,"n":5,"lower":0.565508505247919,"upper":1,"pow5":1,"steps":9,"perSuccess":0.0051029199999999995,"date":"3 Sept 2026","href":"evidence/notes/report.html","failures":"none","k":5},{"model":"gpt-5.6-luna","condition":"Documents folder missing","verified":true,"passed":2,"n":5,"lower":0.11761823115925325,"upper":0.769280067791163,"pow5":0,"steps":30,"perSuccess":0.0277332,"date":"3 Sept 2026","href":"evidence/notes-nodir/report.html","failures":"3 · behavior variability","k":5},{"model":"claude-sonnet-5","condition":"baseline prompt","verified":false,"estimate":1.023654,"k":5,"task":"notes-nodir","cmd":"PASSK_MODEL=claude-sonnet-5 npm run passk run tasks/notes-nodir.yaml -- --k 5 --budget 2.25"},{"model":"claude-opus-5","condition":"baseline prompt","verified":false,"estimate":2.5591350000000004,"k":5,"task":"notes-nodir","cmd":"PASSK_MODEL=claude-opus-5 npm run passk run tasks/notes-nodir.yaml -- --k 5 --budget 5.25"},{"model":"gpt-5.6","condition":"baseline prompt","verified":false,"estimate":2.588115,"k":5,"task":"notes-nodir","cmd":"PASSK_MODEL=gpt-5.6 npm run passk run tasks/notes-nodir.yaml -- --k 5 --budget 5.25"}],"runs":10,"spend":0.12903920000000002}];
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const pct = (x) => Math.round(x * 100) + "%";
+const usd = (x, d = 3) => x === null || x === undefined ? "—" : "$" + x.toFixed(d);
+let current = SHAPES[0].id;
+function chips() {
+  document.getElementById("chips").innerHTML = SHAPES.map((s) => `<button type="button" class="chip${s.id === current ? " on" : ""}" data-id="${s.id}">${esc(s.name)}</button>`).join("")
+    + `<a class="chip more" href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">+ propose a shape</a>`;
+}
+function row(r) {
+  if (!r.verified) return `<tr class="unrun"><td class="model"><b>${esc(r.model)}</b><span>${esc(r.condition)}</span></td>
+    <td><div class="rate"><div class="track"></div><div class="v" style="color:var(--ink-3)">—</div></div></td>
+    <td class="num dim">—</td><td class="num dim">—</td><td class="fails" style="color:var(--ink-3)">—</td>
+    <td><span class="pill no">not yet run</span></td>
+    <td><button type="button" class="btn primary run">Run · ${r.estimate !== undefined ? "est. " + usd(r.estimate, 2) : "your keys"}</button><div class="cmd">${esc(r.cmd)}\n<span style="color:var(--ink-3)"># from passk/ with SOLARI_API_KEY and the model's key in .env · the report lands in runs/</span></div></td></tr>`;
+  const lo = r.lower * 100, hi = r.upper * 100, p = (r.passed / r.n) * 100;
+  return `<tr><td class="model"><b>${esc(r.model)}</b><span>${esc(r.condition)}</span></td>
+    <td><div class="rate"><div class="track"><div class="band" style="left:${lo}%;width:${hi - lo}%"></div><div class="pt" style="left:${p}%"></div></div><div class="v">${r.passed}/${r.n} <span>${pct(r.lower)}–${pct(r.upper)}</span></div></div></td>
+    <td class="num">${pct(r.pow5)}</td><td class="num">${usd(r.perSuccess)}</td>
+    <td class="fails">${esc(r.failures)}</td>
+    <td><span class="pill ok" title="${esc(r.date)}">verified</span></td>
+    <td><a class="btn" href="${esc(r.href)}">Open</a></td></tr>`;
+}
+function render() {
+  const s = SHAPES.find((x) => x.id === current);
+  document.getElementById("sname").textContent = s.name;
+  document.getElementById("sblurb").textContent = s.blurb;
+  document.getElementById("sk").innerHTML = `k = <code>${s.k}</code> · ${s.k} passes prove at least ${pct(s.proves)}`;
+  document.getElementById("rows").innerHTML = s.rows.map(row).join("");
+  chips();
+}
+function match(text) {
+  const t = text.toLowerCase();
+  let best = null, bestScore = 0;
+  for (const s of SHAPES) {
+    const score = s.keywords.reduce((n, k) => n + (t.includes(k) ? (k.length > 5 ? 2 : 1) : 0), 0);
+    if (score > bestScore) { best = s; bestScore = score; }
+  }
+  const m = document.getElementById("match");
+  if (!t.trim()) { m.innerHTML = "closest shape: <b>—</b>"; return; }
+  if (!best) { m.innerHTML = "no close shape yet · <b>propose one</b>"; return; }
+  m.innerHTML = `closest shape: <b>${esc(best.name)}</b>`;
+  if (best.id !== current) { current = best.id; render(); }
+}
+document.getElementById("chips").addEventListener("click", (e) => { const b = e.target.closest("button[data-id]"); if (!b) return; current = b.dataset.id; render(); });
+document.getElementById("rows").addEventListener("click", (e) => { const b = e.target.closest("button.run"); if (!b) return; b.closest("tr").classList.toggle("open"); });
+document.getElementById("q").addEventListener("input", (e) => match(e.target.value));
+const q0 = new URLSearchParams(location.search).get("shape"); if (q0 && SHAPES.some((s) => s.id === q0)) current = q0;
+render();
 </script>
-</div></main></body></html>
+</body></html>
