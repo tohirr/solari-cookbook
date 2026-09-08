@@ -64,7 +64,10 @@ export interface Shape {
 const pow = (m: BenchResult["metrics"], k: number) => (m.passPowK as unknown as Record<string, number>)[String(Math.min(k, m.n))] ?? 0;
 const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
-export function buildShapes(benches: BoardBench[]): Shape[] {
+export function buildShapes(all: BoardBench[]): Shape[] {
+  // A local bench that was exported into evidence/ is the same bench; show it once, as verified.
+  const published = new Set(all.filter((x) => x.source === "evidence").map((x) => `${x.b.taskId}|${x.b.startedAt}`));
+  const benches = all.filter((x) => x.source === "evidence" || !published.has(`${x.b.taskId}|${x.b.startedAt}`));
   return SHAPES.map((s) => {
     const mine = benches.filter((x) => s.tasks[x.b.taskId]).sort((p, q) => q.b.metrics.n - p.b.metrics.n || p.b.startedAt.localeCompare(q.b.startedAt));
     const latest = mine.slice().sort((p, q) => q.b.startedAt.localeCompare(p.b.startedAt))[0];
