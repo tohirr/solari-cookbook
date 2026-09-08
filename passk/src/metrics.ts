@@ -136,7 +136,7 @@ export function backfillCosts(runs: RunResult[], model: string): void {
 }
 
 /** Price per million tokens. Aliases move; the table is a best-effort default, override with PASSK_PRICE_IN/OUT. */
-const PRICES: Record<string, { in: number; out: number }> = {
+export const PRICES: Record<string, { in: number; out: number }> = {
   "claude-opus-5": { in: 5, out: 25 },
   "claude-sonnet-5": { in: 2, out: 10 },
   "claude-fable-5-1": { in: 10, out: 50 },

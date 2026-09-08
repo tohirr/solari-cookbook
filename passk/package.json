@@ -12,7 +12,11 @@
     "prepare-task": "tsx src/cli.ts prepare",
     "run-task": "tsx src/cli.ts run",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/*.test.ts"
+    "test": "tsx --test test/*.test.ts",
+    "studio:data": "tsx scripts/studio-data.ts",
+    "studio:build": "npm run studio:data && vite build --config studio/vite.config.ts",
+    "studio:dev": "npm run studio:data && vite --config studio/vite.config.ts",
+    "typecheck:studio": "tsc -p studio/app/tsconfig.json"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
@@ -25,6 +29,7 @@
     "@types/node": "^24.0.0",
     "ajv": "^8.20.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vite": "^8.2.2"
   }
 }
