@@ -1,9 +1,124 @@
-<!doctype html>
+/**
+ * The leaderboard: one question, the shape of your task, and a board of
+ * models with their pass rate, interval, pass^5 and cost. Every row is read
+ * from a bench file, so the board cannot claim anything the evidence does
+ * not. The same page renders in two modes: `static`, the published front
+ * page built from evidence/, and `studio`, served locally by `passk studio`
+ * with your own runs/ folded in, a key form, and a Run button that works.
+ */
+import fs from "node:fs";
+import path from "node:path";
+import { PRICES, wilson } from "../metrics.js";
+import { esc, usd } from "./theme.js";
+import type { BenchResult } from "../types.js";
+
+/** The shapes on the board: which tasks belong to each, how each condition is named, and the words that map a use case to it. */
+export const SHAPES: { id: string; name: string; blurb: string; keywords: string[]; tasks: Record<string, string> }[] = [
+  { id: "ticket-triage", name: "Ticket triage · web app", blurb: "Find rows in an internal tool, change dropdowns, save each one. One closed ticket must not be touched.",
+    keywords: ["ticket", "support", "queue", "crm", "dashboard", "assign", "web app", "webapp", "internal tool", "dropdown", "priority", "helpdesk", "zendesk", "jira", "rows", "saas", "portal", "admin"],
+    tasks: { "ticket-queue": "baseline prompt", "ticket-queue-verify": "prompt adds “screenshot and confirm”", "ticket-queue-reload": "prompt adds “reload and confirm”" } },
+  { id: "invoice-entry", name: "Invoice entry · PDF to form", blurb: "Read the right PDF of three, skip the one already entered, fill a form, attach the file, save as Pending review. Never approve or pay.",
+    keywords: ["invoice", "pdf", "accounts payable", "payable", "erp", "ledger", "data entry", "upload", "attach", "form", "vendor", "receipt", "expense", "bill", "quickbooks", "xero", "netsuite", "sap"],
+    tasks: { "invoice-entry": "baseline prompt" } },
+  { id: "spreadsheet", name: "Spreadsheet edit · Calc", blurb: "Open a sheet, add a total row with a formula, save as CSV through the keep-format dialog.",
+    keywords: ["spreadsheet", "excel", "calc", "csv", "formula", "total", "sum", "sheet", "cells", "column", "report", "numbers", "libreoffice", "google sheets"],
+    tasks: { "q3-total": "baseline prompt" } },
+  { id: "files", name: "File operations · desktop", blurb: "Archive the oldest invoices in a folder with the file manager. Which ones count as oldest is the ambiguity.",
+    keywords: ["file", "files", "rename", "folder", "archive", "move", "finder", "explorer", "organise", "organize", "sort", "directory", "downloads", "desktop"],
+    tasks: { "rename-invoices": "ambiguous prompt", "rename-invoices-clarified": "clarified prompt" } },
+  { id: "notes", name: "Save a note · dialogs", blurb: "Type a note in a text editor and save it to a named path through the save dialog.",
+    keywords: ["note", "notes", "text editor", "editor", "save dialog", "dialog", "write", "document", "type", "notepad", "memo", "draft"],
+    tasks: { "notes-nodir": "Documents folder missing", "notes": "Documents folder present" } },
+];
+
+/** Models offered for a run when no evidence exists yet. */
+export const CANDIDATES = ["claude-sonnet-5", "claude-opus-5", "gpt-5.6"];
+
+export interface BoardBench { dir: string; href: string; source: "evidence" | "local"; b: BenchResult }
+
+/** Every bench under a folder: evidence/ (verified, published) or runs/ (local). */
+export function loadBenches(root: string, source: BoardBench["source"], hrefPrefix: string): BoardBench[] {
+  if (!fs.existsSync(root)) return [];
+  const out: BoardBench[] = [];
+  for (const d of fs.readdirSync(root).sort()) {
+    const p = path.join(root, d, "bench.json");
+    if (!fs.existsSync(p)) continue;
+    try { out.push({ dir: d, href: `${hrefPrefix}${d}/report.html`, source, b: JSON.parse(fs.readFileSync(p, "utf8")) as BenchResult }); } catch { /* a half-written manifest; skip */ }
+  }
+  return out;
+}
+
+export interface Row {
+  model: string; condition: string; task: string; state: "verified" | "local" | "running" | "unrun";
+  passed?: number; n?: number; k?: number; lower?: number; upper?: number; pow5?: number; perSuccess?: number | null;
+  spent?: number; date?: string; href?: string; failures?: string; estimate?: number;
+}
+export interface Shape {
+  id: string; name: string; blurb: string; keywords: string[]; k: number; proves: number; rows: Row[];
+  /** The task (condition) a fresh run defaults to, and every condition by task id. */
+  task: string; conditions: Record<string, string>;
+  /** Estimated model spend per run, by model, from this shape's last bench's tokens at list price. */
+  perRun: Record<string, number>;
+}
+
+const pow = (m: BenchResult["metrics"], k: number) => (m.passPowK as unknown as Record<string, number>)[String(Math.min(k, m.n))] ?? 0;
+const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
+export function buildShapes(benches: BoardBench[]): Shape[] {
+  return SHAPES.map((s) => {
+    const mine = benches.filter((x) => s.tasks[x.b.taskId]).sort((p, q) => q.b.metrics.n - p.b.metrics.n || p.b.startedAt.localeCompare(q.b.startedAt));
+    const latest = mine.slice().sort((p, q) => q.b.startedAt.localeCompare(p.b.startedAt))[0];
+    const ref = latest?.b;
+    const k = ref ? ref.k : 10;
+    const rows: Row[] = mine.map(({ href, source, b }) => {
+      const m = b.metrics;
+      const causes = new Map<string, number>();
+      for (const f of b.failures) causes.set(f.cause, (causes.get(f.cause) ?? 0) + 1);
+      const fails = m.n - m.passed;
+      const failures = fails === 0 ? (m.errored ? `none · ${m.errored} lost to infrastructure` : "none")
+        : `${fails} · ${[...causes.entries()].map(([c, n]) => `${causes.size > 1 ? `${n} ` : ""}${c.replace(/_/g, " ")}`).join(", ") || "not yet classified"}`;
+      const running = b.status === "running";
+      return { model: b.model, condition: s.tasks[b.taskId], task: b.taskId, state: running ? "running" : source === "evidence" ? "verified" : "local",
+        passed: m.passed, n: m.n, k: b.k, lower: m.passAt1Lower, upper: m.passAt1Upper, pow5: pow(m, 5), perSuccess: m.costPerSuccessUsd, spent: m.totalCostUsd,
+        date: day(b.finishedAt ?? b.startedAt), href, failures };
+    });
+    // Spend per run for a model with no evidence: this shape's tokens per run at that model's list price.
+    const attempted = ref ? ref.runs.filter((r) => r.steps.length > 0) : [];
+    const tokIn = attempted.length ? attempted.reduce((a, r) => a + r.usage.inputTokens, 0) / attempted.length : 0;
+    const tokOut = attempted.length ? attempted.reduce((a, r) => a + r.usage.outputTokens, 0) / attempted.length : 0;
+    const perRun: Record<string, number> = {};
+    for (const [model, price] of Object.entries(PRICES)) perRun[model] = ref ? (tokIn * price.in + tokOut * price.out) / 1e6 : 0;
+    perRun.scripted = 0;
+    const have = new Set(rows.map((r) => r.model));
+    const task = Object.keys(s.tasks)[0];
+    for (const model of CANDIDATES) {
+      if (have.has(model)) continue;
+      rows.push({ model, condition: s.tasks[task], task, state: "unrun", k, estimate: ref ? perRun[model] * k : undefined });
+    }
+    return { id: s.id, name: s.name, blurb: s.blurb, keywords: s.keywords, k, proves: wilson(k, k).lower, rows, task, conditions: s.tasks, perRun };
+  });
+}
+
+export const providerFor = (model: string): "anthropic" | "openai" | "scripted" => model === "scripted" ? "scripted" : model.startsWith("claude") ? "anthropic" : "openai";
+
+export interface BoardPage {
+  mode: "static" | "studio";
+  shapes: Shape[];
+  totals: { runs: number; spend: number; models: number };
+  /** Studio only: which keys are set (never their values). */
+  keys?: Record<string, boolean>;
+}
+
+export function renderBoard(page: BoardPage): string {
+  const { shapes, totals } = page;
+  const studio = page.mode === "studio";
+  const models = [...Object.keys(PRICES), "scripted"];
+  return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · which model can actually do your computer task, reliably?</title>
+<title>passk${studio ? " studio" : ""} · which model can actually do your computer task, reliably?</title>
 <meta name="description" content="A leaderboard of computer-use agents by task shape: every row is k forks of one desktop snapshot, graded inside the VM. Pass rate with its interval, pass^5 and cost per success.">
 <meta property="og:title" content="passk · which model can actually do your computer task, reliably?">
-<meta property="og:description" content="210 verified runs across 5 task shapes. Pick yours, compare models on the chance it works every time.">
+<meta property="og:description" content="${totals.runs} verified runs across ${shapes.length} task shapes. Pick yours, compare models on the chance it works every time.">
 <meta property="og:image" content="https://tohirr.github.io/solari-cookbook/passk/docs/compare-ticket-queue.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2322c55e'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='%230e0f12' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,12 +209,12 @@ tr.open .cmd{display:block}
 .check input{width:auto}
 </style></head><body>
 <div class="bar"><div class="in">
-  <a class="logo" href="./"><i></i>passk</a>
-  <div class="right"><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a><a class="btn primary" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup">Run your own task</a></div>
+  <a class="logo" href="./"><i></i>passk${studio ? " <span>studio · local</span>" : ""}</a>
+  <div class="right"><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a>${studio ? `<a class="btn" href="https://tohirr.github.io/solari-cookbook/passk/">Published board</a>` : `<a class="btn primary" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup">Run your own task</a>`}</div>
 </div></div>
 <main>
   <h1>Which model can actually do your computer task, reliably?</h1>
-  <p class="sub">Pick the shape of your task. Every row is <b>k forks of one desktop snapshot</b>, same prompt, and every outcome is graded <b>inside the VM</b>, never by what the agent says. Browsing is free. Running is one command.</p>
+  <p class="sub">Pick the shape of your task. Every row is <b>k forks of one desktop snapshot</b>, same prompt, and every outcome is graded <b>inside the VM</b>, never by what the agent says.${studio ? " Runs start from this page and use the keys on this machine." : " Browsing is free. Running is one command."}</p>
 
   <form class="ask" id="ask" onsubmit="return false">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
@@ -115,17 +230,46 @@ tr.open .cmd{display:block}
   </table></div>
   <div class="note">The bar is the 95% Wilson interval on the pass rate, the dot the observed rate. pass^5 is the chance five attempts in a row all pass. A run estimate is this shape's tokens per run at that model's list price, times k; Solari desktop time is on your plan.</div>
 
-  
+  ${studio ? `
+  <div class="card" id="runcard" style="margin-top:28px">
+    <h3>Run a model on this shape</h3>
+    <p class="hint">Forks the shape's snapshot k times on your Solari account, runs the agent on each fork with your model key, grades every run inside the VM, and adds the row above. Prepares the snapshot first if this machine has none.</p>
+    <div class="fields">
+      <div class="field"><label>Model</label><select id="rmodel">${models.map((m) => `<option value="${esc(m)}">${esc(m)}${m === "scripted" ? " · demo, no VM, no keys" : ""}</option>`).join("")}</select></div>
+      <div class="field"><label>Condition</label><select id="rtask"></select></div>
+      <div class="field"><label>Runs (k)</label><input id="rk" type="number" min="1" max="200" value="10"></div>
+      <div class="field"><label>Concurrency</label><input id="rc" type="number" min="1" max="10" value="2"></div>
+      <div class="field"><label>Budget, USD</label><input id="rb" type="number" min="0" step="0.25" value="1"></div>
+    </div>
+    <div class="row">
+      <label class="check"><input id="rsafety" type="checkbox" checked> acknowledge the model's safety checks inside the disposable VM</label>
+    </div>
+    <div class="row"><button class="btn primary" id="rgo" type="button">Start</button><span class="est" id="rest"></span></div>
+    <div class="msg" id="rmsg"></div>
+    <div class="jobs" id="jobs"></div>
+  </div>
+
+  <div class="card" id="keycard" style="margin-top:14px">
+    <h3>Keys</h3>
+    <p class="hint">Stored in <code>passk/.env</code> on this machine and sent only to Solari and the model provider by the runs you start. This page never shows a stored key.</p>
+    <form class="keys" id="keys" onsubmit="return false">
+      <div class="field"><label>Solari <span id="k-SOLARI_API_KEY"></span></label><input name="SOLARI_API_KEY" type="password" placeholder="slr_live_…" autocomplete="off"></div>
+      <div class="field"><label>OpenAI <span id="k-OPENAI_API_KEY"></span></label><input name="OPENAI_API_KEY" type="password" placeholder="sk-…" autocomplete="off"></div>
+      <div class="field"><label>Anthropic <span id="k-ANTHROPIC_API_KEY"></span></label><input name="ANTHROPIC_API_KEY" type="password" placeholder="sk-ant-…" autocomplete="off"></div>
+      <div class="field"><button class="btn" id="ksave" type="button">Save to .env</button></div>
+    </form>
+    <div class="msg" id="kmsg"></div>
+  </div>` : ""}
 
   <div class="fine">
-    <div id="totals">210 verified runs · 5 task shapes · 1 model with evidence · $2.36 of model spend in total. Every number on this page is read from <a href="evidence/">the published bench files</a>.</div>
+    <div id="totals">${totals.runs} verified runs · ${shapes.length} task shapes · ${totals.models} model${totals.models === 1 ? "" : "s"} with evidence · ${usd(totals.spend, 2)} of model spend in total. Every number on this page is read from ${studio ? "the bench files in <code>evidence/</code> and <code>runs/</code>" : `<a href="evidence/">the published bench files</a>`}.</div>
     <div><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/METHOD.md">How it is measured</a> · <a href="evidence/index.html">Evidence and findings</a> · <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">Write a task</a> · built on <a href="https://getsolari.com">Solari</a></div>
   </div>
 </main>
 <script>
-const MODE = "static";
-let SHAPES = [{"id":"ticket-triage","name":"Ticket triage · web app","blurb":"Find rows in an internal tool, change dropdowns, save each one. One closed ticket must not be touched.","keywords":["ticket","support","queue","crm","dashboard","assign","web app","webapp","internal tool","dropdown","priority","helpdesk","zendesk","jira","rows","saas","portal","admin"],"k":50,"proves":0.9286499658256813,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","task":"ticket-queue","state":"verified","passed":47,"n":50,"k":50,"lower":0.8378265662912299,"upper":0.9793854036353695,"pow5":0.7239795918367347,"perSuccess":0.0072854212765957466,"spent":0.3504068000000001,"date":"3 Sept 2026","href":"evidence/ticket-queue-baseline/report.html","failures":"3 · behavior variability"},{"model":"gpt-5.6-luna","condition":"prompt adds “screenshot and confirm”","task":"ticket-queue-verify","state":"verified","passed":47,"n":49,"k":50,"lower":0.8628671652316888,"upper":0.9887346030720716,"pow5":0.8044217687074829,"perSuccess":0.007339382978723405,"spent":0.3515858,"date":"3 Sept 2026","href":"evidence/ticket-queue-verify/report.html","failures":"2 · 2 behavior variability, 1 unknown"},{"model":"gpt-5.6-luna","condition":"prompt adds “reload and confirm”","task":"ticket-queue-reload","state":"verified","passed":49,"n":49,"k":50,"lower":0.9272997032640948,"upper":0.9999999999999998,"pow5":1,"perSuccess":0.008250795918367346,"spent":0.40428899999999995,"date":"3 Sept 2026","href":"evidence/ticket-queue-reload/report.html","failures":"none · 1 lost to infrastructure"},{"model":"claude-sonnet-5","condition":"baseline prompt","task":"ticket-queue","state":"unrun","k":50,"estimate":4.066873469387755},{"model":"claude-opus-5","condition":"baseline prompt","task":"ticket-queue","state":"unrun","k":50,"estimate":10.167183673469388},{"model":"gpt-5.6","condition":"baseline prompt","task":"ticket-queue","state":"unrun","k":50,"estimate":10.313494897959183}],"task":"ticket-queue","conditions":{"ticket-queue":"baseline prompt","ticket-queue-verify":"prompt adds “screenshot and confirm”","ticket-queue-reload":"prompt adds “reload and confirm”"},"perRun":{"claude-opus-5":0.20334367346938775,"claude-sonnet-5":0.0813374693877551,"claude-fable-5-1":0.4066873469387755,"gpt-5.6":0.20626989795918366,"gpt-5.6-sol":0.20626989795918366,"gpt-5.6-terra":0.08250795918367347,"gpt-5.6-luna":0.00825079591836735,"scripted":0}},{"id":"invoice-entry","name":"Invoice entry · PDF to form","blurb":"Read the right PDF of three, skip the one already entered, fill a form, attach the file, save as Pending review. Never approve or pay.","keywords":["invoice","pdf","accounts payable","payable","erp","ledger","data entry","upload","attach","form","vendor","receipt","expense","bill","quickbooks","xero","netsuite","sap"],"k":30,"proves":0.886482908609522,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","task":"invoice-entry","state":"verified","passed":23,"n":26,"k":30,"lower":0.7102370691310167,"upper":0.9599682817885051,"pow5":0.5115384615384615,"perSuccess":0.0243024,"spent":0.7944168,"date":"3 Sept 2026","href":"evidence/invoice-entry/report.html","failures":"3 · 3 behavior variability, 4 unknown"},{"model":"claude-sonnet-5","condition":"baseline prompt","task":"invoice-entry","state":"unrun","k":30,"estimate":9.094781538461538},{"model":"claude-opus-5","condition":"baseline prompt","task":"invoice-entry","state":"unrun","k":30,"estimate":22.736953846153845},{"model":"gpt-5.6","condition":"baseline prompt","task":"invoice-entry","state":"unrun","k":30,"estimate":22.915869230769232}],"task":"invoice-entry","conditions":{"invoice-entry":"baseline prompt"},"perRun":{"claude-opus-5":0.7578984615384615,"claude-sonnet-5":0.3031593846153846,"claude-fable-5-1":1.515796923076923,"gpt-5.6":0.7638623076923077,"gpt-5.6-sol":0.7638623076923077,"gpt-5.6-terra":0.30554492307692305,"gpt-5.6-luna":0.030554492307692308,"scripted":0}},{"id":"spreadsheet","name":"Spreadsheet edit · Calc","blurb":"Open a sheet, add a total row with a formula, save as CSV through the keep-format dialog.","keywords":["spreadsheet","excel","calc","csv","formula","total","sum","sheet","cells","column","report","numbers","libreoffice","google sheets"],"k":10,"proves":0.7224598312333834,"rows":[{"model":"gpt-5.6-luna","condition":"baseline prompt","task":"q3-total","state":"verified","passed":10,"n":10,"k":10,"lower":0.7224598312333834,"upper":1,"pow5":1,"perSuccess":0.01640048,"spent":0.16400479999999998,"date":"2 Sept 2026","href":"evidence/q3-total/report.html","failures":"none"},{"model":"claude-sonnet-5","condition":"baseline prompt","task":"q3-total","state":"unrun","k":10,"estimate":1.6224260000000001},{"model":"claude-opus-5","condition":"baseline prompt","task":"q3-total","state":"unrun","k":10,"estimate":4.056065},{"model":"gpt-5.6","condition":"baseline prompt","task":"q3-total","state":"unrun","k":10,"estimate":4.1001199999999995}],"task":"q3-total","conditions":{"q3-total":"baseline prompt"},"perRun":{"claude-opus-5":0.4056065,"claude-sonnet-5":0.16224260000000001,"claude-fable-5-1":0.811213,"gpt-5.6":0.410012,"gpt-5.6-sol":0.410012,"gpt-5.6-terra":0.1640048,"gpt-5.6-luna":0.016400480000000002,"scripted":0}},{"id":"files","name":"File operations · desktop","blurb":"Archive the oldest invoices in a folder with the file manager. Which ones count as oldest is the ambiguity.","keywords":["file","files","rename","folder","archive","move","finder","explorer","organise","organize","sort","directory","downloads","desktop"],"k":5,"proves":0.565508505247919,"rows":[{"model":"gpt-5.6-luna","condition":"ambiguous prompt","task":"rename-invoices","state":"verified","passed":5,"n":5,"k":5,"lower":0.565508505247919,"upper":1,"pow5":1,"perSuccess":0.01362264,"spent":0.0681132,"date":"3 Sept 2026","href":"evidence/rename-invoices/report.html","failures":"none"},{"model":"gpt-5.6-luna","condition":"clarified prompt","task":"rename-invoices-clarified","state":"verified","passed":5,"n":5,"k":5,"lower":0.565508505247919,"upper":1,"pow5":1,"perSuccess":0.02031328,"spent":0.1015664,"date":"3 Sept 2026","href":"evidence/rename-invoices-clarified/report.html","failures":"none"},{"model":"claude-sonnet-5","condition":"ambiguous prompt","task":"rename-invoices","state":"unrun","k":5,"estimate":1.0072},{"model":"claude-opus-5","condition":"ambiguous prompt","task":"rename-invoices","state":"unrun","k":5,"estimate":2.5180000000000002},{"model":"gpt-5.6","condition":"ambiguous prompt","task":"rename-invoices","state":"unrun","k":5,"estimate":2.53916}],"task":"rename-invoices","conditions":{"rename-invoices":"ambiguous prompt","rename-invoices-clarified":"clarified prompt"},"perRun":{"claude-opus-5":0.5036,"claude-sonnet-5":0.20144,"claude-fable-5-1":1.0072,"gpt-5.6":0.507832,"gpt-5.6-sol":0.507832,"gpt-5.6-terra":0.20313279999999997,"gpt-5.6-luna":0.020313280000000003,"scripted":0}},{"id":"notes","name":"Save a note · dialogs","blurb":"Type a note in a text editor and save it to a named path through the save dialog.","keywords":["note","notes","text editor","editor","save dialog","dialog","write","document","type","notepad","memo","draft"],"k":5,"proves":0.565508505247919,"rows":[{"model":"gpt-5.6-luna","condition":"Documents folder present","task":"notes","state":"verified","passed":5,"n":5,"k":5,"lower":0.565508505247919,"upper":1,"pow5":1,"perSuccess":0.0051029199999999995,"spent":0.0255146,"date":"3 Sept 2026","href":"evidence/notes/report.html","failures":"none"},{"model":"gpt-5.6-luna","condition":"Documents folder missing","task":"notes-nodir","state":"verified","passed":2,"n":5,"k":5,"lower":0.11761823115925325,"upper":0.769280067791163,"pow5":0,"perSuccess":0.0277332,"spent":0.10352460000000001,"date":"3 Sept 2026","href":"evidence/notes-nodir/report.html","failures":"3 · behavior variability"},{"model":"claude-sonnet-5","condition":"Documents folder missing","task":"notes-nodir","state":"unrun","k":5,"estimate":1.023654},{"model":"claude-opus-5","condition":"Documents folder missing","task":"notes-nodir","state":"unrun","k":5,"estimate":2.5591350000000004},{"model":"gpt-5.6","condition":"Documents folder missing","task":"notes-nodir","state":"unrun","k":5,"estimate":2.588115}],"task":"notes-nodir","conditions":{"notes-nodir":"Documents folder missing","notes":"Documents folder present"},"perRun":{"claude-opus-5":0.511827,"claude-sonnet-5":0.2047308,"claude-fable-5-1":1.023654,"gpt-5.6":0.517623,"gpt-5.6-sol":0.517623,"gpt-5.6-terra":0.2070492,"gpt-5.6-luna":0.02070492,"scripted":0}}];
-let KEYS = {};
+const MODE = ${JSON.stringify(page.mode)};
+let SHAPES = ${JSON.stringify(shapes)};
+let KEYS = ${JSON.stringify(page.keys ?? {})};
 let JOBS = [];
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const pct = (x) => Math.round(x * 100) + "%";
@@ -137,37 +281,37 @@ const shape = () => SHAPES.find((x) => x.id === current);
 const $ = (id) => document.getElementById(id);
 
 function chips() {
-  $("chips").innerHTML = SHAPES.map((s) => `<button type="button" class="chip${s.id === current ? " on" : ""}" data-id="${s.id}">${esc(s.name)}</button>`).join("")
-    + `<a class="chip more" href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">+ propose a shape</a>`;
+  $("chips").innerHTML = SHAPES.map((s) => \`<button type="button" class="chip\${s.id === current ? " on" : ""}" data-id="\${s.id}">\${esc(s.name)}</button>\`).join("")
+    + \`<a class="chip more" href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">+ propose a shape</a>\`;
 }
 function cmdFor(r, s) {
   const budget = r.estimate ? Math.ceil(r.estimate * 2 * 4) / 4 : 1;
-  return `PASSK_MODEL=${r.model} npm run passk run tasks/${r.task}.yaml -- --k ${r.k} --budget ${budget}`;
+  return \`PASSK_MODEL=\${r.model} npm run passk run tasks/\${r.task}.yaml -- --k \${r.k} --budget \${budget}\`;
 }
 function row(r, s) {
-  if (r.state === "unrun") return `<tr class="unrun"><td class="model"><b>${esc(r.model)}</b><span>${esc(r.condition)}</span></td>
+  if (r.state === "unrun") return \`<tr class="unrun"><td class="model"><b>\${esc(r.model)}</b><span>\${esc(r.condition)}</span></td>
     <td><div class="rate"><div class="track"></div><div class="v" style="color:var(--ink-3)">—</div></div></td>
     <td class="num dim">—</td><td class="num dim">—</td><td class="fails" style="color:var(--ink-3)">—</td>
     <td><span class="pill no">not yet run</span></td>
-    <td><button type="button" class="btn primary run" data-model="${esc(r.model)}" data-task="${esc(r.task)}" data-k="${r.k}">Run · ${r.estimate !== undefined ? "est. " + usd(r.estimate, 2) : "your keys"}</button>${MODE === "static" ? `<div class="cmd">${esc(cmdFor(r, s))}\n<span style="color:var(--ink-3)"># from passk/ with SOLARI_API_KEY and the model's key in .env · the report lands in runs/</span></div>` : ""}</td></tr>`;
+    <td><button type="button" class="btn primary run" data-model="\${esc(r.model)}" data-task="\${esc(r.task)}" data-k="\${r.k}">Run · \${r.estimate !== undefined ? "est. " + usd(r.estimate, 2) : "your keys"}</button>\${MODE === "static" ? \`<div class="cmd">\${esc(cmdFor(r, s))}\\n<span style="color:var(--ink-3)"># from passk/ with SOLARI_API_KEY and the model's key in .env · the report lands in runs/</span></div>\` : ""}</td></tr>\`;
   const lo = r.lower * 100, hi = r.upper * 100, p = r.n ? (r.passed / r.n) * 100 : 0;
-  if (r.state === "running") return `<tr><td class="model"><b>${esc(r.model)}</b><span>${esc(r.condition)}</span></td>
-    <td><div class="rate"><div class="track"><div class="fill" style="width:${(r.n / r.k) * 100}%"></div></div><div class="v">${r.passed}/${r.n} <span>of ${r.k}</span></div></div></td>
-    <td class="num dim">—</td><td class="num">${usd(r.spent, 2)}</td><td class="fails">${esc(r.failures)}</td>
-    <td><span class="pill live">running · ${r.n}/${r.k}</span></td>
-    <td><a class="btn" href="${esc(r.href)}">Open</a></td></tr>`;
-  return `<tr><td class="model"><b>${esc(r.model)}</b><span>${esc(r.condition)}</span></td>
-    <td><div class="rate"><div class="track"><div class="band" style="left:${lo}%;width:${hi - lo}%"></div><div class="pt" style="left:${p}%"></div></div><div class="v">${r.passed}/${r.n} <span>${pct(r.lower)}–${pct(r.upper)}</span></div></div></td>
-    <td class="num">${pct(r.pow5)}</td><td class="num">${usd(r.perSuccess)}</td>
-    <td class="fails">${esc(r.failures)}</td>
-    <td><span class="pill ${r.state === "verified" ? "ok" : "local"}" title="${esc(r.date)}">${r.state === "verified" ? "verified" : "local · " + esc(r.date)}</span></td>
-    <td><a class="btn" href="${esc(r.href)}">Open</a></td></tr>`;
+  if (r.state === "running") return \`<tr><td class="model"><b>\${esc(r.model)}</b><span>\${esc(r.condition)}</span></td>
+    <td><div class="rate"><div class="track"><div class="fill" style="width:\${(r.n / r.k) * 100}%"></div></div><div class="v">\${r.passed}/\${r.n} <span>of \${r.k}</span></div></div></td>
+    <td class="num dim">—</td><td class="num">\${usd(r.spent, 2)}</td><td class="fails">\${esc(r.failures)}</td>
+    <td><span class="pill live">running · \${r.n}/\${r.k}</span></td>
+    <td><a class="btn" href="\${esc(r.href)}">Open</a></td></tr>\`;
+  return \`<tr><td class="model"><b>\${esc(r.model)}</b><span>\${esc(r.condition)}</span></td>
+    <td><div class="rate"><div class="track"><div class="band" style="left:\${lo}%;width:\${hi - lo}%"></div><div class="pt" style="left:\${p}%"></div></div><div class="v">\${r.passed}/\${r.n} <span>\${pct(r.lower)}–\${pct(r.upper)}</span></div></div></td>
+    <td class="num">\${pct(r.pow5)}</td><td class="num">\${usd(r.perSuccess)}</td>
+    <td class="fails">\${esc(r.failures)}</td>
+    <td><span class="pill \${r.state === "verified" ? "ok" : "local"}" title="\${esc(r.date)}">\${r.state === "verified" ? "verified" : "local · " + esc(r.date)}</span></td>
+    <td><a class="btn" href="\${esc(r.href)}">Open</a></td></tr>\`;
 }
 function render() {
   const s = shape();
   $("sname").textContent = s.name;
   $("sblurb").textContent = s.blurb;
-  $("sk").innerHTML = `k = <code>${s.k}</code> · ${s.k} passes prove at least ${pct(s.proves)}`;
+  $("sk").innerHTML = \`k = <code>\${s.k}</code> · \${s.k} passes prove at least \${pct(s.proves)}\`;
   $("rows").innerHTML = s.rows.map((r) => row(r, s)).join("");
   chips();
   if (MODE === "studio") { renderRunForm(); renderKeys(); renderJobs(); }
@@ -182,7 +326,7 @@ function match(text) {
   const m = $("match");
   if (!t.trim()) { m.innerHTML = "closest shape: <b>—</b>"; return; }
   if (!best) { m.innerHTML = "no close shape yet · <b>propose one</b>"; return; }
-  m.innerHTML = `closest shape: <b>${esc(best.name)}</b>`;
+  m.innerHTML = \`closest shape: <b>\${esc(best.name)}</b>\`;
   if (best.id !== current) { current = best.id; render(); }
 }
 $("chips").addEventListener("click", (e) => { const b = e.target.closest("button[data-id]"); if (!b) return; current = b.dataset.id; render(); });
@@ -201,7 +345,7 @@ function renderRunForm() {
   const sel = $("rtask"); if (!sel) return;
   const prev = sel.value;
   const conds = $("rmodel").value === "scripted" ? { fake: "harness test · no VM, no model" } : s.conditions;
-  sel.innerHTML = Object.entries(conds).map(([t, c]) => `<option value="${esc(t)}">${esc(c)} · ${esc(t)}</option>`).join("");
+  sel.innerHTML = Object.entries(conds).map(([t, c]) => \`<option value="\${esc(t)}">\${esc(c)} · \${esc(t)}</option>\`).join("");
   if (prev && conds[prev]) sel.value = prev;
   if (!$("rk").dataset.touched) $("rk").value = String(Math.min(s.k, 10));
   estimate();
@@ -211,7 +355,7 @@ function estimate() {
   const per = s.perRun[m] ?? 0; const est = per * k;
   const need = keyFor[providerFor(m)];
   const missing = (m !== "scripted" && !KEYS.SOLARI_API_KEY) ? "SOLARI_API_KEY" : (need && !KEYS[need]) ? need : null;
-  $("rest").innerHTML = m === "scripted" ? "no spend: the scripted agent runs in memory" : `est. model spend <b>${usd(est, 2)}</b> for ${k} runs · ${k} passes prove at least ${pct(wilsonLower(k))}` + (missing ? ` · <span style="color:var(--warn)">needs ${missing}</span>` : "");
+  $("rest").innerHTML = m === "scripted" ? "no spend: the scripted agent runs in memory" : \`est. model spend <b>\${usd(est, 2)}</b> for \${k} runs · \${k} passes prove at least \${pct(wilsonLower(k))}\` + (missing ? \` · <span style="color:var(--warn)">needs \${missing}</span>\` : "");
   $("rgo").disabled = !!missing;
 }
 function wilsonLower(n) { const z = 1.96, z2 = z * z; const p = 1; const d = 1 + z2 / n; const c = p + z2 / (2 * n); const h = z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n)); return (c - h) / d; }
@@ -223,11 +367,11 @@ async function api(path, body) {
 }
 function renderJobs() {
   const el = $("jobs"); if (!el) return;
-  el.innerHTML = JOBS.slice().reverse().map((j) => `<div class="job"><div><b>${esc(j.model)}</b> on <b>${esc(j.task)}</b> · k=${j.k} · <span class="pill ${j.status === "running" ? "live" : j.status === "done" ? "ok" : "no"}">${esc(j.status)}</span>
-      <div class="sub2">${j.progress ? `${j.progress.done}/${j.k} runs · ${j.progress.passed} passed · ${usd(j.progress.spent, 2)} spent` : esc(j.phase || "starting")}${j.error ? ` · <span style="color:var(--crit)">${esc(j.error)}</span>` : ""}</div>
-      ${j.progress ? `<div class="bar2"><i style="width:${(j.progress.done / j.k) * 100}%"></i></div>` : ""}
-      <div class="log">${esc((j.log || []).slice(-3).join("\n"))}</div></div>
-    <div>${j.status === "running" ? `<button type="button" class="btn danger" data-cancel="${j.id}">Stop</button>` : j.href ? `<a class="btn" href="${esc(j.href)}">Open report</a>` : ""}</div></div>`).join("");
+  el.innerHTML = JOBS.slice().reverse().map((j) => \`<div class="job"><div><b>\${esc(j.model)}</b> on <b>\${esc(j.task)}</b> · k=\${j.k} · <span class="pill \${j.status === "running" ? "live" : j.status === "done" ? "ok" : "no"}">\${esc(j.status)}</span>
+      <div class="sub2">\${j.progress ? \`\${j.progress.done}/\${j.k} runs · \${j.progress.passed} passed · \${usd(j.progress.spent, 2)} spent\` : esc(j.phase || "starting")}\${j.error ? \` · <span style="color:var(--crit)">\${esc(j.error)}</span>\` : ""}</div>
+      \${j.progress ? \`<div class="bar2"><i style="width:\${(j.progress.done / j.k) * 100}%"></i></div>\` : ""}
+      <div class="log">\${esc((j.log || []).slice(-3).join("\\n"))}</div></div>
+    <div>\${j.status === "running" ? \`<button type="button" class="btn danger" data-cancel="\${j.id}">Stop</button>\` : j.href ? \`<a class="btn" href="\${esc(j.href)}">Open report</a>\` : ""}</div></div>\`).join("");
 }
 async function refresh() {
   try {
@@ -267,4 +411,10 @@ if (MODE === "studio") {
 }
 render();
 </script>
-</body></html>
+</body></html>`;
+}
+
+export function totalsOf(benches: BoardBench[]): BoardPage["totals"] {
+  const verified = benches.filter((x) => x.source === "evidence");
+  return { runs: verified.reduce((a, x) => a + x.b.runs.length, 0), spend: verified.reduce((a, x) => a + x.b.metrics.totalCostUsd, 0), models: new Set(verified.map((x) => x.b.model)).size };
+}

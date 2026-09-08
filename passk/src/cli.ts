@@ -14,6 +14,7 @@
  *   passk recommend runs/<dir>                what to change next, and what to keep fixed, from a finished bench
  *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
+ *   passk studio                              the leaderboard on localhost, with your keys and a Run button that works
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
  */
@@ -115,6 +116,13 @@ async function main() {
       process.exitCode = (await doctor()) ? 0 : 1;
       return;
     }
+    case "studio": {
+      const { startStudio } = await import("./studio.js");
+      const { url } = await startStudio({ port: flag("port") ? Number(flag("port")) : undefined, open: !has("no-open") });
+      console.log(`passk studio: ${url}\nkeys live in ${path.resolve(".env")}; runs land in runs/. Ctrl+C to stop.`);
+      await new Promise(() => {});
+      return;
+    }
     case "sweep": {
       const { solari } = await import("./desktop.js");
       let n = 0;
@@ -179,6 +187,7 @@ async function main() {
   passk recommend <runs/dir>
   passk doctor
   passk sweep
+  passk studio  [--port 8787] [--no-open]
   passk classify <runs/dir>
 
   --budget N         stop launching new runs once estimated model spend reaches $N

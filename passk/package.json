@@ -19,7 +19,8 @@
     "typecheck:studio": "tsc -p studio/app/tsconfig.json",
     "showcase": "tsx scripts/showcase.ts",
     "landing": "tsx scripts/landing.ts",
-    "site:build": "npm run studio:build && npm run showcase && npm run landing"
+    "site:build": "npm run studio:build && npm run showcase && npm run landing",
+    "studio": "tsx src/cli.ts studio"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.123.0",
