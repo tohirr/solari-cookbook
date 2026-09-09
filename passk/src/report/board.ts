@@ -358,9 +358,11 @@ function estimate() {
   const per = s.perRun[m] ?? 0; const est = per * k;
   const need = keyFor[providerFor(m)];
   const missing = (m !== "scripted" && !KEYS.SOLARI_API_KEY) ? "SOLARI_API_KEY" : (need && !KEYS[need]) ? need : null;
-  $("rest").innerHTML = m === "scripted" ? "no spend: the scripted agent runs in memory" : \`est. model spend <b>\${usd(est, 2)}</b> for \${k} runs · \${k} passes prove at least \${pct(wilsonLower(k))}\` + (missing ? \` · <span style="color:var(--warn)">needs \${missing}</span>\` : "");
+  const floors = [0.7, 0.8, 0.9].map((f) => \`\${pct(f)} needs \${runsFor(f)}\`).join(", ");
+  $("rest").innerHTML = (m === "scripted" ? "no spend: the scripted agent runs in memory" : \`est. model spend <b>\${usd(est, 2)}</b> for \${k} runs\`) + \` · \${k} passes prove at least \${pct(wilsonLower(k))}; a floor of \${floors} passes\` + (missing ? \` · <span style="color:var(--warn)">needs \${missing}</span>\` : "");
   $("rgo").disabled = !!missing;
 }
+function runsFor(floor) { for (let n = 1; n < 1000; n++) if (wilsonLower(n) >= floor) return n; return "∞"; }
 function wilsonLower(n) { const z = 1.96, z2 = z * z; const p = 1; const d = 1 + z2 / n; const c = p + z2 / (2 * n); const h = z * Math.sqrt((p * (1 - p)) / n + z2 / (4 * n * n)); return (c - h) / d; }
 async function api(path, body) {
   const r = await fetch(path, body ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) } : {});
@@ -371,10 +373,10 @@ async function api(path, body) {
 function renderJobs() {
   const el = $("jobs"); if (!el) return;
   el.innerHTML = JOBS.slice().reverse().map((j) => \`<div class="job"><div><b>\${esc(j.model)}</b> on <b>\${esc(j.task)}</b> · k=\${j.k} · <span class="pill \${j.status === "running" ? "live" : j.status === "done" ? "ok" : "no"}">\${esc(j.status)}</span>
-      <div class="sub2">\${j.progress ? \`\${j.progress.done}/\${j.k} runs · \${j.progress.passed} passed · \${usd(j.progress.spent, 2)} spent\` : esc(j.phase || "starting")}\${j.error ? \` · <span style="color:var(--crit)">\${esc(j.error)}</span>\` : ""}</div>
+      <div class="sub2">\${j.progress ? \`\${j.progress.done}/\${j.k} runs · \${j.progress.passed} passed · \${usd(j.progress.spent, 2)} spent\` : esc(j.phase || (j.status === "queued" ? "waiting for the run ahead to finish" : "starting"))}\${j.error ? \` · <span style="color:var(--crit)">\${esc(j.error)}</span>\` : ""}</div>
       \${j.progress ? \`<div class="bar2"><i style="width:\${(j.progress.done / j.k) * 100}%"></i></div>\` : ""}
       <div class="log">\${esc((j.log || []).slice(-3).join("\\n"))}</div></div>
-    <div>\${j.status === "running" ? \`<button type="button" class="btn danger" data-cancel="\${j.id}">Stop</button>\` : j.href ? \`<a class="btn" href="\${esc(j.href)}">Open report</a>\` : ""}</div></div>\`).join("");
+    <div>\${j.status === "running" || j.status === "queued" ? \`<button type="button" class="btn danger" data-cancel="\${j.id}">\${j.status === "queued" ? "Remove" : "Stop"}</button>\` : j.href ? \`<a class="btn" href="\${esc(j.href)}">Open report</a>\` : ""}</div></div>\`).join("");
 }
 async function refresh() {
   try {
@@ -408,7 +410,7 @@ if (MODE === "studio") {
     try { await api("/api/keys", body); $("keys").reset(); $("kmsg").className = "msg good"; $("kmsg").textContent = "saved to .env"; refresh(); }
     catch (e) { $("kmsg").className = "msg bad"; $("kmsg").textContent = e.message; }
   });
-  setInterval(() => { if (JOBS.some((j) => j.status === "running")) refresh(); }, 2000);
+  setInterval(() => { if (JOBS.some((j) => j.status === "running" || j.status === "queued")) refresh(); }, 2000);
 } else {
   $("rows").addEventListener("click", (e) => { const b = e.target.closest("button.run"); if (!b) return; b.closest("tr").classList.toggle("open"); });
 }

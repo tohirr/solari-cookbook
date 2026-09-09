@@ -13,13 +13,9 @@
     "run-task": "tsx src/cli.ts run",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts",
-    "studio:data": "tsx scripts/studio-data.ts",
-    "studio:build": "npm run studio:data && vite build --config studio/vite.config.ts",
-    "studio:dev": "npm run studio:data && vite --config studio/vite.config.ts",
-    "typecheck:studio": "tsc -p studio/app/tsconfig.json",
     "showcase": "tsx scripts/showcase.ts",
     "landing": "tsx scripts/landing.ts",
-    "site:build": "npm run studio:build && npm run showcase && npm run landing",
+    "site:build": "npm run showcase && npm run landing",
     "studio": "tsx src/cli.ts studio"
   },
   "dependencies": {
@@ -33,7 +29,6 @@
     "@types/node": "^24.0.0",
     "ajv": "^8.20.0",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2",
-    "vite": "^8.2.2"
+    "typescript": "^5.7.2"
   }
 }

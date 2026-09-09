@@ -34,6 +34,15 @@ test("studio: scripted run from the API becomes a local row", { timeout: 120_000
     const job = JSON.parse(startedText);
     assert.equal(job.status, "running");
 
+    // The same model on the same task is refused; a different model queues behind the running one.
+    const dup = await fetch(`${url}api/run`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ task: "fake", model: "scripted", k: 2 }) });
+    assert.equal(dup.status, 409);
+    process.env.SOLARI_API_KEY ??= "slr_live_test"; process.env.OPENAI_API_KEY ??= "sk-test";
+    const second = await (await fetch(`${url}api/run`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ task: "fake", model: "gpt-5.6-luna", k: 1 }) })).json();
+    assert.equal(second.status, "queued", JSON.stringify(second));
+    const removed = await (await fetch(`${url}api/jobs/${second.id}/cancel`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" })).json();
+    assert.equal(removed.status, "stopped");
+
     let done: { status: string; href?: string; error?: string; progress?: { done: number; passed: number } } | undefined;
     for (let i = 0; i < 100; i++) {
       await new Promise((r) => setTimeout(r, 1000));

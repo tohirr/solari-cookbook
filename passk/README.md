@@ -11,7 +11,7 @@
 
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="docs/compare-ticket-queue.jpg" alt="Three prompts, one snapshot: 47/50, 47/49, 49/49" width="100%"></a></p>
 
-**Start here:** [the front page](https://tohirr.github.io/solari-cookbook/passk/), the leaderboard by task shape. `npm run studio` serves the same board from your machine with a key form and a Run button that starts real benches (see [Studio](#studio)). Then [the planner](https://tohirr.github.io/solari-cookbook/passk/studio/), a browser front for every task, experiment and comparison with a planner that says what k runs can prove and cost, or [the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html), with every
+**Start here:** [the front page](https://tohirr.github.io/solari-cookbook/passk/), the leaderboard by task shape. `npm run studio` serves the same board from your machine with a key form and a Run button that starts real benches (see [Studio](#studio)). For the findings behind the numbers, [the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html), with every
 number read from the bench files (rendered by GitHub Pages; the source is in [`evidence/`](evidence/)). `sh demo.sh` runs the whole pipeline in forty
 seconds with no API spend.
 
@@ -91,8 +91,11 @@ Paste your Solari key and a model key into the form; they are written to
 `passk/.env` on this machine and go only to Solari and the model provider,
 by the runs you start. Pick a shape, a model, k, a budget, and Start. Each
 run is `passk run` in a child process with exactly the command the board
-shows, so the button and the docs never disagree. The row appears as
-"local" when it finishes, with its report. The board is served only on
+shows, so the button and the docs never disagree. Runs execute one at a
+time; a second Start queues behind the first, so two benches never compete
+for your Solari concurrency. The row appears as "local" when it finishes,
+with its report. The form says what k passes can prove and how many a floor
+needs, before you spend. The board is served only on
 127.0.0.1; nothing about a run leaves your machine unless you export the
 bench into `evidence/` and send it as a pull request, which is how the
 published board gains a row.

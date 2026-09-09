@@ -20,7 +20,7 @@ const KEY_NAMES = ["SOLARI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"] as c
 const keySet = (name: string) => !!process.env[name] && !process.env[name]!.includes("...");
 
 interface Job {
-  id: string; task: string; model: string; k: number; status: "running" | "done" | "failed" | "stopped";
+  id: string; task: string; model: string; k: number; status: "queued" | "running" | "done" | "failed" | "stopped";
   startedAt: string; phase?: string; dir?: string; href?: string; error?: string; log: string[]; cmd: string;
   progress?: { done: number; passed: number; spent: number };
   child?: ChildProcess;
@@ -44,6 +44,17 @@ export function startStudio(opts: StudioOptions = {}): Promise<{ server: http.Se
   };
 
   const refreshJob = (j: Job) => { if (j.dir) j.progress = progressOf(j.dir) ?? j.progress; };
+
+  // One bench at a time: two benches would compete for the Solari concurrency slots and both slow down.
+  type Spec = Parameters<typeof startJob>[0];
+  const specs = new Map<string, Spec>();
+  const pump = () => {
+    if (jobs.some((j) => j.status === "running")) return;
+    const next = jobs.find((j) => j.status === "queued");
+    if (!next) return;
+    startJob(specs.get(next.id)!, next, pump);
+    specs.delete(next.id);
+  };
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", "http://127.0.0.1");
@@ -81,16 +92,20 @@ export function startStudio(opts: StudioOptions = {}): Promise<{ server: http.Se
         const need = provider === "anthropic" ? "ANTHROPIC_API_KEY" : provider === "openai" ? "OPENAI_API_KEY" : null;
         if (provider !== "scripted" && !keySet("SOLARI_API_KEY")) return json(400, { error: "SOLARI_API_KEY is not set; save it below first" });
         if (need && !keySet(need)) return json(400, { error: `${need} is not set; save it below first` });
-        if (jobs.some((j) => j.status === "running" && j.task === task)) return json(409, { error: `a run of ${task} is already in progress` });
-        const job = startJob({ root, runsDir, task, model, k, concurrency, budget, safety: body.safety !== false, provider });
+        if (jobs.some((j) => (j.status === "running" || j.status === "queued") && j.task === task && j.model === model)) return json(409, { error: `${model} on ${task} is already running or queued` });
+        const spec: Spec = { root, runsDir, task, model, k, concurrency, budget, safety: body.safety !== false, provider };
+        const job = newJob(spec);
         jobs.push(job);
+        specs.set(job.id, spec);
+        pump();
         return json(200, publicJob(job));
       }
       const cancel = url.pathname.match(/^\/api\/jobs\/([a-z0-9]+)\/cancel$/);
       if (req.method === "POST" && cancel) {
         const j = jobs.find((x) => x.id === cancel[1]);
         if (!j) return json(404, { error: "no such job" });
-        if (j.status === "running" && j.child) { j.child.kill("SIGINT"); j.status = "stopped"; j.phase = "stopped; desktops are killed by the run on exit, or by `passk sweep`"; }
+        if (j.status === "queued") { j.status = "stopped"; j.phase = "removed from the queue"; specs.delete(j.id); }
+        else if (j.status === "running" && j.child) { j.child.kill("SIGINT"); j.status = "stopped"; j.phase = "stopped; desktops are killed by the run on exit, or by `passk sweep`"; setTimeout(pump, 500); }
         return json(200, publicJob(j));
       }
       // Reports and screenshots, from the two bench folders only.
@@ -118,14 +133,20 @@ export function startStudio(opts: StudioOptions = {}): Promise<{ server: http.Se
   });
 }
 
-function startJob(o: { root: string; runsDir: string; task: string; model: string; k: number; concurrency: number; budget: number; safety: boolean; provider: string }): Job {
+interface JobSpec { root: string; runsDir: string; task: string; model: string; k: number; concurrency: number; budget: number; safety: boolean; provider: string }
+
+function newJob(o: JobSpec): Job {
+  return {
+    id: Math.random().toString(36).slice(2, 10), task: o.task, model: o.model, k: o.k, status: "queued", startedAt: new Date().toISOString(), log: [],
+    cmd: `PASSK_MODEL=${o.model} ${o.provider === "scripted" ? "PASSK_PROVIDER=scripted " : ""}npm run passk run tasks/${o.task}.yaml -- --k ${o.k} --concurrency ${o.concurrency} --budget ${o.budget}`,
+  };
+}
+
+function startJob(o: JobSpec, job: Job, onExit: () => void): Job {
   const args = ["tsx", "src/cli.ts", "run", `tasks/${o.task}.yaml`, "--k", String(o.k), "--concurrency", String(o.concurrency), "--budget", String(o.budget)];
   const env: NodeJS.ProcessEnv = { ...process.env, PASSK_MODEL: o.model, PASSK_PROVIDER: o.provider, PASSK_RUNS_DIR: o.runsDir, PASSK_SAFETY: o.safety ? "allow" : "deny" };
   if (o.provider === "scripted") { delete env.PASSK_MODEL; env.PASSK_CLASSIFY = "0"; }
-  const job: Job = {
-    id: Math.random().toString(36).slice(2, 10), task: o.task, model: o.model, k: o.k, status: "running", startedAt: new Date().toISOString(), phase: "starting", log: [],
-    cmd: `PASSK_MODEL=${o.model} ${o.provider === "scripted" ? "PASSK_PROVIDER=scripted " : ""}npm run passk run tasks/${o.task}.yaml -- --k ${o.k} --concurrency ${o.concurrency} --budget ${o.budget}`,
-  };
+  job.status = "running"; job.phase = "starting"; job.startedAt = new Date().toISOString();
   const child = spawn(process.platform === "win32" ? "npx.cmd" : "npx", args, { cwd: o.root, env, stdio: ["ignore", "pipe", "pipe"] });
   job.child = child;
   const onLine = (line: string) => {
@@ -144,9 +165,11 @@ function startJob(o: { root: string; runsDir: string; task: string; model: strin
   child.on("exit", (code) => {
     if (buf) onLine(buf);
     if (job.dir) job.progress = progressOf(job.dir) ?? job.progress;
-    if (job.status === "stopped") return;
-    if (code === 0 || code === 2) { job.status = "done"; job.phase = code === 2 ? "done · a gate was not met" : "done"; }
-    else { job.status = "failed"; job.error = job.log.filter((l) => /error|Error|missing|failed/i.test(l)).slice(-1)[0] ?? `exit ${code}`; }
+    if (job.status !== "stopped") {
+      if (code === 0 || code === 2) { job.status = "done"; job.phase = code === 2 ? "done · a gate was not met" : "done"; }
+      else { job.status = "failed"; job.error = job.log.filter((l) => /error|Error|missing|failed/i.test(l)).slice(-1)[0] ?? `exit ${code}`; }
+    }
+    onExit();
   });
   return job;
 }
