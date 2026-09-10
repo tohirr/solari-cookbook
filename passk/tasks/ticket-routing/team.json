@@ -1,0 +1,6 @@
+[
+  {"customer": "Acme Ltd", "owner": "Dana", "plan": "Enterprise"},
+  {"customer": "Acme Logistics", "owner": "Priya", "plan": "Business"},
+  {"customer": "Globex", "owner": "Sam", "plan": "Enterprise"},
+  {"customer": "Initech", "owner": "Dana", "plan": "Starter"}
+]

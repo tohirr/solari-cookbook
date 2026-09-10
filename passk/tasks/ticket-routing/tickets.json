@@ -1,0 +1,14 @@
+[
+  {"id": 101, "title": "Login page shows blank screen on Safari", "customer": "Acme Ltd", "opened": "2026-09-09", "status": "open", "priority": "normal", "assignee": "unassigned"},
+  {"id": 102, "title": "Invoice PDF won't download", "customer": "Acme Ltd", "opened": "2026-09-04", "status": "open", "priority": "normal", "assignee": "Sam"},
+  {"id": 103, "title": "Password reset email delayed", "customer": "Acme Ltd", "opened": "2026-09-01", "status": "closed", "priority": "normal", "assignee": "Sam"},
+  {"id": 104, "title": "Tracking numbers missing from shipment emails", "customer": "Acme Logistics", "opened": "2026-09-08", "status": "open", "priority": "normal", "assignee": "unassigned"},
+  {"id": 105, "title": "Warehouse scanner app logs out every hour", "customer": "Acme Logistics", "opened": "2026-09-02", "status": "open", "priority": "low", "assignee": "Dana"},
+  {"id": 106, "title": "Dashboard shows wrong monthly totals", "customer": "Globex", "opened": "2026-09-10", "status": "open", "priority": "normal", "assignee": "Sam"},
+  {"id": 107, "title": "SSO login loops back to the sign-in page", "customer": "Globex", "opened": "2026-09-05", "status": "open", "priority": "high", "assignee": "unassigned"},
+  {"id": 108, "title": "Feature request: dark mode", "customer": "Globex", "opened": "2026-08-28", "status": "closed", "priority": "low", "assignee": "Sam"},
+  {"id": 109, "title": "Export to CSV fails over 10k rows", "customer": "Initech", "opened": "2026-09-08", "status": "open", "priority": "normal", "assignee": "unassigned"},
+  {"id": 110, "title": "Webhook retries stop after the first failure", "customer": "Initech", "opened": "2026-09-03", "status": "open", "priority": "normal", "assignee": "Priya"},
+  {"id": 111, "title": "Billing address cannot be changed", "customer": "Initech", "opened": "2026-09-06", "status": "closed", "priority": "high", "assignee": "Dana"},
+  {"id": 112, "title": "Search returns archived records", "customer": "Acme Ltd", "opened": "2026-09-06", "status": "open", "priority": "low", "assignee": "unassigned"}
+]

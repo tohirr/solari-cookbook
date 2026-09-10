@@ -34,6 +34,15 @@ h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-
 .verdict{font-size:20px;line-height:1.35;letter-spacing:-.01em;margin:0 0 26px;max-width:820px}
 .verdict b{font-weight:650}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+table.checks{width:100%;border-collapse:collapse;font-size:13px}
+table.checks th{text-align:left;color:var(--ink-3);font-weight:500;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;padding:0 8px 6px 0}
+table.checks td{padding:5px 8px 5px 0;border-top:1px solid var(--line);vertical-align:middle;font-family:var(--sans)}
+table.checks td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2)}
+table.checks tr.miss td:first-child{color:var(--ink)}
+table.checks .bar{width:160px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+table.checks .bar i{display:block;height:100%;background:var(--good)}
+table.checks tr.miss .bar i{background:var(--crit)}
+.pill.inv{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line-2)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
 .kpi span{color:var(--ink-3);font-size:12px;display:block}

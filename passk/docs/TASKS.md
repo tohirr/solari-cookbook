@@ -76,6 +76,11 @@ Setup steps: `exec` (argv, no shell), `open` (launch a GUI app by name),
 
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
+Prefer several checks that each grade one fact over one script that grades
+everything: a run still passes only if all of them pass, but the report then
+carries a Checks table, pass count per check across the bench, worst first,
+so a pass rate turns into a diagnosis. `tasks/ticket-routing.yaml` is the
+example, with nineteen.
 Any check may carry a `name` ("Invoice was created"); reports show it in
 place of the raw path or command, which stays available for audit. Naming a
 check changes neither grading nor the task hash.
@@ -122,6 +127,7 @@ published in [`evidence/`](../evidence/).
 | `rename-invoices` / `-clarified` | default | validated, 5 + 5 runs | File manager; a prompt pair (ambiguous vs spelled out) |
 | `q3-total` | office | validated, 10 runs | LibreOffice Calc, formulas, the CSV "keep format" dialog |
 | `ticket-queue` / `-verify` / `-reload` | default | validated, 50 + 50 + 50 runs | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. Three prompt conditions on one snapshot. |
+| `ticket-routing` | default | ready (verifier validated, no published runs yet) | The ticket queue, harder: twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report's Checks table says which rule fails. |
 | `invoice-entry` | office | validated, 30 runs | Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment's sha256. |
 | `fake` | none | harness test | Runs on the scripted provider; exercises the pipeline with no VM or model |
 

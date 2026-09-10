@@ -34,3 +34,11 @@ Everything below was found on a live VM while building passk, and cost an aftern
   `exit_code` is given.
 - **Clipboard readback is empty** (`xclip -o` exits 1) even after a real copy.
   Verify results through the filesystem instead.
+- **A snapshot id can come back before the snapshot exists.** Once, `snapshot()`
+  returned an id, `createDesktop({ fromSnapshot })` booted a fork from it, and
+  the fork's first `exec` hung until passk's five-minute action timeout. A
+  later fork of the same id got `404 Snapshot not found`. Re-running `prepare`
+  produced a snapshot that forked and exec'd normally in under a second.
+  passk treats a fork whose first action never returns as a lost run, not an
+  agent failure; a short readiness probe after `fromSnapshot`, or a status
+  field on the snapshot, would let it retry the fork instead.

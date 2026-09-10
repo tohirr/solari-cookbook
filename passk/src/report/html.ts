@@ -77,6 +77,29 @@ ${attention.length ? `<div class="runs">${attention.map((r) => runCard(b, r, tru
 <div class="runs">${passed.map((r) => runRow(b, r)).join("")}</div>`;
 }
 
+/**
+ * One row per check, pass count across the scored runs, worst first. A task
+ * with one check has nothing to add here; a task with many turns a pass rate
+ * into a diagnosis: which rule the agent gets wrong, and how often.
+ */
+function checksSection(b: BenchResult, scorable: RunResult[]): string {
+  const checks = b.provenance?.task?.checks ?? [];
+  if (checks.length < 2 || !scorable.length) return "";
+  const rows = checks.map((c, i) => {
+    const seen = scorable.filter((r) => r.checks[i] && !r.checks[i].errored);
+    const passed = seen.filter((r) => r.checks[i].passed).length;
+    return { label: checkLabel(c), invariant: !!c.invariant, passed, n: seen.length, rate: seen.length ? passed / seen.length : 1 };
+  }).sort((x, y) => x.rate - y.rate);
+  const worst = rows.filter((r) => r.n && r.passed < r.n);
+  return `<h2>Checks</h2>
+<div class="card">
+  <div class="note" style="margin:0 0 10px">${worst.length ? `${worst.length} of ${rows.length} checks failed in at least one run. Worst first.` : `Every one of the ${rows.length} checks passed in every scored run.`}</div>
+  <table class="checks"><thead><tr><th>check</th><th>passed</th><th></th></tr></thead><tbody>
+  ${rows.map((r) => `<tr class="${r.passed < r.n ? "miss" : ""}"><td>${esc(r.label)}${r.invariant ? ` <span class="pill inv">guard</span>` : ""}</td><td class="num">${r.passed}/${r.n}</td><td><div class="bar"><i style="width:${(r.rate * 100).toFixed(0)}%"></i></div></td></tr>`).join("\n  ")}
+  </tbody></table>
+</div>`;
+}
+
 export function renderReport(b: BenchResult): string {
   const m = b.metrics;
   const p = b.provenance ?? {
@@ -129,6 +152,7 @@ export function renderReport(b: BenchResult): string {
   <div class="card kpi"><b>${usd(m.costPerSuccessUsd)}</b><span>per success</span><span class="sub">all scored spend ÷ passes · ${usd(m.totalCostUsd, 2)} total${m.costPerPassingRunUsd !== null && m.costPerPassingRunUsd !== undefined ? ` · ${usd(m.costPerPassingRunUsd)} per passing run` : ""}</span></div>
 </div>
 
+${checksSection(b, scorable)}
 <h2>Effort per run</h2>
 <div class="card">
   <div style="color:var(--ink-3);font-size:12px">steps</div>
