@@ -19,6 +19,10 @@ const comp = (name: string) => JSON.parse(fs.readFileSync(path.join(EV, name, "c
 
 const env = comp("compare-notes-environment");
 const reload = comp("compare-ticket-queue-baseline-vs-reload");
+const routing = comp("compare-ticket-routing-prompt");
+const routeA = bench("ticket-routing"), routeB = bench("ticket-routing-reload");
+/** Every comparison folder, so a new experiment is on this page the day it lands. */
+const allComps = fs.readdirSync(EV).filter((d) => d.startsWith("compare-") && fs.existsSync(path.join(EV, d, "compare.json"))).map((d) => [d, comp(d)] as const);
 const base = bench("ticket-queue-baseline");
 const verify = bench("ticket-queue-verify");
 const sheet = bench("q3-total");
@@ -87,6 +91,34 @@ const html = `<!doctype html>
   </div>
 </div>
 
+<h2>One sentence, measured per rule</h2>
+<div class="two">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline"><b style="font-size:15px">${esc(routeA.taskName)}</b><span style="font-size:12px;color:var(--ink-3)">${routeA.provenance.task.checks.length} checks · ${routeA.provenance.task.checks.filter((c) => c.invariant).length} guards</span></div>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:10px 0 12px">Twelve tickets, the owners on a second page, a three-day rule, two customers called Acme. Eight rows to change. Every check grades one fact, so the bench can say which rule fails, not only how often runs do.</p>
+    <div class="cap">A · baseline prompt</div>
+    ${dots(routeA, "ticket-routing")}
+    <div class="cap">B · prompt adds “reload and confirm”</div>
+    ${dots(routeB, "ticket-routing-reload")}
+    <div style="font-size:12.5px;color:var(--ink-3);margin:12px 0 0">held fixed: ${routing.heldFixed.map((h) => `<code>${esc(h)}</code>`).join(" ")} · changed: ${routing.changed.map((h) => `<code>${esc(h)}</code>`).join(" ")}</div>
+    ${deltaTiles([
+      { label: "passed", a: `${routeA.metrics.passed}/${routeA.metrics.n}`, b: `${routeB.metrics.passed}/${routeB.metrics.n}`, delta: Math.round(routing.delta.passAt1 * 100), unit: " pts", better: "up" },
+      { label: "median steps", a: String(routeA.metrics.medianSteps), b: String(routeB.metrics.medianSteps), delta: routing.delta.medianSteps, better: "down" },
+      { label: "$ per success", a: usd(routeA.metrics.costPerSuccessUsd), b: usd(routeB.metrics.costPerSuccessUsd), delta: routing.delta.costPerSuccessUsd ?? 0, better: "down", digits: 3 },
+    ])}
+    <p style="color:var(--ink-2);font-size:13.5px;margin:14px 0 10px">${routeA.metrics.passed}/${routeA.metrics.n} became ${routeB.metrics.passed}/${routeB.metrics.n}; the pass/fail split is ${routing.fisherP < 0.05 ? "unlikely to be noise" : "consistent with noise"} (p = ${routing.fisherP.toFixed(3)}). The table says what the sentence did and what it cost.</p>
+    <a class="btn" style="display:inline-block;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);padding:5px 10px;border-radius:999px" href="compare-ticket-routing-prompt/compare.html">See the comparison</a>
+  </div>
+  <div class="card">
+    <b style="font-size:15px">By check, where either side missed</b>
+    <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 10px">A → B, worst on the baseline first</div>
+    <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
+    ${(routing.checks ?? []).filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => `<tr class="${x.delta < 0 ? "miss" : ""}"><td>${esc(x.label)}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num" style="color:${x.delta > 0 ? "var(--good)" : x.delta < 0 ? "var(--crit)" : "var(--ink-3)"}">${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)} pts</td></tr>`).join("\n    ")}
+    </tbody></table>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:12px 0 0">Every row that was being left unsaved is now saved. The price is the step budget: median effort rose to the cap, and the last open row, 112, got worse because runs ran out of steps before reaching it. Every guard held on both sides. The next experiment is the same prompt with a higher cap.</p>
+  </div>
+</div>
+
 <h2>Where a failure diverges</h2>
 <div class="card">
   <p style="margin:0 0 14px;color:var(--ink-2);font-size:13.5px">Run ${ref.runIndex} and run ${featured.runIndex} of the baseline bench on one time axis: same snapshot, same prompt, same model. The agent's own report of the outcome sits next to what the checker found in the VM.</p>
@@ -141,6 +173,13 @@ const html = `<!doctype html>
   <div><b>Report</b>pass@k, pass^k with intervals, effort spread, a hypothesis per failure</div>
   <div><b>Compare</b>change one thing, fork the same snapshot again, measure the delta</div>
 </div>
+
+<h2>Every comparison</h2>
+<div class="card" style="padding:0;overflow-x:auto"><table>
+<tr><th>Comparison</th><th>Changed</th><th class="num">A</th><th class="num">B</th><th class="num">Median steps</th><th class="num">Fisher p</th></tr>
+${allComps.map(([d, c]) => `<tr><td><a href="${d}/compare.html">${esc(c.a.taskName)}</a></td><td>${c.changed.map((x) => `<code>${esc(x)}</code>`).join(" ")}</td><td class="num">${c.a.metrics.passed}/${c.a.metrics.n}</td><td class="num">${c.b.metrics.passed}/${c.b.metrics.n}</td><td class="num">${c.a.metrics.medianSteps} → ${c.b.metrics.medianSteps}</td><td class="num">${c.fisherP.toFixed(2)}${c.fisherP < 0.05 ? " ·" : ""}</td></tr>`).join("")}
+</table></div>
+<div class="note">Same snapshot and checks on both sides unless the row says the snapshot changed. A dot marks a split unlikely to be noise at that sample size.</div>
 
 <h2>Every bench</h2>
 <div class="card" style="padding:0;overflow-x:auto"><table>
