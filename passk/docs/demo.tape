@@ -1,4 +1,6 @@
 # The no-key demo as a GIF, for the README and the video's terminal scene.
+# (The GIF in docs/ today is a screen recording of the same demo in Ghostty,
+# cropped and encoded with ffmpeg; this tape is the hands-off way to remake it.)
 #   brew install vhs        (needs ttyd and ffmpeg, which brew pulls in)
 #   cd passk && vhs docs/demo.tape
 # Produces docs/demo.gif in about a minute. Nothing here touches Solari or a
