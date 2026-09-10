@@ -31,6 +31,8 @@ git clone https://github.com/tohirr/solari-cookbook.git && cd solari-cookbook/pa
 PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 ```
 
+<p align="center"><img src="docs/demo.gif" alt="Terminal recording: passk snapshots the task, proves the verifier, forks ten desktops, grades each run, prints pass@1 with its interval and pass^k, and the gate refuses an 80% agent" width="100%"></p>
+
 The real thing, with a [Solari key](https://console.getsolari.com) and an
 OpenAI or Anthropic key in `.env` (copy `.env.example`; `doctor` checks both):
 
