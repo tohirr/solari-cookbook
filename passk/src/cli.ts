@@ -271,4 +271,5 @@ function must(v: string | undefined): string {
   return v;
 }
 
-main().catch((err) => { console.error(err); process.exit(1); });
+// A task that fails to load or a missing key is a message, not a stack trace. PASSK_DEBUG=1 shows the stack.
+main().catch((err) => { console.error(process.env.PASSK_DEBUG || !(err instanceof Error) ? err : err.message); process.exit(1); });

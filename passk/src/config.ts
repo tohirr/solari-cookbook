@@ -1,7 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { createRequire } from "node:module";
 import { parse } from "yaml";
+import { Ajv, type ErrorObject } from "ajv";
 import type { Task } from "./types.js";
+
+const require = createRequire(import.meta.url);
+const validateTaskFile = new Ajv({ allErrors: true }).compile(require("../schema/task.schema.json"));
 
 function loadDotenv(): void {
   const p = path.resolve(".env");
@@ -55,10 +60,50 @@ export const config = {
   get stateDir() { return path.resolve(process.env.PASSK_STATE_DIR ?? ".passk"); },
 };
 
+/**
+ * Ajv reports every branch of a oneOf that failed, so one bad check yields a
+ * dozen lines from branches the author never meant. Pick the branch the
+ * author meant (a check by its `type`, a step by its key) and report only
+ * that branch's complaints; an unknown type or step key is its own message.
+ */
+function schemaProblems(errors: ErrorObject[], raw: unknown): string[] {
+  const schema = require("../schema/task.schema.json") as { properties: { checks: { items: { oneOf: { properties: { type: { const: string } } }[] } }; setup: { items: { oneOf: { required: string[] }[] } } } };
+  const checkBranches = schema.properties.checks.items.oneOf, stepBranches = schema.properties.setup.items.oneOf;
+  const doc = (raw ?? {}) as Record<string, unknown>;
+  const out = new Set<string>();
+  for (const e of errors) {
+    if (e.keyword === "oneOf") continue;
+    // /checks/3/... → the check's type picks the branch; /setup/2/... or /golden/0/... → the step's key does.
+    const m = e.instancePath.match(/^\/(checks|setup|golden)\/(\d+)/);
+    if (m) {
+      const list = (doc[m[1]] as Record<string, unknown>[] | undefined) ?? [];
+      const item = list[Number(m[2])] ?? {};
+      const branch = m[1] === "checks"
+        ? checkBranches.findIndex((b) => b.properties.type.const === item.type)
+        : stepBranches.findIndex((b) => b.required[0] in item);
+      if (branch === -1) {
+        out.add(m[1] === "checks"
+          ? `  /${m[1]}/${m[2]} unknown check type ${JSON.stringify(item.type)}; one of ${checkBranches.map((b) => b.properties.type.const).join(", ")}`
+          : `  /${m[1]}/${m[2]} not a step; a step starts with one of ${stepBranches.map((b) => b.required[0]).join(", ")}`);
+        continue;
+      }
+      if (!e.schemaPath.includes(`/oneOf/${branch}/`)) continue;
+    }
+    const extra = "additionalProperty" in e.params ? ` (${String(e.params.additionalProperty)})` : "";
+    out.add(`  ${e.instancePath || "/"} ${e.message}${extra}`);
+  }
+  return [...out];
+}
+
+/**
+ * Parse a task file and refuse it before anything billable if it does not
+ * match schema/task.schema.json: the same schema the editor uses, so what
+ * completes in VS Code is what runs.
+ */
 export function loadTask(file: string): Task {
   const raw = parse(fs.readFileSync(file, "utf8")) as Task;
-  if (!raw.id || !raw.prompt || !raw.checks?.length) {
-    throw new Error(`${file}: a task needs at least id, prompt and one check`);
+  if (!validateTaskFile(raw)) {
+    throw new Error(`${file} is not a valid passk task:\n${schemaProblems(validateTaskFile.errors ?? [], raw).join("\n")}`);
   }
   return { template: "default", resolution: "1280x720", max_steps: 40, ...raw };
 }
