@@ -16,6 +16,7 @@ export_bench() {
 }
 export_bench ticket-queue-baseline     "ticket-queue-2026-09-02*"
 export_bench ticket-queue-terra        "ticket-queue-2026-09-10T07-43*"
+export_bench ticket-routing            "ticket-routing-2026-09-10T08-33*"
 export_bench ticket-queue-verify       "ticket-queue-verify-*"
 export_bench ticket-queue-reload       "ticket-queue-reload-*"
 export_bench invoice-entry             "invoice-entry-2026-09-03T01-4*"

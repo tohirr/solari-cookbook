@@ -16,6 +16,7 @@ Numbers are observed counts with a 95% Wilson interval. Runs lost to infrastruct
 | [ticket-queue-reload](ticket-queue-reload/report.html) | `gpt-5.6-luna` | 49/49 | 100% (93%–100%) | 100% | 18 | $0.008 | 1 |
 | [ticket-queue-terra](ticket-queue-terra/report.html) | `gpt-5.6-terra` | 10/10 | 100% (72%–100%) | 100% | 14 | $0.079 | 0 |
 | [ticket-queue-verify](ticket-queue-verify/report.html) | `gpt-5.6-luna` | 47/49 | 96% (86%–99%) | 80% | 15 | $0.007 | 1 |
+| [ticket-routing](ticket-routing/report.html) | `gpt-5.6-luna` | 5/18 | 28% (12%–51%) | 0% | 56 | $0.126 | 2 |
 
 ## Comparisons
 
