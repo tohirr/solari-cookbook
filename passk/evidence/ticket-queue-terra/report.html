@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>passk · Triage tickets in an internal web tool</title><style>
+:root{
+  --bg:#0e0f12;--surface:#15171c;--surface-2:#1b1e25;--line:#262a33;--line-2:#333845;
+  --ink:#eceef2;--ink-2:#a3a9b7;--ink-3:#6b7180;
+  --good:#22c55e;--good-dim:rgba(34,197,94,.22);--crit:#e5484d;--crit-dim:rgba(229,72,77,.22);--warn:#f5a524;
+  --a:#3987e5;--a-dim:rgba(57,135,229,.22);--b:#eb6834;--b-dim:rgba(235,104,52,.22);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,sans-serif;
+  --radius:14px;--radius-s:8px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+main{max-width:1120px;margin:0 auto;padding:48px 28px 80px}
+h1{font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:0 0 6px;font-weight:650}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:40px 0 14px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink-3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:22px}
+.brand b{color:var(--ink);font-weight:700;letter-spacing:0;text-transform:none;font-size:13px}
+.meta{color:var(--ink-3);font-size:13px;margin-bottom:22px}.meta code{font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.prompt{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 26px;font-size:15px;max-width:820px}
+.verdict{font-size:20px;line-height:1.35;letter-spacing:-.01em;margin:0 0 26px;max-width:820px}
+.verdict b{font-weight:650}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi b{display:block;font-size:26px;font-weight:600;letter-spacing:-.02em;line-height:1.1;margin-bottom:6px;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--ink-3);font-size:12px;display:block}
+.kpi .sub{color:var(--ink-2)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:10px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid transparent;display:inline-grid;place-items:center;font-size:11px;font-weight:700;color:var(--bg);font-family:var(--mono);text-decoration:none;line-height:1}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1px}
+.dot.passed{background:var(--good)}.dot.failed{background:var(--crit)}.dot.errored{background:transparent;border-color:var(--ink-3);color:var(--ink-3)}
+.dot.skipped{background:transparent;border-color:var(--line-2);color:var(--ink-3)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font-size:26px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.headline span{color:var(--ink-2);font-size:13px}
+.runrow{margin:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 20px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12px}
+.runrow[open]>summary{border-bottom:1px solid var(--line)}
+.runrow>.card{border:0;border-radius:0 0 var(--radius) var(--radius)}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:3px solid var(--line-2);padding:6px 14px;color:var(--ink-2);margin:0 0 22px;font-size:15px;max-width:820px;line-height:1.6}
+.diff del{background:var(--crit-dim);color:var(--crit);text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good);text-decoration:none;border-radius:3px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
+.legend{display:flex;gap:16px;color:var(--ink-3);font-size:12px;margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.range{position:relative;height:10px;background:var(--surface-2);border-radius:5px;margin:14px 0 6px}
+.range i{position:absolute;top:0;bottom:0;border-radius:5px;background:var(--good-dim)}
+.range b{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;background:var(--good);border:3px solid var(--surface);transform:translateX(-50%)}
+.range-labels{display:flex;justify-content:space-between;color:var(--ink-3);font-size:11px;font-family:var(--mono)}
+.strip{position:relative;height:44px;margin:6px 0 2px}
+.strip .axis{position:absolute;left:0;right:0;top:22px;height:1px;background:var(--line-2)}
+.strip .tick{position:absolute;top:28px;transform:translateX(-50%);color:var(--ink-3);font-size:11px;font-family:var(--mono)}
+.strip .pt{position:absolute;top:14px;width:16px;height:16px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--surface);cursor:default}
+.strip .pt.passed{background:var(--good)}.strip .pt.failed{background:var(--crit)}
+.strip .pt.a{background:var(--a)}.strip .pt.b{background:var(--b)}
+.strip .pt.hollow{background:transparent!important;border:2.5px solid;box-shadow:inset 0 0 0 2px var(--surface)}.strip .pt.a.hollow{border-color:var(--a)}.strip .pt.b.hollow{border-color:var(--b)}
+.strip .med{position:absolute;top:8px;width:2px;height:28px;background:var(--ink);opacity:.7;transform:translateX(-50%)}
+.strip .med.a{background:var(--a);opacity:1}.strip .med.b{background:var(--b);opacity:1}.strip .med.b:after{top:auto;bottom:-16px}
+.strip .med:after{content:attr(data-label);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--ink-2);font-family:var(--mono);white-space:nowrap}
+.runs{display:grid;gap:12px}
+.run{display:grid;grid-template-columns:150px 1fr;gap:18px;align-items:start}.run>div{min-width:0}
+.run .id{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.run .id b{display:block;font-size:15px;color:var(--ink);font-family:var(--sans);font-weight:600;margin-bottom:2px}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.pill.passed{background:var(--good-dim);color:var(--good)}.pill.failed{background:var(--crit-dim);color:var(--crit)}.pill.errored{background:var(--surface-2);color:var(--ink-2)}
+.pill.a{background:var(--a-dim);color:var(--a)}.pill.b{background:var(--b-dim);color:var(--b)}
+.pill.neutral{background:var(--surface-2);color:var(--ink-2)}
+.checks{display:flex;flex-direction:column;gap:3px;font-size:12px;font-family:var(--mono);color:var(--ink-2)}
+.checks .ok{color:var(--good)}.checks .bad{color:var(--crit)}
+.checks .detail{color:var(--ink-3);white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto}
+.film{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:thin}
+.film a{flex:none;position:relative}
+.film img{height:84px;border-radius:6px;border:1px solid var(--line);display:block;background:#000}
+.film a.final img{border-color:var(--good)}.film a.diverge img{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn)}
+.film em{position:absolute;left:4px;bottom:4px;font:10px var(--mono);font-style:normal;background:rgba(0,0,0,.65);color:#fff;padding:1px 5px;border-radius:4px}
+.hyp{overflow-wrap:anywhere;margin-top:10px;padding:10px 12px;background:var(--surface-2);border-radius:var(--radius-s);font-size:13px;color:var(--ink-2)}
+.hyp b{color:var(--ink);font-weight:600}
+details{margin-top:8px}summary{cursor:pointer;color:var(--ink-3);font-size:12px}
+pre{white-space:pre-wrap;font:12px/1.5 var(--mono);color:var(--ink-2);margin:8px 0 0}
+.foot{color:var(--ink-3);font-size:12px;margin-top:40px;border-top:1px solid var(--line);padding-top:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.run{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px;text-align:left;border-top:1px solid var(--line);vertical-align:top;font-size:13px}th{color:var(--ink-3);font-weight:500;border-top:0;font-size:12px}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px}
+.delta.up{color:var(--good)}.delta.down{color:var(--crit)}.delta.flat{color:var(--ink-3)}
+.note{color:var(--ink-3);font-size:12.5px;margin-top:8px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font:12px var(--mono);padding:5px 8px;border-radius:6px;transform:translate(-50%,-130%);opacity:0;transition:opacity .08s;white-space:nowrap;z-index:9}
+</style></head><body><main>
+<div class="brand"><b>passk</b> reliability test · outcomes verified inside the VM</div>
+<h1>Triage tickets in an internal web tool</h1>
+<div class="meta"><code>gpt-5.6-terra</code> · k=10 · snapshot <code>snap_dl58ex84y8it</code> · 2026-09-10 07:43 UTC</div>
+<blockquote class="prompt">The support queue is open in the browser. Assign all of Acme Ltd's open tickets to Dana, and set the ticket about the login outage to urgent priority. Save each row you change.</blockquote>
+<p class="verdict"><b>10 of 10 passed</b>. Consistent in outcome and in effort (9–15 steps). With 10 runs the pass rate is at least 72% at 95% confidence.</p>
+
+<div class="card">
+  <div class="headline"><b>10/10 passed</b><span>pass@1 100% · 95% interval 72%–100%</span></div>
+  <div class="dots"><div class="dotrow"><a class="dot passed " data-tip="run 0: passed in 15 steps" aria-label="run 0: passed in 15 steps" href="#run-0">✓</a><a class="dot passed " data-tip="run 1: passed in 14 steps" aria-label="run 1: passed in 14 steps" href="#run-1">✓</a><a class="dot passed " data-tip="run 2: passed in 11 steps" aria-label="run 2: passed in 11 steps" href="#run-2">✓</a><a class="dot passed " data-tip="run 3: passed in 15 steps" aria-label="run 3: passed in 15 steps" href="#run-3">✓</a><a class="dot passed " data-tip="run 4: passed in 9 steps" aria-label="run 4: passed in 9 steps" href="#run-4">✓</a><a class="dot passed " data-tip="run 5: passed in 15 steps" aria-label="run 5: passed in 15 steps" href="#run-5">✓</a><a class="dot passed " data-tip="run 6: passed in 14 steps" aria-label="run 6: passed in 14 steps" href="#run-6">✓</a><a class="dot passed " data-tip="run 7: passed in 13 steps" aria-label="run 7: passed in 13 steps" href="#run-7">✓</a><a class="dot passed " data-tip="run 8: passed in 9 steps" aria-label="run 8: passed in 9 steps" href="#run-8">✓</a><a class="dot passed " data-tip="run 9: passed in 15 steps" aria-label="run 9: passed in 15 steps" href="#run-9">✓</a></div></div>
+  <div class="legend"><span><i style="background:var(--good)"></i>✓ passed</span><span><i style="background:var(--crit)"></i>× failed</span><span><i style="border:2px solid var(--ink-3);width:6px;height:6px"></i>not scored: <b>!</b> desktop infra · <b>M</b> model provider · <b>?</b> checker crash</span><span>click a dot for the run</span></div>
+  <div class="range" data-tip="observed 100%, 95% Wilson interval 72%–100%"><i style="left:72.24598312333835%;right:0%"></i><b style="left:100%"></b></div>
+  <div class="range-labels"><span>0%</span><span>where the true pass rate plausibly sits (95% Wilson interval)</span><span>100%</span></div>
+</div>
+
+<h2>Numbers</h2>
+<div class="kpis">
+  <div class="card kpi"><b>100%</b><span>pass^5 · all 5 in a row</span><span class="sub">lower bound 20%</span></div>
+  
+  <div class="card kpi"><b>14</b><span>median steps</span><span class="sub">p90 15 · range 9–15</span></div>
+  <div class="card kpi"><b>56s</b><span>median duration</span><span class="sub">p90 62s · range 50s–74s</span></div>
+  <div class="card kpi"><b>$0.079</b><span>per success</span><span class="sub">all scored spend ÷ passes · $0.79 total · $0.079 per passing run</span></div>
+</div>
+
+<h2>Effort per run</h2>
+<div class="card">
+  <div style="color:var(--ink-3);font-size:12px">steps</div>
+  <div class="strip" style="">
+    <div class="axis"></div>
+    <span class="tick" style="left:0%">0</span><span class="tick" style="left:53.333333333333336%">8</span><span class="tick" style="left:100%">15</span>
+    <span class="med" style="left:93.33333333333333%" data-label="median 14"></span>
+    <span class="pt passed" style="left:100%" data-tip="run 0: 15 steps, passed"></span><span class="pt passed" style="left:93.33333333333333%" data-tip="run 1: 14 steps, passed"></span><span class="pt passed" style="left:73.33333333333333%" data-tip="run 2: 11 steps, passed"></span><span class="pt passed" style="left:100%" data-tip="run 3: 15 steps, passed"></span><span class="pt passed" style="left:60%" data-tip="run 4: 9 steps, passed"></span><span class="pt passed" style="left:100%" data-tip="run 5: 15 steps, passed"></span><span class="pt passed" style="left:93.33333333333333%" data-tip="run 6: 14 steps, passed"></span><span class="pt passed" style="left:86.66666666666667%" data-tip="run 7: 13 steps, passed"></span><span class="pt passed" style="left:60%" data-tip="run 8: 9 steps, passed"></span><span class="pt passed" style="left:100%" data-tip="run 9: 15 steps, passed"></span>
+  </div>
+  <div style="color:var(--ink-3);font-size:12px;margin-top:16px">seconds</div>
+  <div class="strip" style="">
+    <div class="axis"></div>
+    <span class="tick" style="left:0%">0s</span><span class="tick" style="left:50%">37s</span><span class="tick" style="left:100%">74s</span>
+    <span class="med" style="left:75.67567567567568%" data-label="median 56s"></span>
+    <span class="pt passed" style="left:75.67567567567568%" data-tip="run 0: 56s, passed"></span><span class="pt passed" style="left:79.72972972972973%" data-tip="run 1: 59s, passed"></span><span class="pt passed" style="left:100%" data-tip="run 2: 74s, passed"></span><span class="pt passed" style="left:68.91891891891892%" data-tip="run 3: 51s, passed"></span><span class="pt passed" style="left:77.02702702702703%" data-tip="run 4: 57s, passed"></span><span class="pt passed" style="left:68.91891891891892%" data-tip="run 5: 51s, passed"></span><span class="pt passed" style="left:68.91891891891892%" data-tip="run 6: 51s, passed"></span><span class="pt passed" style="left:74.32432432432432%" data-tip="run 7: 55s, passed"></span><span class="pt passed" style="left:82.43243243243244%" data-tip="run 8: 61s, passed"></span><span class="pt passed" style="left:67.56756756756756%" data-tip="run 9: 50s, passed"></span>
+  </div>
+  <div class="note">Every point is one run from the same snapshot. A wide spread on a task that always passes is behavior variability: same result, different routes, different cost.</div>
+</div>
+
+<h2>Runs</h2>
+<div class="runs"><div class="card run" id="run-0">
+    <div class="id"><b>Run 0</b><span class="pill passed">passed</span> <div style="margin-top:8px">15 steps · 56s · $0.051</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-00/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-00/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Assigned Acme Ltd’s open tickets to Dana and set the login outage ticket to urgent, saving both rows.” — not used for grading.</div>
+      <details><summary>trace (15 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:832,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;HOME&quot;]}
+ 3  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;urgent&quot;}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:967,&quot;y&quot;:381}
+ 6  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+ 7  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1118,&quot;y&quot;:381}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:969,&quot;y&quot;:429}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1118,&quot;y&quot;:429}
+14  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div><div class="card run" id="run-1">
+    <div class="id"><b>Run 1</b><span class="pill passed">passed</span> <div style="margin-top:8px">14 steps · 59s · $0.067</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-01/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-01/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is set to urgent.” — not used for grading.</div>
+      <details><summary>trace (14 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:827,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;U&quot;]}
+ 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:968,&quot;y&quot;:381}
+ 5  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+ 6  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1121,&quot;y&quot;:381}
+ 8  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:970,&quot;y&quot;:429}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:429}
+13  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div><div class="card run" id="run-2">
+    <div class="id"><b>Run 2</b><span class="pill passed">passed</span> <div style="margin-top:8px">11 steps · 74s · $0.134</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-02/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-02/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage is marked urgent.” — not used for grading.</div>
+      <details><summary>trace (11 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:828,&quot;y&quot;:382}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;U&quot;]}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:968,&quot;y&quot;:381}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:977,&quot;y&quot;:381}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:945,&quot;y&quot;:455}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1119,&quot;y&quot;:381}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:932,&quot;y&quot;:430}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:945,&quot;y&quot;:503}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:428}</pre></details>
+    </div>
+  </div><div class="card run" id="run-3">
+    <div class="id"><b>Run 3</b><span class="pill passed">passed</span> <div style="margin-top:8px">15 steps · 51s · $0.051</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-03/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-03/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.” — not used for grading.</div>
+      <details><summary>trace (15 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:832,&quot;y&quot;:382}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;HOME&quot;]}
+ 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;U&quot;]}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:968,&quot;y&quot;:382}
+ 6  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+ 7  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1119,&quot;y&quot;:382}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:972,&quot;y&quot;:430}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1118,&quot;y&quot;:430}
+14  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div><div class="card run" id="run-4">
+    <div class="id"><b>Run 4</b><span class="pill passed">passed</span> <div style="margin-top:8px">9 steps · 57s · $0.130</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-04/step-000.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-000.jpg" alt="step 0"><em>0</em></a><a href="run-04/step-001.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-001.jpg" alt="step 1"><em>1</em></a><a href="run-04/step-002.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-002.jpg" alt="step 2"><em>2</em></a><a href="run-04/step-003.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-003.jpg" alt="step 3"><em>3</em></a><a href="run-04/step-004.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-004.jpg" alt="step 4"><em>4</em></a><a href="run-04/step-005.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-005.jpg" alt="step 5"><em>5</em></a><a href="run-04/step-006.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-006.jpg" alt="step 6"><em>6</em></a><a href="run-04/step-007.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-007.jpg" alt="step 7"><em>7</em></a><a href="run-04/step-008.jpg" target="_blank" class=""><img loading="lazy" src="run-04/step-008.jpg" alt="step 8"><em>8</em></a><a href="run-04/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-04/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Assigned both open Acme Ltd tickets to Dana, set the login outage to urgent, and saved both rows.” — not used for grading.</div>
+      <details><summary>trace (9 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:825,&quot;y&quot;:381}
+ 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:820,&quot;y&quot;:478}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:971,&quot;y&quot;:381}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:947,&quot;y&quot;:454}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:380}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:928,&quot;y&quot;:430}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:946,&quot;y&quot;:503}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:429}</pre></details>
+    </div>
+  </div><div class="card run" id="run-5">
+    <div class="id"><b>Run 5</b><span class="pill passed">passed</span> <div style="margin-top:8px">15 steps · 51s · $0.051</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-05/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-05/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.” — not used for grading.</div>
+      <details><summary>trace (15 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:829,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;HOME&quot;]}
+ 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;U&quot;]}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:971,&quot;y&quot;:381}
+ 6  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+ 7  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1119,&quot;y&quot;:382}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:970,&quot;y&quot;:430}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1118,&quot;y&quot;:429}
+14  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div><div class="card run" id="run-6">
+    <div class="id"><b>Run 6</b><span class="pill passed">passed</span> <div style="margin-top:8px">14 steps · 51s · $0.051</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-06/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-06/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Assigned both open Acme Ltd tickets to Dana and set the login outage ticket to urgent, saving each changed row.” — not used for grading.</div>
+      <details><summary>trace (14 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:825,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;U&quot;]}
+ 3  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:971,&quot;y&quot;:381}
+ 5  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+ 6  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1119,&quot;y&quot;:382}
+ 8  wait             {&quot;type&quot;:&quot;wait&quot;}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:968,&quot;y&quot;:430}
+10  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;D&quot;]}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:430}
+13  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div><div class="card run" id="run-7">
+    <div class="id"><b>Run 7</b><span class="pill passed">passed</span> <div style="margin-top:8px">13 steps · 55s · $0.068</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-07/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-07/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.” — not used for grading.</div>
+      <details><summary>trace (13 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:835,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;HOME&quot;]}
+ 3  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;urgent&quot;}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:968,&quot;y&quot;:380}
+ 6  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+ 7  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:382}
+ 9  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:928,&quot;y&quot;:430}
+10  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+11  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+12  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:430}</pre></details>
+    </div>
+  </div><div class="card run" id="run-8">
+    <div class="id"><b>Run 8</b><span class="pill passed">passed</span> <div style="margin-top:8px">9 steps · 61s · $0.130</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-08/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-08/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “Assigned Acme Ltd’s open tickets to Dana and marked the login outage ticket urgent, saving both rows.” — not used for grading.</div>
+      <details><summary>trace (9 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:829,&quot;y&quot;:381}
+ 2  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:820,&quot;y&quot;:479}
+ 3  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:970,&quot;y&quot;:381}
+ 4  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:946,&quot;y&quot;:453}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:380}
+ 6  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:934,&quot;y&quot;:429}
+ 7  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:947,&quot;y&quot;:503}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1119,&quot;y&quot;:430}</pre></details>
+    </div>
+  </div><div class="card run" id="run-9">
+    <div class="id"><b>Run 9</b><span class="pill passed">passed</span> <div style="margin-top:8px">15 steps · 50s · $0.052</div></div>
+    <div>
+      <div class="checks"><div><span class="ok">✓</span> exec python3 /root/app/check.py</div></div>
+      <div class="film"><a href="run-09/final.jpg" target="_blank" class="final"><img loading="lazy" src="run-09/final.jpg" alt="final"><em>final</em></a></div>
+      
+      <div class="note">Agent's own claim: “All open Acme Ltd tickets are assigned to Dana, and the login outage is marked urgent.” — not used for grading.</div>
+      <details><summary>trace (15 actions)</summary><pre> 0  screenshot       {&quot;type&quot;:&quot;screenshot&quot;}
+ 1  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:829,&quot;y&quot;:381}
+ 2  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;HOME&quot;]}
+ 3  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;urgent&quot;}
+ 4  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 5  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:971,&quot;y&quot;:381}
+ 6  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+ 7  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+ 8  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1120,&quot;y&quot;:381}
+ 9  wait             {&quot;type&quot;:&quot;wait&quot;}
+10  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:973,&quot;y&quot;:430}
+11  type             {&quot;type&quot;:&quot;type&quot;,&quot;text&quot;:&quot;Dana&quot;}
+12  keypress         {&quot;type&quot;:&quot;keypress&quot;,&quot;keys&quot;:[&quot;ENTER&quot;]}
+13  click            {&quot;type&quot;:&quot;click&quot;,&quot;button&quot;:&quot;left&quot;,&quot;keys&quot;:null,&quot;x&quot;:1121,&quot;y&quot;:429}
+14  wait             {&quot;type&quot;:&quot;wait&quot;}</pre></details>
+    </div>
+  </div></div>
+
+<div class="foot">
+  <div>Grading: a run passes only if every check passes when evaluated inside the desktop after the agent stops. The agent's own report of success is shown but never counted.</div>
+  <div style="margin-top:8px">openai · gpt-5.6-terra · effort high · concurrency 2 · passk 0.1.1 @ 6358e03 · safety allow · system prompt 6a01640dbd508353 · node v24.18.0 · @solarisdk/sdk@unknown, @anthropic-ai/sdk@unknown, openai@unknown</div>
+  <div style="margin-top:4px">task hash <code>0d18c7eb59a81bd2</code></div>
+  <div style="margin-top:4px">verifier validated before the bench: 1/1 goal checks fail on the untouched snapshot, as they should; all 1 checks pass after the golden steps</div>
+  <details><summary>checks as run</summary><pre>{&quot;type&quot;:&quot;exec&quot;,&quot;cmd&quot;:&quot;python3&quot;,&quot;args&quot;:[&quot;/root/app/check.py&quot;],&quot;stdout_contains&quot;:&quot;ALL_OK&quot;}</pre></details>
+</div>
+<script type="application/json" id="bench">{"status":"complete","taskId":"ticket-queue","taskName":"Triage tickets in an internal web tool","prompt":"The support queue is open in the browser. Assign all of Acme Ltd's open tickets to Dana, and set the ticket about the login outage to urgent priority. Save each row you change.\n","model":"gpt-5.6-terra","snapshotId":"snap_dl58ex84y8it","k":10,"startedAt":"2026-09-10T07:43:17.172Z","finishedAt":"2026-09-10T07:48:11.527Z","runs":[{"runIndex":0,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzU5OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjIxMjIzMA.imP55N5MeZbsu-Zo_iGmAp0mE5LX2jpeYBt_RdsrfXk","status":"passed","startedAt":"2026-09-10T07:43:17.241Z","finishedAt":"2026-09-10T07:44:13.549Z","durationMs":56308,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:43:38.028Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":832,"y":381},"startedAt":"2026-09-10T07:43:45.684Z","durationMs":446},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["HOME"]},"startedAt":"2026-09-10T07:43:46.130Z","durationMs":361},{"index":3,"name":"type","input":{"type":"type","text":"urgent"},"startedAt":"2026-09-10T07:43:46.491Z","durationMs":503},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:43:46.995Z","durationMs":332},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":967,"y":381},"startedAt":"2026-09-10T07:43:47.327Z","durationMs":435},{"index":6,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:43:47.762Z","durationMs":415},{"index":7,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:43:48.177Z","durationMs":378},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1118,"y":381},"startedAt":"2026-09-10T07:43:53.805Z","durationMs":543},{"index":9,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:43:54.348Z","durationMs":2004},{"index":10,"name":"click","input":{"type":"click","button":"left","keys":null,"x":969,"y":429},"startedAt":"2026-09-10T07:44:00.662Z","durationMs":458},{"index":11,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:44:01.120Z","durationMs":430},{"index":12,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:44:01.550Z","durationMs":463},{"index":13,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1118,"y":429},"startedAt":"2026-09-10T07:44:05.268Z","durationMs":477},{"index":14,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:44:05.745Z","durationMs":2001}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"Assigned Acme Ltd’s open tickets to Dana and set the login outage ticket to urgent, saving both rows.","stoppedBy":"end_turn","usage":{"inputTokens":23396,"outputTokens":380,"costUsd":0.051352}},{"runIndex":1,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzYwOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjIxMzA2OQ.f89naecXJwkEvxtvHyxcCsvr9spTFC3JyhTzcGtlb9w","status":"passed","startedAt":"2026-09-10T07:43:17.242Z","finishedAt":"2026-09-10T07:44:15.952Z","durationMs":58710,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:43:38.151Z","durationMs":1},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":827,"y":381},"startedAt":"2026-09-10T07:43:44.409Z","durationMs":430},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["U"]},"startedAt":"2026-09-10T07:43:44.839Z","durationMs":352},{"index":3,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:43:45.191Z","durationMs":346},{"index":4,"name":"click","input":{"type":"click","button":"left","keys":null,"x":968,"y":381},"startedAt":"2026-09-10T07:43:51.947Z","durationMs":442},{"index":5,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:43:52.390Z","durationMs":376},{"index":6,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:43:52.766Z","durationMs":394},{"index":7,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1121,"y":381},"startedAt":"2026-09-10T07:43:56.793Z","durationMs":452},{"index":8,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:43:57.246Z","durationMs":2000},{"index":9,"name":"click","input":{"type":"click","button":"left","keys":null,"x":970,"y":429},"startedAt":"2026-09-10T07:44:03.358Z","durationMs":438},{"index":10,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:44:03.797Z","durationMs":389},{"index":11,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:44:04.187Z","durationMs":393},{"index":12,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":429},"startedAt":"2026-09-10T07:44:08.312Z","durationMs":444},{"index":13,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:44:08.757Z","durationMs":2000}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is set to urgent.","stoppedBy":"end_turn","usage":{"inputTokens":31260,"outputTokens":414,"costUsd":0.067488}},{"runIndex":2,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzYxOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjI2OTI3Mg.TIfV2lHeTVIRz28hTOZBS7T6jcGjvq_Ysb5VushhcVY","status":"passed","startedAt":"2026-09-10T07:44:15.657Z","finishedAt":"2026-09-10T07:45:29.627Z","durationMs":73970,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:44:35.923Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":828,"y":382},"startedAt":"2026-09-10T07:44:43.252Z","durationMs":435},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["U"]},"startedAt":"2026-09-10T07:44:43.687Z","durationMs":336},{"index":3,"name":"click","input":{"type":"click","button":"left","keys":null,"x":968,"y":381},"startedAt":"2026-09-10T07:44:48.158Z","durationMs":455},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:44:48.613Z","durationMs":345},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":977,"y":381},"startedAt":"2026-09-10T07:44:53.615Z","durationMs":654},{"index":6,"name":"click","input":{"type":"click","button":"left","keys":null,"x":945,"y":455},"startedAt":"2026-09-10T07:44:58.839Z","durationMs":448},{"index":7,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1119,"y":381},"startedAt":"2026-09-10T07:45:03.426Z","durationMs":433},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":932,"y":430},"startedAt":"2026-09-10T07:45:09.254Z","durationMs":449},{"index":9,"name":"click","input":{"type":"click","button":"left","keys":null,"x":945,"y":503},"startedAt":"2026-09-10T07:45:16.236Z","durationMs":445},{"index":10,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":428},"startedAt":"2026-09-10T07:45:23.334Z","durationMs":432}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage is marked urgent.","stoppedBy":"end_turn","usage":{"inputTokens":62993,"outputTokens":704,"costUsd":0.134434}},{"runIndex":3,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzYyOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjI3MDAzMg.oCBeNLtnhUTkxpD2Fz-0nL63psxjBJJXABMe0_XH6-o","status":"passed","startedAt":"2026-09-10T07:44:16.310Z","finishedAt":"2026-09-10T07:45:07.609Z","durationMs":51299,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:44:34.856Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":832,"y":382},"startedAt":"2026-09-10T07:44:41.085Z","durationMs":448},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["HOME"]},"startedAt":"2026-09-10T07:44:41.533Z","durationMs":373},{"index":3,"name":"keypress","input":{"type":"keypress","keys":["U"]},"startedAt":"2026-09-10T07:44:41.907Z","durationMs":331},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:44:42.238Z","durationMs":335},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":968,"y":382},"startedAt":"2026-09-10T07:44:42.573Z","durationMs":500},{"index":6,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:44:43.073Z","durationMs":421},{"index":7,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:44:43.494Z","durationMs":388},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1119,"y":382},"startedAt":"2026-09-10T07:44:48.384Z","durationMs":476},{"index":9,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:44:48.861Z","durationMs":2003},{"index":10,"name":"click","input":{"type":"click","button":"left","keys":null,"x":972,"y":430},"startedAt":"2026-09-10T07:44:54.535Z","durationMs":630},{"index":11,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:44:55.165Z","durationMs":492},{"index":12,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:44:55.657Z","durationMs":416},{"index":13,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1118,"y":430},"startedAt":"2026-09-10T07:44:59.865Z","durationMs":663},{"index":14,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:45:00.529Z","durationMs":2001}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.","stoppedBy":"end_turn","usage":{"inputTokens":23325,"outputTokens":359,"costUsd":0.050958}},{"runIndex":4,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzY0OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjMyMTc3Mw.OwFQw2S2LhwmPWLa9jozeq9GtjlE6shr63aiOB2nuu0","status":"passed","startedAt":"2026-09-10T07:45:08.876Z","finishedAt":"2026-09-10T07:46:06.183Z","durationMs":57307,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:45:27.741Z","durationMs":0,"screenshot":"step-000.jpg"},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":825,"y":381},"startedAt":"2026-09-10T07:45:32.774Z","durationMs":451,"screenshot":"step-001.jpg"},{"index":2,"name":"click","input":{"type":"click","button":"left","keys":null,"x":820,"y":478},"startedAt":"2026-09-10T07:45:36.844Z","durationMs":602,"screenshot":"step-002.jpg"},{"index":3,"name":"click","input":{"type":"click","button":"left","keys":null,"x":971,"y":381},"startedAt":"2026-09-10T07:45:41.162Z","durationMs":497,"screenshot":"step-003.jpg"},{"index":4,"name":"click","input":{"type":"click","button":"left","keys":null,"x":947,"y":454},"startedAt":"2026-09-10T07:45:45.552Z","durationMs":465,"screenshot":"step-004.jpg"},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":380},"startedAt":"2026-09-10T07:45:49.037Z","durationMs":595,"screenshot":"step-005.jpg"},{"index":6,"name":"click","input":{"type":"click","button":"left","keys":null,"x":928,"y":430},"startedAt":"2026-09-10T07:45:53.100Z","durationMs":434,"screenshot":"step-006.jpg"},{"index":7,"name":"click","input":{"type":"click","button":"left","keys":null,"x":946,"y":503},"startedAt":"2026-09-10T07:45:56.946Z","durationMs":477,"screenshot":"step-007.jpg"},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":429},"startedAt":"2026-09-10T07:46:00.909Z","durationMs":473,"screenshot":"step-008.jpg"}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"Assigned both open Acme Ltd tickets to Dana, set the login outage to urgent, and saved both rows.","stoppedBy":"end_turn","usage":{"inputTokens":61921,"outputTokens":547,"costUsd":0.130406}},{"runIndex":5,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzY3OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjM0Mzc4OQ.Evx3e_e_k98L8IMKQyMjfI7aHIWAqlM5k6sRZsu1ueg","status":"passed","startedAt":"2026-09-10T07:45:31.041Z","finishedAt":"2026-09-10T07:46:21.730Z","durationMs":50689,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:45:49.782Z","durationMs":4},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":829,"y":381},"startedAt":"2026-09-10T07:45:56.650Z","durationMs":414},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["HOME"]},"startedAt":"2026-09-10T07:45:57.064Z","durationMs":326},{"index":3,"name":"keypress","input":{"type":"keypress","keys":["U"]},"startedAt":"2026-09-10T07:45:57.390Z","durationMs":384},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:45:57.774Z","durationMs":318},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":971,"y":381},"startedAt":"2026-09-10T07:45:58.092Z","durationMs":453},{"index":6,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:45:58.545Z","durationMs":439},{"index":7,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:45:58.985Z","durationMs":330},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1119,"y":382},"startedAt":"2026-09-10T07:46:02.503Z","durationMs":476},{"index":9,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:46:02.979Z","durationMs":2001},{"index":10,"name":"click","input":{"type":"click","button":"left","keys":null,"x":970,"y":430},"startedAt":"2026-09-10T07:46:09.595Z","durationMs":446},{"index":11,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:46:10.041Z","durationMs":351},{"index":12,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:10.392Z","durationMs":362},{"index":13,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1118,"y":429},"startedAt":"2026-09-10T07:46:14.868Z","durationMs":441},{"index":14,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:46:15.309Z","durationMs":2000}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.","stoppedBy":"end_turn","usage":{"inputTokens":23412,"outputTokens":378,"costUsd":0.05136}},{"runIndex":6,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzY4OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjM4MDIyNA.ViM1HK20pkuQt2Q3H5EZU4FMrzH8KbiZS5YM_x5Cw8I","status":"passed","startedAt":"2026-09-10T07:46:07.472Z","finishedAt":"2026-09-10T07:46:58.172Z","durationMs":50700,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:46:26.251Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":825,"y":381},"startedAt":"2026-09-10T07:46:32.063Z","durationMs":474},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["U"]},"startedAt":"2026-09-10T07:46:32.538Z","durationMs":337},{"index":3,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:32.876Z","durationMs":430},{"index":4,"name":"click","input":{"type":"click","button":"left","keys":null,"x":971,"y":381},"startedAt":"2026-09-10T07:46:33.306Z","durationMs":459},{"index":5,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:46:33.765Z","durationMs":357},{"index":6,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:34.122Z","durationMs":353},{"index":7,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1119,"y":382},"startedAt":"2026-09-10T07:46:37.916Z","durationMs":518},{"index":8,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:46:38.434Z","durationMs":2002},{"index":9,"name":"click","input":{"type":"click","button":"left","keys":null,"x":968,"y":430},"startedAt":"2026-09-10T07:46:45.474Z","durationMs":430},{"index":10,"name":"keypress","input":{"type":"keypress","keys":["D"]},"startedAt":"2026-09-10T07:46:45.905Z","durationMs":317},{"index":11,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:46.222Z","durationMs":340},{"index":12,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":430},"startedAt":"2026-09-10T07:46:50.883Z","durationMs":417},{"index":13,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:46:51.300Z","durationMs":2001}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"Assigned both open Acme Ltd tickets to Dana and set the login outage ticket to urgent, saving each changed row.","stoppedBy":"end_turn","usage":{"inputTokens":23404,"outputTokens":382,"costUsd":0.051392}},{"runIndex":7,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzY5OmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjM5NTI3MQ.ilG3iJaF0HYPfFRlWuDnuHtP7zjQnDXfsKcEjlsTSHg","status":"passed","startedAt":"2026-09-10T07:46:23.123Z","finishedAt":"2026-09-10T07:47:17.831Z","durationMs":54708,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:46:42.624Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":835,"y":381},"startedAt":"2026-09-10T07:46:48.988Z","durationMs":425},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["HOME"]},"startedAt":"2026-09-10T07:46:49.413Z","durationMs":351},{"index":3,"name":"type","input":{"type":"type","text":"urgent"},"startedAt":"2026-09-10T07:46:49.764Z","durationMs":370},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:50.134Z","durationMs":350},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":968,"y":380},"startedAt":"2026-09-10T07:46:53.847Z","durationMs":548},{"index":6,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:46:54.395Z","durationMs":726},{"index":7,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:46:55.121Z","durationMs":371},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":382},"startedAt":"2026-09-10T07:47:00.283Z","durationMs":447},{"index":9,"name":"click","input":{"type":"click","button":"left","keys":null,"x":928,"y":430},"startedAt":"2026-09-10T07:47:06.280Z","durationMs":427},{"index":10,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:47:06.707Z","durationMs":439},{"index":11,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:47:07.146Z","durationMs":361},{"index":12,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":430},"startedAt":"2026-09-10T07:47:11.335Z","durationMs":472}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage ticket is marked urgent.","stoppedBy":"end_turn","usage":{"inputTokens":31519,"outputTokens":455,"costUsd":0.068498}},{"runIndex":8,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzcyOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjQzMzg3NQ.XVFwTdUnqxnkjkb9_07dlORNDZPn303PhaofmePkHZY","status":"passed","startedAt":"2026-09-10T07:46:59.835Z","finishedAt":"2026-09-10T07:48:01.004Z","durationMs":61169,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:47:18.944Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":829,"y":381},"startedAt":"2026-09-10T07:47:23.919Z","durationMs":454},{"index":2,"name":"click","input":{"type":"click","button":"left","keys":null,"x":820,"y":479},"startedAt":"2026-09-10T07:47:27.968Z","durationMs":429},{"index":3,"name":"click","input":{"type":"click","button":"left","keys":null,"x":970,"y":381},"startedAt":"2026-09-10T07:47:31.998Z","durationMs":451},{"index":4,"name":"click","input":{"type":"click","button":"left","keys":null,"x":946,"y":453},"startedAt":"2026-09-10T07:47:36.009Z","durationMs":491},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":380},"startedAt":"2026-09-10T07:47:40.586Z","durationMs":434},{"index":6,"name":"click","input":{"type":"click","button":"left","keys":null,"x":934,"y":429},"startedAt":"2026-09-10T07:47:45.338Z","durationMs":432},{"index":7,"name":"click","input":{"type":"click","button":"left","keys":null,"x":947,"y":503},"startedAt":"2026-09-10T07:47:49.619Z","durationMs":512},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1119,"y":430},"startedAt":"2026-09-10T07:47:54.670Z","durationMs":586}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"Assigned Acme Ltd’s open tickets to Dana and marked the login outage ticket urgent, saving both rows.","stoppedBy":"end_turn","usage":{"inputTokens":61748,"outputTokens":508,"costUsd":0.129592}},{"runIndex":9,"sessionId":"ZGVza3RvcC1wb29sLWktMGIxMjAwMTljMjA4Nzc4Zjc6dm1fMDEyMzczOmNtdGtqODhoaDAwdmRvNDAxdHJjMHFleHg6MTc4OTAyNjQ1MzY5MA.BDXkw9Pop2wwbpqsUyrSZk0NWe_DYVr_i0OgHXonf58","status":"passed","startedAt":"2026-09-10T07:47:19.140Z","finishedAt":"2026-09-10T07:48:09.003Z","durationMs":49864,"steps":[{"index":0,"name":"screenshot","input":{"type":"screenshot"},"startedAt":"2026-09-10T07:47:39.772Z","durationMs":0},{"index":1,"name":"click","input":{"type":"click","button":"left","keys":null,"x":829,"y":381},"startedAt":"2026-09-10T07:47:45.783Z","durationMs":445},{"index":2,"name":"keypress","input":{"type":"keypress","keys":["HOME"]},"startedAt":"2026-09-10T07:47:46.228Z","durationMs":363},{"index":3,"name":"type","input":{"type":"type","text":"urgent"},"startedAt":"2026-09-10T07:47:46.591Z","durationMs":397},{"index":4,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:47:46.988Z","durationMs":404},{"index":5,"name":"click","input":{"type":"click","button":"left","keys":null,"x":971,"y":381},"startedAt":"2026-09-10T07:47:47.392Z","durationMs":440},{"index":6,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:47:47.832Z","durationMs":360},{"index":7,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:47:48.192Z","durationMs":331},{"index":8,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1120,"y":381},"startedAt":"2026-09-10T07:47:51.833Z","durationMs":442},{"index":9,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:47:52.275Z","durationMs":2003},{"index":10,"name":"click","input":{"type":"click","button":"left","keys":null,"x":973,"y":430},"startedAt":"2026-09-10T07:47:57.635Z","durationMs":448},{"index":11,"name":"type","input":{"type":"type","text":"Dana"},"startedAt":"2026-09-10T07:47:58.083Z","durationMs":434},{"index":12,"name":"keypress","input":{"type":"keypress","keys":["ENTER"]},"startedAt":"2026-09-10T07:47:58.517Z","durationMs":374},{"index":13,"name":"click","input":{"type":"click","button":"left","keys":null,"x":1121,"y":429},"startedAt":"2026-09-10T07:48:02.478Z","durationMs":451},{"index":14,"name":"wait","input":{"type":"wait"},"startedAt":"2026-09-10T07:48:02.929Z","durationMs":2001}],"checks":[{"check":{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"},"passed":true}],"finalScreenshot":"final.jpg","finalMessage":"All open Acme Ltd tickets are assigned to Dana, and the login outage is marked urgent.","stoppedBy":"end_turn","usage":{"inputTokens":23576,"outputTokens":418,"costUsd":0.052168}}],"metrics":{"requested":10,"n":10,"passed":10,"errored":0,"lost":{"solari":0,"provider":0,"verifier":0},"skipped":0,"passAt1":1,"passAt1Lower":0.7224598312333834,"passAt1Upper":1,"endToEnd":1,"passPowK":{"1":1,"2":1,"3":1,"4":1,"5":1,"6":1,"7":1,"8":1,"9":1,"10":1},"passPowKLower":{"1":0.7224598312333834,"2":0.5219482077457689,"3":0.3770866140805751,"4":0.2724299315690203,"5":0.19681968238427658,"6":0.14219431451875258,"7":0.10272968046956464,"8":0.07421806761470108,"9":0.05361957260338478,"10":0.03873798737384752},"passAtK":{"1":1,"2":1,"3":1,"4":1,"5":1,"6":1,"7":1,"8":1,"9":1,"10":1},"meanSteps":13,"medianSteps":14,"p95Steps":15,"minSteps":9,"maxSteps":15,"meanDurationMs":56472.4,"medianDurationMs":55508,"p95DurationMs":68209.55,"totalCostUsd":0.787648,"costPerSuccessUsd":0.0787648,"costPerPassingRunUsd":0.0787648},"failures":[],"provenance":{"passkVersion":"0.1.1","gitCommit":"6358e03","gitDirty":false,"provider":"openai","agent":"src/agent/openai.ts","systemPromptHash":"6a01640dbd508353","safety":"allow","model":"gpt-5.6-terra","effort":"high","concurrency":2,"node":"v24.18.0","packages":{"@solarisdk/sdk":"unknown","@anthropic-ai/sdk":"unknown","openai":"unknown"},"taskHash":"0d18c7eb59a81bd2","task":{"template":"default","resolution":"1280x720","max_steps":40,"id":"ticket-queue","name":"Triage tickets in an internal web tool","setup":[{"exec":"sh","args":["-c","mkdir -p /root/app"]},{"upload":"tasks/ticket-queue/server.py","to":"/root/app/server.py"},{"upload":"tasks/ticket-queue/tickets.json","to":"/root/app/tickets.json"},{"upload":"tasks/ticket-queue/check.py","to":"/root/app/check.py"},{"exec":"sh","args":["-c","cd /root/app && nohup python3 server.py 8080 >/root/app/server.log 2>&1 & sleep 1; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ || wget -q -O /dev/null http://127.0.0.1:8080/"]},{"click":[640,125]},{"press":"ctrl+l"},{"type":"http://127.0.0.1:8080/"},{"press":"Return"},{"wait":4}],"prompt":"The support queue is open in the browser. Assign all of Acme Ltd's open tickets to Dana, and set the ticket about the login outage to urgent priority. Save each row you change.\n","golden":[{"exec":"sh","args":["-c","curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\",\"priority\":\"urgent\"}' http://127.0.0.1:8080/api/tickets/101 && curl -s -X POST -H 'content-type: application/json' -d '{\"assignee\":\"Dana\"}' http://127.0.0.1:8080/api/tickets/102"]}],"checks":[{"type":"exec","cmd":"python3","args":["/root/app/check.py"],"stdout_contains":"ALL_OK"}]},"budgetUsd":null},"validation":{"at":"2026-09-10T07:43:17.168Z","ok":true,"notes":["1/1 goal checks fail on the untouched snapshot, as they should","all 1 checks pass after the golden steps"],"problems":[]}}</script>
+
+<div class="tip" id="tip"></div>
+<script>
+(function(){var t=document.getElementById('tip');document.addEventListener('mousemove',function(e){var el=e.target.closest&&e.target.closest('[data-tip]');if(!el){t.style.opacity=0;return;}t.textContent=el.getAttribute('data-tip');t.style.left=e.clientX+'px';t.style.top=e.clientY+'px';t.style.opacity=1;});})();
+</script>
+<script>
+(function(){function open(){var id=location.hash.slice(1),el=id&&document.getElementById(id);if(el&&el.tagName==='DETAILS'){el.open=true;el.scrollIntoView();}}addEventListener('hashchange',open);open();})();
+</script>
+</main></body></html>

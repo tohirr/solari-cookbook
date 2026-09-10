@@ -14,7 +14,8 @@ export_bench() {
   [ -n "$src" ] || { echo "missing: $2"; exit 1; }
   $P export "$src" "evidence/$name"
 }
-export_bench ticket-queue-baseline     "ticket-queue-2026-*"
+export_bench ticket-queue-baseline     "ticket-queue-2026-09-02*"
+export_bench ticket-queue-terra        "ticket-queue-2026-09-10T07-43*"
 export_bench ticket-queue-verify       "ticket-queue-verify-*"
 export_bench ticket-queue-reload       "ticket-queue-reload-*"
 export_bench invoice-entry             "invoice-entry-2026-09-03T01-4*"
@@ -35,6 +36,7 @@ done
 
 $P compare evidence/ticket-queue-baseline evidence/ticket-queue-reload  --out evidence/compare-ticket-queue-baseline-vs-reload >/dev/null
 $P compare evidence/ticket-queue-baseline evidence/ticket-queue-verify  --out evidence/compare-ticket-queue-baseline-vs-verify >/dev/null
+$P compare evidence/ticket-queue-baseline evidence/ticket-queue-terra   --out evidence/compare-ticket-queue-model >/dev/null
 $P compare evidence/notes-nodir evidence/notes                            --out evidence/compare-notes-environment >/dev/null
 $P compare evidence/rename-invoices evidence/rename-invoices-clarified   --out evidence/compare-invoices-prompt >/dev/null
 for f in evidence/compare-*/compare.html; do sed -i '' 's/\.png"/.jpg"/g' "$f"; done
