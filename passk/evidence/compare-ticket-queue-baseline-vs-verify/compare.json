@@ -188,8 +188,11 @@
       "medianDurationMs": 56142.5,
       "p95DurationMs": 71908.1,
       "totalCostUsd": 0.3504068000000001,
-      "costPerSuccessUsd": 0.0072854212765957466
-    }
+      "costPerSuccessUsd": 0.007455463829787235,
+      "costPerPassingRunUsd": 0.0072854212765957466
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "b": {
     "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/ticket-queue-verify",
@@ -377,8 +380,11 @@
       "medianDurationMs": 52936,
       "p95DurationMs": 72230,
       "totalCostUsd": 0.3515858,
-      "costPerSuccessUsd": 0.007339382978723405
-    }
+      "costPerSuccessUsd": 0.007480548936170213,
+      "costPerPassingRunUsd": 0.007339382978723405
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "heldFixed": [
     "snapshot",
@@ -396,7 +402,7 @@
     "medianSteps": 0,
     "p95Steps": 0,
     "medianDurationMs": -3206.5,
-    "costPerSuccessUsd": 0.00005396170212765804
+    "costPerSuccessUsd": 0.00002508510638297729
   },
   "fisherP": 1
 }

@@ -126,7 +126,7 @@ export function renderReport(b: BenchResult): string {
   ${endToEnd}
   <div class="card kpi"><b>${m.medianSteps}</b><span>median steps</span><span class="sub">${stepsSub}</span></div>
   <div class="card kpi"><b>${secs(m.medianDurationMs)}</b><span>median duration</span><span class="sub">${durSub}</span></div>
-  <div class="card kpi"><b>${usd(m.costPerSuccessUsd)}</b><span>per successful run</span><span class="sub">${usd(m.totalCostUsd, 2)} total model spend</span></div>
+  <div class="card kpi"><b>${usd(m.costPerSuccessUsd)}</b><span>per success</span><span class="sub">all scored spend ÷ passes · ${usd(m.totalCostUsd, 2)} total${m.costPerPassingRunUsd !== null && m.costPerPassingRunUsd !== undefined ? ` · ${usd(m.costPerPassingRunUsd)} per passing run` : ""}</span></div>
 </div>
 
 <h2>Effort per run</h2>

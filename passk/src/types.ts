@@ -223,6 +223,12 @@ export interface BenchMetrics {
   p95DurationMs: number;
   /** Model spend across all runs, from recorded token usage and a price table. Undefined prices count as zero. */
   totalCostUsd: number;
-  /** Mean model spend per passing run, the number that turns reliability into a budget line. */
+  /**
+   * Model spend across all scored attempts divided by the number of passes:
+   * what one success actually costs when the failures along the way are paid
+   * for too. The number that turns reliability into a budget line.
+   */
   costPerSuccessUsd: number | null;
+  /** Mean spend of the passing runs alone: how much a run costs when it goes well. Always <= costPerSuccessUsd. */
+  costPerPassingRunUsd: number | null;
 }

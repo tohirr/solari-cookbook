@@ -81,6 +81,10 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
   const durations = runs.map((r) => r.durationMs).sort((a, b) => a - b);
   const passedRuns = runs.filter((r) => r.status === "passed");
   const costPassed = passedRuns.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0);
+  // Every scored attempt is part of the price of a success: nine failures
+  // before the tenth pass are not free. Lost runs (infra) are excluded here
+  // and in n, and their spend is only in totalCostUsd.
+  const costScored = runs.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0);
   return {
     requested,
     n,
@@ -104,7 +108,8 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
     medianDurationMs: percentile(durations, 0.5),
     p95DurationMs: percentile(durations, 0.95),
     totalCostUsd: allRuns.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0),
-    costPerSuccessUsd: passedRuns.length ? costPassed / passedRuns.length : null,
+    costPerSuccessUsd: passedRuns.length ? costScored / passedRuns.length : null,
+    costPerPassingRunUsd: passedRuns.length ? costPassed / passedRuns.length : null,
   };
 }
 

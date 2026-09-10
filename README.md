@@ -45,7 +45,7 @@ Headline result so far, on the cheapest model available: an internal ticket
 tool went 47/50 → 47/49 → 49/49 across three prompts on one snapshot, and the
 bench explains why the middle one changed nothing. An accounts-payable entry
 task (PDF → mock ERP, with a duplicate trap and forbidden buttons) scored
-23/26 for 2.4 cents a run. Every number is in
+23/26 at 3.5 cents per success, failed attempts included. Every number is in
 [`passk/evidence/`](passk/evidence/) with screenshots and traces; start at
 [`passk/evidence/index.html`](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html).
 

@@ -188,8 +188,11 @@
       "medianDurationMs": 56142.5,
       "p95DurationMs": 71908.1,
       "totalCostUsd": 0.3504068000000001,
-      "costPerSuccessUsd": 0.0072854212765957466
-    }
+      "costPerSuccessUsd": 0.007455463829787235,
+      "costPerPassingRunUsd": 0.0072854212765957466
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "b": {
     "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/ticket-queue-reload",
@@ -377,8 +380,11 @@
       "medianDurationMs": 57840,
       "p95DurationMs": 78635.6,
       "totalCostUsd": 0.40428899999999995,
-      "costPerSuccessUsd": 0.008250795918367346
-    }
+      "costPerSuccessUsd": 0.008250795918367346,
+      "costPerPassingRunUsd": 0.008250795918367346
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "heldFixed": [
     "snapshot",
@@ -396,7 +402,7 @@
     "medianSteps": 3,
     "p95Steps": 6.800000000000001,
     "medianDurationMs": 1697.5,
-    "costPerSuccessUsd": 0.0009653746417715992
+    "costPerSuccessUsd": 0.0007953320885801104
   },
   "fisherP": 0.24242424242423155
 }

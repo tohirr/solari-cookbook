@@ -53,8 +53,11 @@
       "medianDurationMs": 138080,
       "p95DurationMs": 238753.2,
       "totalCostUsd": 0.0681132,
-      "costPerSuccessUsd": 0.01362264
-    }
+      "costPerSuccessUsd": 0.01362264,
+      "costPerPassingRunUsd": 0.01362264
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "b": {
     "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/rename-invoices-clarified",
@@ -110,8 +113,11 @@
       "medianDurationMs": 146425,
       "p95DurationMs": 281989.4,
       "totalCostUsd": 0.1015664,
-      "costPerSuccessUsd": 0.02031328
-    }
+      "costPerSuccessUsd": 0.02031328,
+      "costPerPassingRunUsd": 0.02031328
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "heldFixed": [
     "snapshot",

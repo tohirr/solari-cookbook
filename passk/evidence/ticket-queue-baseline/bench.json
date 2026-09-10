@@ -11287,7 +11287,8 @@
     "medianDurationMs": 56142.5,
     "p95DurationMs": 71908.1,
     "totalCostUsd": 0.3504068000000001,
-    "costPerSuccessUsd": 0.0072854212765957466
+    "costPerSuccessUsd": 0.007455463829787235,
+    "costPerPassingRunUsd": 0.0072854212765957466
   },
   "failures": [
     {

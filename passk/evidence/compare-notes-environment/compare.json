@@ -53,8 +53,11 @@
       "medianDurationMs": 101359,
       "p95DurationMs": 111694.6,
       "totalCostUsd": 0.10352460000000001,
-      "costPerSuccessUsd": 0.0277332
-    }
+      "costPerSuccessUsd": 0.051762300000000004,
+      "costPerPassingRunUsd": 0.0277332
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "b": {
     "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/notes",
@@ -110,8 +113,11 @@
       "medianDurationMs": 65836,
       "p95DurationMs": 105498,
       "totalCostUsd": 0.0255146,
-      "costPerSuccessUsd": 0.0051029199999999995
-    }
+      "costPerSuccessUsd": 0.0051029199999999995,
+      "costPerPassingRunUsd": 0.0051029199999999995
+    },
+    "systemPromptHash": null,
+    "safety": null
   },
   "heldFixed": [
     "prompt",
@@ -129,7 +135,7 @@
     "medianSteps": -21,
     "p95Steps": -23.6,
     "medianDurationMs": -35523,
-    "costPerSuccessUsd": -0.02263028
+    "costPerSuccessUsd": -0.04665938000000001
   },
   "fisherP": 0.1666666666666663
 }

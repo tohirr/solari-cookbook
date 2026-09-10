@@ -55,7 +55,9 @@ test("step and cost summaries", () => {
   assert.equal(m.maxSteps, 30);
   assert.equal(m.medianSteps, 24);
   assert.ok(Math.abs(m.totalCostUsd - 0.13) < 1e-9);
-  assert.ok(Math.abs((m.costPerSuccessUsd ?? 0) - 0.035) < 1e-9);
+  // 0.13 of scored spend bought 2 successes; the failed run's 0.06 is part of the price.
+  assert.ok(Math.abs((m.costPerSuccessUsd ?? 0) - 0.065) < 1e-9);
+  assert.ok(Math.abs((m.costPerPassingRunUsd ?? 0) - 0.035) < 1e-9);
 });
 
 test("percentile interpolates and handles empties", () => {
