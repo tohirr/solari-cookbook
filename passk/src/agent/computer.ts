@@ -44,10 +44,19 @@ const MODS: Record<string, string> = {
   control: "ctrl", ctrl: "ctrl", cmd: "super", command: "super", super: "super",
   win: "super", alt: "alt", option: "alt", shift: "shift", meta: "super",
 };
-function parseKeyChord(text: string): string[] {
+/**
+ * Punctuation by its X keysym name. xdotool rejects a bare "-" ("Invalid key
+ * sequence 'ctrl+-'"), which cost an agent its zoom-out on a live bench.
+ * "+" itself cannot appear inside a "+"-joined chord, so "plus" must be spelt.
+ */
+const KEYSYMS: Record<string, string> = {
+  "-": "minus", "=": "equal", ",": "comma", ".": "period", "/": "slash", "\\": "backslash", ";": "semicolon",
+  "'": "apostrophe", "[": "bracketleft", "]": "bracketright", "`": "grave", " ": "space",
+};
+export function parseKeyChord(text: string): string[] {
   // Single letters are lowercased so a chord never picks up an implicit shift
   // (ctrl+A → ctrl+shift+a, which opens Chrome's tab search and eats the next typing).
-  return text.split("+").map((k) => { const t = k.trim(); return MODS[t.toLowerCase()] ?? (t.length === 1 ? t.toLowerCase() : t); });
+  return text.split("+").map((k) => { const t = k.trim(); return MODS[t.toLowerCase()] ?? KEYSYMS[t] ?? (t.length === 1 ? t.toLowerCase() : t); });
 }
 const chord = (keys: string[]) => keys.join("+");
 
