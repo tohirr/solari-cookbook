@@ -1,6 +1,6 @@
 #!/bin/sh
 # A forty-second demo with no API spend: run a bench on the scripted provider so
-# the terminal shows the real flow (fork, run, check, report, gate), then open
+# the terminal shows the real flow (snapshot, validate the verifier, fork, run, check, report, gate), then open
 # the real evidence. Record this, or just watch it.
 #   sh demo.sh
 set -e

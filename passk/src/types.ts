@@ -156,6 +156,19 @@ export interface Provenance {
   budgetUsd: number | null;
 }
 
+/**
+ * What `passk run` proved about the verifier before forking the bench: the
+ * checks failed on the untouched snapshot, agreed with themselves twice, and
+ * passed after the task's golden steps. Recorded so a report can say the
+ * numbers were produced by a verifier that was shown to be sound, not assumed.
+ */
+export interface ValidationSummary {
+  at: string;
+  ok: boolean;
+  notes: string[];
+  problems: string[];
+}
+
 export interface BenchResult {
   /** "running" while runs are still being added (or the process died); "complete" after finalize. */
   status: "running" | "complete";
@@ -171,6 +184,8 @@ export interface BenchResult {
   metrics: BenchMetrics;
   failures: FailureAnalysis[];
   provenance: Provenance;
+  /** Absent on benches run with --no-validate, on resumed benches, and on benches that predate the fold. */
+  validation?: ValidationSummary;
 }
 
 export interface BenchMetrics {

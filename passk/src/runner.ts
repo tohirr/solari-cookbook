@@ -19,7 +19,7 @@ import { destroyDesktop, forkDesktop, isFake, solari, withReconnect } from "./de
 import { computeMetrics, estimateCostUsd } from "./metrics.js";
 import { collectProvenance } from "./provenance.js";
 import { renderReport } from "./report/html.js";
-import type { BenchResult, RunResult, Task } from "./types.js";
+import type { BenchResult, RunResult, Task, ValidationSummary } from "./types.js";
 
 export interface RunBenchOptions {
   task: Task;
@@ -34,6 +34,8 @@ export interface RunBenchOptions {
   resumeDir?: string;
   /** Test hook: throw after this many runs complete in this invocation, as if the process died. */
   abortAfter?: number;
+  /** The verifier check `run` performed before forking, to be recorded on the bench. */
+  validation?: ValidationSummary;
 }
 
 const runDirName = (i: number) => `run-${String(i).padStart(2, "0")}`;
@@ -100,6 +102,7 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   const bench: BenchResult = {
     status: "running", taskId: task.id, taskName: task.name, prompt: task.prompt, model: config.model,
     snapshotId, k, startedAt, finishedAt: startedAt, runs: existing, metrics: computeMetrics(existing, k), failures: [], provenance,
+    ...(opts.validation ? { validation: opts.validation } : {}),
   };
   const persist = () => {
     bench.runs = [...done.values()].sort((a, b) => a.runIndex - b.runIndex);

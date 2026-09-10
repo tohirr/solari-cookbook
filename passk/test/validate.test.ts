@@ -41,3 +41,20 @@ test("golden steps that do not satisfy the checks are reported", async () => {
   assert.equal(v.ok, false);
   assert.match(v.problems[0], /still fails after the golden steps/);
 });
+
+test("run records the validation it performed on the bench and in the report", async () => {
+  const { runBench } = await import("../src/runner.js");
+  const { renderReport } = await import("../src/report/html.js");
+  process.env.PASSK_SCRIPT = "pass";
+  const task = loadTask("tasks/fake.yaml");
+  const v = await validateTask(task);
+  const validation = { at: new Date().toISOString(), ok: true, notes: v.notes, problems: [] };
+  const { bench, dir } = await runBench({ task, k: 2, concurrency: 2, noClassify: true, validation });
+  const saved = JSON.parse(fs.readFileSync(path.join(dir, "bench.json"), "utf8"));
+  assert.deepEqual(saved.validation, validation);
+  assert.match(renderReport(bench), /verifier validated before the bench: 1\/1 goal checks fail/);
+  // A bench run without the check carries no claim about its verifier.
+  const bare = await runBench({ task, k: 1, concurrency: 1, noClassify: true });
+  assert.equal("validation" in bare.bench, false);
+  assert.doesNotMatch(renderReport(bare.bench), /verifier validated/);
+});

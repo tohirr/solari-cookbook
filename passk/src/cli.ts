@@ -2,21 +2,26 @@
 /**
  * passk — does your computer-use agent pass twice?
  *
- *   passk prepare tasks/notes.yaml            boot, set up, snapshot
- *   passk probe   tasks/notes.yaml            find ambiguities before benching
- *   passk run     tasks/notes.yaml --k 5      fork ×5, run, check, report
- *   passk report  runs/<dir>                  re-render report.html from bench.json
- *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold
- *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
- *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
- *   passk export  runs/<dir> evidence/<name>  copy a bench with only the screenshots that carry proof
- *   passk validate tasks/notes.yaml           prove the checks fail before and pass after the task's golden steps
- *   passk recommend runs/<dir>                what to change next, and what to keep fixed, from a finished bench
- *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
- *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
- *   passk studio                              the leaderboard on localhost, with your keys and a Run button that works
+ * The one command:
+ *   passk run tasks/notes.yaml --k 10        snapshot if needed, prove the verifier, fork ×10, run, check, report
  *
- * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met.
+ * After a first bench:
+ *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
+ *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold (CI)
+ *   passk probe   tasks/notes.yaml            what would the agent ask a human before acting?
+ *   passk recommend runs/<dir>                what to change next, and what to keep fixed
+ *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
+ *
+ * Pieces of `run`, on their own when you need one:
+ *   passk prepare  tasks/notes.yaml           boot, set up, snapshot
+ *   passk validate tasks/notes.yaml           prove the checks fail before and pass after the task's golden steps
+ *   passk report   runs/<dir>                 re-render report.html from bench.json
+ *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
+ *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof
+ *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
+ *   passk studio                              the leaderboard on localhost, with a Run button
+ *
+ * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met or the verifier is unsound.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -33,7 +38,7 @@ import { prepareTask } from "./prepare.js";
 import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
 import { findLatest, findResumable, runBench } from "./runner.js";
-import type { BenchResult } from "./types.js";
+import type { BenchResult, Task, ValidationSummary } from "./types.js";
 
 function flag(name: string, fallback?: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
@@ -70,8 +75,12 @@ async function main() {
       // What this sample size can establish, said before spending.
       feasibility(k, flag("require-lower") ? Number(flag("require-lower")) : undefined);
       if (!resumeDir && !flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
+      // Prove the verifier before paying for the agent. One fork, no model calls
+      // (unless a check is a screenshot judge). A resumed bench was validated
+      // when it started; --no-validate skips it while iterating on a task.
+      const validation = resumeDir || has("no-validate") ? undefined : await validateOrExit(task, flag("snapshot"));
       const { bench, dir } = await runBench({
-        task, k, resumeDir,
+        task, k, resumeDir, validation,
         abortAfter: process.env.PASSK_ABORT_AFTER ? Number(process.env.PASSK_ABORT_AFTER) : undefined,
         concurrency: flag("concurrency") ? Number(flag("concurrency")) : undefined,
         // PASSK_CLASSIFY=0 turns the LLM failure classification off without the flag.
@@ -105,10 +114,7 @@ async function main() {
     case "validate": {
       const task = loadTask(must(target));
       if (!readSnapshots()[task.id] && !flag("snapshot")) await prepareTask(task);
-      const v = await validateTask(task, flag("snapshot"));
-      for (const n of v.notes) console.log(`  · ${n}`);
-      for (const p of v.problems) console.log(`  ✗ ${p}`);
-      console.log(v.ok ? `\n${task.id}: the verifier is sound` : `\n${task.id}: ${v.problems.length} problem${v.problems.length === 1 ? "" : "s"}`);
+      const v = await printValidation(task, flag("snapshot"));
       process.exitCode = v.ok ? 0 : 2;
       return;
     }
@@ -173,28 +179,53 @@ async function main() {
     }
     default:
       console.log(`usage:
-  passk prepare <task.yaml>
-  passk probe   <task.yaml>
-  passk run     <task.yaml> [--k 5] [--concurrency 2] [--prepare] [--no-classify]
-                            [--budget 1.00] [--require 0.9] [--require-lower 0.7] [--snapshot snap_…]
-                            [--resume [runs/dir]]   finish an interrupted bench, or extend a finished one with a larger --k
-                            [--safety deny|allow]   what to do when the model raises a safety check (default deny)
-  passk report  <runs/dir>
-  passk gate    <runs/dir> [--require 0.9] [--require-lower 0.7]
-  passk compare <runs/A> <runs/B> [--out dir]
-  passk export  <runs/dir> <evidence/dir>
-  passk validate <task.yaml> [--snapshot snap_…]
-  passk recommend <runs/dir>
-  passk doctor
-  passk sweep
-  passk studio  [--port 8787] [--no-open]
-  passk classify <runs/dir>
+  passk run <task.yaml> [--k 5]     snapshot the task if needed, prove its verifier, fork ×k, run, check, report
 
-  --budget N         stop launching new runs once estimated model spend reaches $N
-  --require P        exit 2 unless observed pass@1 >= P
-  --require-lower P  exit 2 unless the 95% lower bound on pass@1 >= P (the stricter gate)`);
+      --k N              runs to fork from the snapshot (default 5)
+      --budget N         stop launching new runs once estimated model spend reaches $N
+      --require P        exit 2 unless observed pass@1 >= P
+      --require-lower P  exit 2 unless the 95% lower bound on pass@1 >= P (the stricter gate)
+      --concurrency N    forks in flight at once (default PASSK_CONCURRENCY or 2; match your Solari plan)
+      --resume [dir]     finish an interrupted bench, or extend a finished one with a larger --k
+      --snapshot snap_…  fork a specific snapshot instead of the task's own (paired experiments)
+      --prepare          re-snapshot even if one exists      --no-validate  skip the verifier check
+      --no-classify      skip the LLM failure classification  --safety deny|allow  on model safety checks
+
+  after a first bench:
+  passk compare <runs/A> <runs/B> [--out dir]      passk gate <runs/dir> [--require P] [--require-lower P]
+  passk probe <task.yaml>                          passk recommend <runs/dir>
+  passk doctor
+
+  pieces of run, on their own:
+  passk prepare <task.yaml>      passk validate <task.yaml> [--snapshot snap_…]      passk report <runs/dir>
+  passk classify <runs/dir>      passk export <runs/dir> <evidence/dir>              passk sweep
+  passk studio [--port 8787] [--no-open]`);
       process.exit(cmd ? 1 : 0);
   }
+}
+
+/** Run the verifier check and print it the same way whether `run` or `validate` asked. */
+async function printValidation(task: Task, snapshotId: string | undefined) {
+  const v = await validateTask(task, snapshotId);
+  for (const n of v.notes) console.log(`  · ${n}`);
+  for (const p of v.problems) console.log(`  ✗ ${p}`);
+  console.log(v.ok ? `verifier: sound` : `verifier: ${v.problems.length} problem${v.problems.length === 1 ? "" : "s"}`);
+  return v;
+}
+
+/**
+ * The verifier gate inside `run`. An unsound verifier makes every number
+ * downstream meaningless, so the bench does not start; exit 2 like a failed
+ * --require. Returns the summary that gets recorded on the bench.
+ */
+async function validateOrExit(task: Task, snapshotId: string | undefined): Promise<ValidationSummary> {
+  console.log(`validating the verifier on one fork …`);
+  const v = await printValidation(task, snapshotId);
+  if (!v.ok) {
+    console.error(`\nnot benching "${task.id}": fix the checks or golden steps above, or pass --no-validate to run anyway`);
+    process.exit(2);
+  }
+  return { at: new Date().toISOString(), ok: true, notes: v.notes, problems: [] };
 }
 
 /**
