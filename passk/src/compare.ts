@@ -147,7 +147,7 @@ export function formatComparison(c: Comparison): string {
     row("p95 steps", String(m.p95Steps), String(n.p95Steps), sign(c.delta.p95Steps)),
     row("median time", `${(m.medianDurationMs / 1000).toFixed(0)}s`, `${(n.medianDurationMs / 1000).toFixed(0)}s`, sign(Math.round(c.delta.medianDurationMs / 1000), "s")),
     row("cost / success", m.costPerSuccessUsd === null ? "—" : `$${m.costPerSuccessUsd.toFixed(3)}`, n.costPerSuccessUsd === null ? "—" : `$${n.costPerSuccessUsd.toFixed(3)}`, c.delta.costPerSuccessUsd === null ? "" : sign(Number(c.delta.costPerSuccessUsd.toFixed(3)), "")),
-    ...(c.checks ? [``, `by check (A → B), where either side missed:`, ...c.checks.filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => row(`  ${x.label}`.slice(0, 18), `${x.a.passed}/${x.a.n}`, `${x.b.passed}/${x.b.n}`, sign(Math.round(x.delta * 100), " pts")) + (x.label.length > 16 ? `   ${x.label}` : ""))] : []),
+    ...(c.checks ? [``, `by check, where either side missed (A · B · Δ):`, ...c.checks.filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => `  ${`${x.a.passed}/${x.a.n}`.padEnd(8)}${`${x.b.passed}/${x.b.n}`.padEnd(8)}${sign(Math.round(x.delta * 100), " pts").padEnd(10)}${x.label}${x.invariant ? "  (guard)" : ""}`)] : []),
     ``,
     `Fisher exact p = ${c.fisherP.toFixed(3)} for the pass/fail split${c.fisherP < 0.05 ? " (unlikely to be noise)" : " (consistent with noise at this sample size; the step and cost columns may still be informative)"}`,
   ];

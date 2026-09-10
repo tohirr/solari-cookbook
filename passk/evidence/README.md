@@ -16,6 +16,7 @@ Numbers are observed counts with a 95% Wilson interval. Runs lost to infrastruct
 | [ticket-queue-reload](ticket-queue-reload/report.html) | `gpt-5.6-luna` | 49/49 | 100% (93%–100%) | 100% | 18 | $0.008 | 1 |
 | [ticket-queue-terra](ticket-queue-terra/report.html) | `gpt-5.6-terra` | 10/10 | 100% (72%–100%) | 100% | 14 | $0.079 | 0 |
 | [ticket-queue-verify](ticket-queue-verify/report.html) | `gpt-5.6-luna` | 47/49 | 96% (86%–99%) | 80% | 15 | $0.007 | 1 |
+| [ticket-routing-reload](ticket-routing-reload/report.html) | `gpt-5.6-luna` | 14/20 | 70% (48%–85%) | 13% | 80 | $0.061 | 0 |
 | [ticket-routing](ticket-routing/report.html) | `gpt-5.6-luna` | 5/18 | 28% (12%–51%) | 0% | 56 | $0.126 | 2 |
 
 ## Comparisons
@@ -25,6 +26,7 @@ Numbers are observed counts with a 95% Wilson interval. Runs lost to infrastruct
 - [compare-ticket-queue-baseline-vs-reload](compare-ticket-queue-baseline-vs-reload/compare.html): changed **prompt**; passes 47/50 → 49/49, median steps 15 → 18, Fisher p = 0.24
 - [compare-ticket-queue-baseline-vs-verify](compare-ticket-queue-baseline-vs-verify/compare.html): changed **prompt**; passes 47/50 → 47/49, median steps 15 → 15, Fisher p = 1.00
 - [compare-ticket-queue-model](compare-ticket-queue-model/compare.html): changed **model**; passes 47/50 → 10/10, median steps 15 → 14, Fisher p = 1.00
+- [compare-ticket-routing-prompt](compare-ticket-routing-prompt/compare.html): changed **prompt**; passes 5/18 → 14/20, median steps 56 → 80, Fisher p = 0.02
 
 ## How to read the three ticket-queue benches
 

@@ -1,0 +1,708 @@
+{
+  "a": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/ticket-routing",
+    "taskId": "ticket-routing",
+    "taskName": "Route tickets to account owners with an SLA rule",
+    "prompt": "The support queue is open in the browser. Assign every open ticket to its customer's account owner; the owners are on the Team page. Any open ticket that has been open for more than three days should be high priority. Leave closed tickets alone. Save each row you change.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dlbhp1n5m8qr",
+    "taskHash": "351ec9495054c646",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"101\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"102\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"104\",\"assignee\",\"Priya\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"105\",\"assignee\",\"Priya\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"107\",\"assignee\",\"Sam\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"109\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"110\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"112\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"102\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"105\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"110\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"112\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"101\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"104\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"109\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"107\",\"priority\",\"high\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"untouched\",\"106\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"untouched\",\"103\",\"108\",\"111\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"count\",\"12\"],\"stdout_contains\":\"OK\",\"invariant\":true}]",
+    "metrics": {
+      "requested": 20,
+      "n": 18,
+      "passed": 5,
+      "errored": 2,
+      "lost": {
+        "solari": 2,
+        "provider": 0,
+        "verifier": 0
+      },
+      "skipped": 0,
+      "passAt1": 0.2777777777777778,
+      "passAt1Lower": 0.12499569146355476,
+      "passAt1Upper": 0.5087307754619452,
+      "endToEnd": 0.25,
+      "passPowK": {
+        "1": 0.2777777777777778,
+        "2": 0.06535947712418301,
+        "3": 0.012254901960784314,
+        "4": 0.0016339869281045752,
+        "5": 0.00011671335200746966,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0
+      },
+      "passPowKLower": {
+        "1": 0.12499569146355476,
+        "2": 0.015623922884452175,
+        "3": 0.0019529230443153566,
+        "4": 0.00024410696629930837,
+        "5": 0.000030512319043652708,
+        "6": 0.00000381390841701796,
+        "7": 4.767221197638315e-7,
+        "8": 5.958821099585168e-8,
+        "9": 7.448269636502677e-9,
+        "10": 9.310016134216518e-10,
+        "11": 1.1637119042332446e-10,
+        "12": 1.4545897413400443e-11,
+        "13": 1.818174505145921e-12,
+        "14": 2.2726397947212089e-13,
+        "15": 2.8407018258876863e-14,
+        "16": 3.550754889686139e-15,
+        "17": 4.43829062653917e-16,
+        "18": 5.547672057804772e-17
+      },
+      "passAtK": {
+        "1": 0.2777777777777778,
+        "2": 0.4901960784313726,
+        "3": 0.6495098039215687,
+        "4": 0.7663398692810457,
+        "5": 0.8497899159663865,
+        "6": 0.907563025210084,
+        "7": 0.946078431372549,
+        "8": 0.9705882352941176,
+        "9": 0.9852941176470589,
+        "10": 0.9934640522875817,
+        "11": 0.9975490196078431,
+        "12": 0.9992997198879552,
+        "13": 0.9998832866479925,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1
+      },
+      "meanSteps": 62.5,
+      "medianSteps": 56,
+      "p95Steps": 83.45,
+      "minSteps": 50,
+      "maxSteps": 86,
+      "meanDurationMs": 164861.27777777778,
+      "medianDurationMs": 159050,
+      "p95DurationMs": 215417.25,
+      "totalCostUsd": 0.6302206,
+      "costPerSuccessUsd": 0.12604412,
+      "costPerPassingRunUsd": 0.04363144,
+      "checks": [
+        {
+          "label": "101 Acme Ltd → Dana",
+          "invariant": false,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "102 Acme Ltd → Dana (was Sam)",
+          "invariant": false,
+          "passed": 12,
+          "n": 18
+        },
+        {
+          "label": "104 Acme Logistics → Priya",
+          "invariant": false,
+          "passed": 15,
+          "n": 18
+        },
+        {
+          "label": "105 Acme Logistics → Priya (was Dana, the other Acme's owner)",
+          "invariant": false,
+          "passed": 13,
+          "n": 18
+        },
+        {
+          "label": "107 Globex → Sam",
+          "invariant": false,
+          "passed": 12,
+          "n": 18
+        },
+        {
+          "label": "109 Initech → Dana",
+          "invariant": false,
+          "passed": 16,
+          "n": 18
+        },
+        {
+          "label": "110 Initech → Dana (was Priya)",
+          "invariant": false,
+          "passed": 9,
+          "n": 18
+        },
+        {
+          "label": "112 Acme Ltd → Dana",
+          "invariant": false,
+          "passed": 16,
+          "n": 18
+        },
+        {
+          "label": "102 open 6 days → high",
+          "invariant": false,
+          "passed": 12,
+          "n": 18
+        },
+        {
+          "label": "105 open 8 days → high",
+          "invariant": false,
+          "passed": 13,
+          "n": 18
+        },
+        {
+          "label": "110 open 7 days → high",
+          "invariant": false,
+          "passed": 9,
+          "n": 18
+        },
+        {
+          "label": "112 open 4 days → high",
+          "invariant": false,
+          "passed": 16,
+          "n": 18
+        },
+        {
+          "label": "101 open 1 day stays normal",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "104 open 2 days stays normal",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "109 open 2 days stays normal",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "107 already high stays high",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "106 already correct, untouched",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "closed tickets untouched",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        },
+        {
+          "label": "twelve tickets, none deleted",
+          "invariant": true,
+          "passed": 18,
+          "n": 18
+        }
+      ]
+    },
+    "systemPromptHash": "6a01640dbd508353",
+    "safety": "allow"
+  },
+  "b": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/ticket-routing-reload",
+    "taskId": "ticket-routing-reload",
+    "taskName": "Route tickets to account owners with an SLA rule (reload-and-confirm prompt)",
+    "prompt": "The support queue is open in the browser. Assign every open ticket to its customer's account owner; the owners are on the Team page. Any open ticket that has been open for more than three days should be high priority. Leave closed tickets alone. Save each row you change. When you are done, reload the page and confirm that each changed row still shows the new values after the reload; if a row reverted, fix it and save again.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dlbhp1n5m8qr",
+    "taskHash": "5529295f6ba5e4d1",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"101\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"102\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"104\",\"assignee\",\"Priya\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"105\",\"assignee\",\"Priya\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"107\",\"assignee\",\"Sam\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"109\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"110\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"112\",\"assignee\",\"Dana\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"102\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"105\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"110\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"112\",\"priority\",\"high\"],\"stdout_contains\":\"OK\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"101\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"104\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"109\",\"priority\",\"normal\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"field\",\"107\",\"priority\",\"high\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"untouched\",\"106\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"untouched\",\"103\",\"108\",\"111\"],\"stdout_contains\":\"OK\",\"invariant\":true},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"count\",\"12\"],\"stdout_contains\":\"OK\",\"invariant\":true}]",
+    "metrics": {
+      "requested": 20,
+      "n": 20,
+      "passed": 14,
+      "errored": 0,
+      "lost": {
+        "solari": 0,
+        "provider": 0,
+        "verifier": 0
+      },
+      "skipped": 0,
+      "passAt1": 0.7,
+      "passAt1Lower": 0.4810232237710205,
+      "passAt1Upper": 0.8545247260310062,
+      "endToEnd": 0.7,
+      "passPowK": {
+        "1": 0.7,
+        "2": 0.4789473684210526,
+        "3": 0.3192982456140351,
+        "4": 0.2066047471620227,
+        "5": 0.1291279669762642,
+        "6": 0.07747678018575851,
+        "7": 0.04427244582043344,
+        "8": 0.023839009287925695,
+        "9": 0.011919504643962847,
+        "10": 0.005417956656346749,
+        "11": 0.0021671826625387,
+        "12": 0.0007223942208462332,
+        "13": 0.0001805985552115583,
+        "14": 0.000025799793601651186,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0
+      },
+      "passPowKLower": {
+        "1": 0.4810232237710205,
+        "2": 0.2313833418070653,
+        "3": 0.11130076100294649,
+        "4": 0.05353825086580521,
+        "5": 0.025753142026531253,
+        "6": 0.012387859399835015,
+        "7": 0.005958848064130778,
+        "8": 0.002866344305769892,
+        "9": 0.0013787781783991412,
+        "10": 0.0006632243242386902,
+        "11": 0.0003190263025286513,
+        "12": 0.00015345906051008075,
+        "13": 0.00007381737200343114,
+        "14": 0.00003550787025139513,
+        "15": 0.0000170801102175692,
+        "16": 0.000008215929679219484,
+        "17": 0.000003952052980574162,
+        "18": 0.000001901029265229654,
+        "19": 9.144392256438226e-7,
+        "20": 4.398665042618672e-7
+      },
+      "passAtK": {
+        "1": 0.7,
+        "2": 0.9210526315789473,
+        "3": 0.9824561403508771,
+        "4": 0.9969040247678018,
+        "5": 0.9996130030959752,
+        "6": 0.9999742002063984,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1,
+        "17": 1,
+        "18": 1,
+        "19": 1,
+        "20": 1
+      },
+      "meanSteps": 76.6,
+      "medianSteps": 80,
+      "p95Steps": 84.05,
+      "minSteps": 57,
+      "maxSteps": 85,
+      "meanDurationMs": 176356.15,
+      "medianDurationMs": 168800,
+      "p95DurationMs": 239214.35,
+      "totalCostUsd": 0.8545978,
+      "costPerSuccessUsd": 0.0610427,
+      "costPerPassingRunUsd": 0.042566628571428566,
+      "checks": [
+        {
+          "label": "101 Acme Ltd → Dana",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "102 Acme Ltd → Dana (was Sam)",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "104 Acme Logistics → Priya",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "105 Acme Logistics → Priya (was Dana, the other Acme's owner)",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "107 Globex → Sam",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "109 Initech → Dana",
+          "invariant": false,
+          "passed": 19,
+          "n": 20
+        },
+        {
+          "label": "110 Initech → Dana (was Priya)",
+          "invariant": false,
+          "passed": 18,
+          "n": 20
+        },
+        {
+          "label": "112 Acme Ltd → Dana",
+          "invariant": false,
+          "passed": 14,
+          "n": 20
+        },
+        {
+          "label": "102 open 6 days → high",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "105 open 8 days → high",
+          "invariant": false,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "110 open 7 days → high",
+          "invariant": false,
+          "passed": 18,
+          "n": 20
+        },
+        {
+          "label": "112 open 4 days → high",
+          "invariant": false,
+          "passed": 14,
+          "n": 20
+        },
+        {
+          "label": "101 open 1 day stays normal",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "104 open 2 days stays normal",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "109 open 2 days stays normal",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "107 already high stays high",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "106 already correct, untouched",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "closed tickets untouched",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        },
+        {
+          "label": "twelve tickets, none deleted",
+          "invariant": true,
+          "passed": 20,
+          "n": 20
+        }
+      ]
+    },
+    "systemPromptHash": "6a01640dbd508353",
+    "safety": "allow"
+  },
+  "heldFixed": [
+    "snapshot",
+    "model",
+    "checks",
+    "system prompt",
+    "safety"
+  ],
+  "changed": [
+    "prompt"
+  ],
+  "warnings": [],
+  "powK": 5,
+  "delta": {
+    "passAt1": 0.42222222222222217,
+    "passPowK": 0.12901125362425672,
+    "medianSteps": 24,
+    "p95Steps": 0.5999999999999943,
+    "medianDurationMs": 9750,
+    "costPerSuccessUsd": -0.06500142
+  },
+  "fisherP": 0.021709799772380602,
+  "checks": [
+    {
+      "label": "110 Initech → Dana (was Priya)",
+      "invariant": false,
+      "a": {
+        "passed": 9,
+        "n": 18
+      },
+      "b": {
+        "passed": 18,
+        "n": 20
+      },
+      "delta": 0.4
+    },
+    {
+      "label": "110 open 7 days → high",
+      "invariant": false,
+      "a": {
+        "passed": 9,
+        "n": 18
+      },
+      "b": {
+        "passed": 18,
+        "n": 20
+      },
+      "delta": 0.4
+    },
+    {
+      "label": "102 Acme Ltd → Dana (was Sam)",
+      "invariant": false,
+      "a": {
+        "passed": 12,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.33333333333333337
+    },
+    {
+      "label": "107 Globex → Sam",
+      "invariant": false,
+      "a": {
+        "passed": 12,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.33333333333333337
+    },
+    {
+      "label": "102 open 6 days → high",
+      "invariant": false,
+      "a": {
+        "passed": 12,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.33333333333333337
+    },
+    {
+      "label": "105 Acme Logistics → Priya (was Dana, the other Acme's owner)",
+      "invariant": false,
+      "a": {
+        "passed": 13,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.2777777777777778
+    },
+    {
+      "label": "105 open 8 days → high",
+      "invariant": false,
+      "a": {
+        "passed": 13,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.2777777777777778
+    },
+    {
+      "label": "104 Acme Logistics → Priya",
+      "invariant": false,
+      "a": {
+        "passed": 15,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0.16666666666666663
+    },
+    {
+      "label": "109 Initech → Dana",
+      "invariant": false,
+      "a": {
+        "passed": 16,
+        "n": 18
+      },
+      "b": {
+        "passed": 19,
+        "n": 20
+      },
+      "delta": 0.061111111111111116
+    },
+    {
+      "label": "112 Acme Ltd → Dana",
+      "invariant": false,
+      "a": {
+        "passed": 16,
+        "n": 18
+      },
+      "b": {
+        "passed": 14,
+        "n": 20
+      },
+      "delta": -0.18888888888888888
+    },
+    {
+      "label": "112 open 4 days → high",
+      "invariant": false,
+      "a": {
+        "passed": 16,
+        "n": 18
+      },
+      "b": {
+        "passed": 14,
+        "n": 20
+      },
+      "delta": -0.18888888888888888
+    },
+    {
+      "label": "101 Acme Ltd → Dana",
+      "invariant": false,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "101 open 1 day stays normal",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "104 open 2 days stays normal",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "109 open 2 days stays normal",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "107 already high stays high",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "106 already correct, untouched",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "closed tickets untouched",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    },
+    {
+      "label": "twelve tickets, none deleted",
+      "invariant": true,
+      "a": {
+        "passed": 18,
+        "n": 18
+      },
+      "b": {
+        "passed": 20,
+        "n": 20
+      },
+      "delta": 0
+    }
+  ]
+}

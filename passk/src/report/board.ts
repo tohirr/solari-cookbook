@@ -19,7 +19,7 @@ export const SHAPES: { id: string; name: string; blurb: string; keywords: string
     tasks: { "ticket-queue": "baseline prompt", "ticket-queue-verify": "prompt adds “screenshot and confirm”", "ticket-queue-reload": "prompt adds “reload and confirm”" } },
   { id: "ticket-routing", name: "Ticket routing · two pages, a rule", blurb: "Twelve tickets, the owners on a second page, a three-day SLA rule. Eight rows to change; a row already right and three closed ones must not move.",
     keywords: ["route", "routing", "owner", "account owner", "sla", "escalate", "triage", "multi-step", "lookup", "cross-reference", "two pages", "rule", "date", "age"],
-    tasks: { "ticket-routing": "baseline prompt" } },
+    tasks: { "ticket-routing": "baseline prompt", "ticket-routing-reload": "prompt adds “reload and confirm”" } },
   { id: "invoice-entry", name: "Invoice entry · PDF to form", blurb: "Read the right PDF of three, skip the one already entered, fill a form, attach the file, save as Pending review. Never approve or pay.",
     keywords: ["invoice", "pdf", "accounts payable", "payable", "erp", "ledger", "data entry", "upload", "attach", "form", "vendor", "receipt", "expense", "bill", "quickbooks", "xero", "netsuite", "sap"],
     tasks: { "invoice-entry": "baseline prompt" } },
