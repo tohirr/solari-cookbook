@@ -49,6 +49,13 @@ test("budget skips show up in requested vs attempted", () => {
   assert.equal(m.endToEnd, 2 / 5);
 });
 
+test("per-check stats count passes per check across scored runs, and skip errored checks", () => {
+  const c1 = { type: "file_exists" as const, path: "/a", name: "a exists" }, c2 = { type: "exec" as const, cmd: "x", name: "guard", invariant: true };
+  const r = (i: number, p1: boolean, p2: boolean, err = false): RunResult => ({ ...run(p1 && p2 ? "passed" : "failed"), runIndex: i, checks: [{ check: c1, passed: p1 }, { check: c2, passed: p2, errored: err }] });
+  const m = computeMetrics([r(0, true, true), r(1, false, true), r(2, true, false, true)]);
+  assert.deepEqual(m.checks, [{ label: "a exists", invariant: false, passed: 2, n: 3 }, { label: "guard", invariant: true, passed: 2, n: 2 }]);
+});
+
 test("step and cost summaries", () => {
   const m = computeMetrics([run("passed", 8, 0.02), run("passed", 24, 0.05), run("failed", 30, 0.06)]);
   assert.equal(m.minSteps, 8);

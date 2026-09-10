@@ -79,12 +79,14 @@ async function main() {
       // (unless a check is a screenshot judge). A resumed bench was validated
       // when it started; --no-validate skips it while iterating on a task.
       const validation = resumeDir || has("no-validate") ? undefined : await validateOrExit(task, flag("snapshot"));
+      const noClassify = has("no-classify") || process.env.PASSK_CLASSIFY === "0";
+      if (noClassify) console.log(`classification off (${has("no-classify") ? "--no-classify" : "PASSK_CLASSIFY=0"}): failed runs will carry no hypothesis; \`passk classify <bench dir>\` adds them later`);
       const { bench, dir } = await runBench({
         task, k, resumeDir, validation,
         abortAfter: process.env.PASSK_ABORT_AFTER ? Number(process.env.PASSK_ABORT_AFTER) : undefined,
         concurrency: flag("concurrency") ? Number(flag("concurrency")) : undefined,
         // PASSK_CLASSIFY=0 turns the LLM failure classification off without the flag.
-        noClassify: has("no-classify") || process.env.PASSK_CLASSIFY === "0",
+        noClassify,
         budgetUsd: flag("budget") ? Number(flag("budget")) : undefined,
         // Fork a specific snapshot instead of the task's own. This is how a paired
         // experiment holds the environment fixed while the prompt changes.
@@ -151,6 +153,7 @@ async function main() {
       const dir = must(target);
       const bench = loadBench(dir);
       bench.failures = await classifyFailures(bench.provenance?.task ?? { id: bench.taskId, name: bench.taskName, prompt: bench.prompt, checks: [] }, bench.runs, dir);
+      bench.classified = true;
       fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
       fs.writeFileSync(path.join(dir, "report.html"), renderReport(bench));
       for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause} (${f.confidence} confidence${f.divergenceStep !== null ? `, diverges @${f.divergenceStep}` : ""}) — ${f.explanation}`);

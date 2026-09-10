@@ -137,6 +137,7 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
   bench.runs = [...done.values()].sort((a, b) => a.runIndex - b.runIndex);
   bench.metrics = computeMetrics(bench.runs, k);
   bench.failures = opts.noClassify ? [] : await classifyFailures(task, bench.runs, dir);
+  bench.classified = !opts.noClassify;
   bench.status = "complete";
   bench.finishedAt = new Date().toISOString();
   fs.writeFileSync(path.join(dir, "bench.json"), JSON.stringify(bench, null, 2));
@@ -147,7 +148,24 @@ export async function runBench(opts: RunBenchOptions): Promise<{ bench: BenchRes
 /** Run indices currently holding a desktop in this process. Anything tagged with this task and not in here is a leak. */
 const liveRuns = new Set<string>();
 
+/**
+ * A fork that dies before the agent's first action (channel lost, WebSocket
+ * error) has no agent state to lose, so it is forked again once before the
+ * run is written off as a desktop loss. Later losses are not retried: the
+ * agent may have changed state, and a second attempt would not be the same run.
+ */
 async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir: string): Promise<RunResult> {
+  for (let attempt = 1; ; attempt++) {
+    const r = await runOneAttempt(task, snapshotId, runIndex, benchDir);
+    if (r.status === "errored" && r.errorKind === "solari" && r.steps.length === 0 && attempt === 1) {
+      console.warn(`[run ${runIndex}] desktop lost before the first action (${r.error}); forking again`);
+      continue;
+    }
+    return r;
+  }
+}
+
+async function runOneAttempt(task: Task, snapshotId: string, runIndex: number, benchDir: string): Promise<RunResult> {
   const outDir = path.join(benchDir, runDirName(runIndex));
   fs.mkdirSync(outDir, { recursive: true });
   const started = Date.now();

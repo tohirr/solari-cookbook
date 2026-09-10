@@ -33,6 +33,8 @@ export interface Comparison {
   };
   /** Two-sided Fisher exact test on passed/failed counts. */
   fisherP: number;
+  /** Per check, when the checks were held fixed: what an intervention fixed and what it did not. Worst on side A first. */
+  checks?: { label: string; invariant: boolean; a: { passed: number; n: number }; b: { passed: number; n: number }; delta: number }[];
 }
 
 interface Side {
@@ -97,6 +99,13 @@ export function compareBenches(dirA: string, dirB: string): Comparison {
       costPerSuccessUsd: m.costPerSuccessUsd !== null && n.costPerSuccessUsd !== null ? n.costPerSuccessUsd - m.costPerSuccessUsd : null,
     },
     fisherP: fisherExact(m.passed, m.n - m.passed, n.passed, n.n - n.passed),
+    ...(A.checks === B.checks && A.checks !== "null" && m.checks?.length > 1 && m.checks.length === n.checks?.length
+      ? { checks: m.checks.map((ca, i) => {
+          const cb = n.checks[i];
+          const ra = ca.n ? ca.passed / ca.n : 1, rb = cb.n ? cb.passed / cb.n : 1;
+          return { label: ca.label, invariant: ca.invariant, a: { passed: ca.passed, n: ca.n }, b: { passed: cb.passed, n: cb.n }, delta: rb - ra };
+        }).sort((x, y) => (x.a.n ? x.a.passed / x.a.n : 1) - (y.a.n ? y.a.passed / y.a.n : 1)) }
+      : {}),
   };
 }
 
@@ -138,6 +147,7 @@ export function formatComparison(c: Comparison): string {
     row("p95 steps", String(m.p95Steps), String(n.p95Steps), sign(c.delta.p95Steps)),
     row("median time", `${(m.medianDurationMs / 1000).toFixed(0)}s`, `${(n.medianDurationMs / 1000).toFixed(0)}s`, sign(Math.round(c.delta.medianDurationMs / 1000), "s")),
     row("cost / success", m.costPerSuccessUsd === null ? "—" : `$${m.costPerSuccessUsd.toFixed(3)}`, n.costPerSuccessUsd === null ? "—" : `$${n.costPerSuccessUsd.toFixed(3)}`, c.delta.costPerSuccessUsd === null ? "" : sign(Number(c.delta.costPerSuccessUsd.toFixed(3)), "")),
+    ...(c.checks ? [``, `by check (A → B), where either side missed:`, ...c.checks.filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => row(`  ${x.label}`.slice(0, 18), `${x.a.passed}/${x.a.n}`, `${x.b.passed}/${x.b.n}`, sign(Math.round(x.delta * 100), " pts")) + (x.label.length > 16 ? `   ${x.label}` : ""))] : []),
     ``,
     `Fisher exact p = ${c.fisherP.toFixed(3)} for the pass/fail split${c.fisherP < 0.05 ? " (unlikely to be noise)" : " (consistent with noise at this sample size; the step and cost columns may still be informative)"}`,
   ];

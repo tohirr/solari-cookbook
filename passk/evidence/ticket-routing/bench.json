@@ -20027,7 +20027,123 @@
     "p95DurationMs": 215417.25,
     "totalCostUsd": 0.6302206,
     "costPerSuccessUsd": 0.12604412,
-    "costPerPassingRunUsd": 0.04363144
+    "costPerPassingRunUsd": 0.04363144,
+    "checks": [
+      {
+        "label": "101 Acme Ltd → Dana",
+        "invariant": false,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "102 Acme Ltd → Dana (was Sam)",
+        "invariant": false,
+        "passed": 12,
+        "n": 18
+      },
+      {
+        "label": "104 Acme Logistics → Priya",
+        "invariant": false,
+        "passed": 15,
+        "n": 18
+      },
+      {
+        "label": "105 Acme Logistics → Priya (was Dana, the other Acme's owner)",
+        "invariant": false,
+        "passed": 13,
+        "n": 18
+      },
+      {
+        "label": "107 Globex → Sam",
+        "invariant": false,
+        "passed": 12,
+        "n": 18
+      },
+      {
+        "label": "109 Initech → Dana",
+        "invariant": false,
+        "passed": 16,
+        "n": 18
+      },
+      {
+        "label": "110 Initech → Dana (was Priya)",
+        "invariant": false,
+        "passed": 9,
+        "n": 18
+      },
+      {
+        "label": "112 Acme Ltd → Dana",
+        "invariant": false,
+        "passed": 16,
+        "n": 18
+      },
+      {
+        "label": "102 open 6 days → high",
+        "invariant": false,
+        "passed": 12,
+        "n": 18
+      },
+      {
+        "label": "105 open 8 days → high",
+        "invariant": false,
+        "passed": 13,
+        "n": 18
+      },
+      {
+        "label": "110 open 7 days → high",
+        "invariant": false,
+        "passed": 9,
+        "n": 18
+      },
+      {
+        "label": "112 open 4 days → high",
+        "invariant": false,
+        "passed": 16,
+        "n": 18
+      },
+      {
+        "label": "101 open 1 day stays normal",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "104 open 2 days stays normal",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "109 open 2 days stays normal",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "107 already high stays high",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "106 already correct, untouched",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "closed tickets untouched",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      },
+      {
+        "label": "twelve tickets, none deleted",
+        "invariant": true,
+        "passed": 18,
+        "n": 18
+      }
+    ]
   },
   "failures": [
     {

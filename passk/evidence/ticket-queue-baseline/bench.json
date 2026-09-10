@@ -11288,7 +11288,15 @@
     "p95DurationMs": 71908.1,
     "totalCostUsd": 0.3504068000000001,
     "costPerSuccessUsd": 0.007455463829787235,
-    "costPerPassingRunUsd": 0.0072854212765957466
+    "costPerPassingRunUsd": 0.0072854212765957466,
+    "checks": [
+      {
+        "label": "exec python3 /root/app/check.py",
+        "invariant": false,
+        "passed": 47,
+        "n": 50
+      }
+    ]
   },
   "failures": [
     {

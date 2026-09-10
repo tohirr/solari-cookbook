@@ -14381,7 +14381,15 @@
     "p95DurationMs": 226344,
     "totalCostUsd": 0.7944168,
     "costPerSuccessUsd": 0.03453986086956522,
-    "costPerPassingRunUsd": 0.0243024
+    "costPerPassingRunUsd": 0.0243024,
+    "checks": [
+      {
+        "label": "exec python3 /root/ledgerdesk/check.py",
+        "invariant": false,
+        "passed": 23,
+        "n": 26
+      }
+    ]
   },
   "failures": [
     {

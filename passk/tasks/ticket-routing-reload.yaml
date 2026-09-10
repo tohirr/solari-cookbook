@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=../schema/task.schema.json
+# ticket-routing with one sentence added to the prompt: reload and confirm.
+# Same setup, same checks, same golden steps, so it forks the routing
+# snapshot (--snapshot) and compare holds everything but the prompt fixed.
+# The baseline's failures were rows never saved; this asks the agent to
+# read the state back from the server instead of trusting the screen.
+id: ticket-routing-reload
+name: Route tickets to account owners with an SLA rule (reload-and-confirm prompt)
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/app"]
+  - upload: tasks/ticket-routing/server.py
+    to: /root/app/server.py
+  - upload: tasks/ticket-routing/tickets.json
+    to: /root/app/tickets.json
+  - upload: tasks/ticket-routing/team.json
+    to: /root/app/team.json
+  - upload: tasks/ticket-routing/check.py
+    to: /root/app/check.py
+  - exec: sh
+    args: ["-c", "cd /root/app && nohup python3 server.py 8080 >/root/app/server.log 2>&1 & sleep 1; curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/ || wget -q -O /dev/null http://127.0.0.1:8080/"]
+  - click: [640, 125]
+  - press: ctrl+l
+  - type: "http://127.0.0.1:8080/"
+  - press: Return
+  - wait: 4
+prompt: >
+  The support queue is open in the browser. Assign every open ticket to its
+  customer's account owner; the owners are on the Team page. Any open ticket
+  that has been open for more than three days should be high priority. Leave
+  closed tickets alone. Save each row you change. When you are done, reload
+  the page and confirm that each changed row still shows the new values after
+  the reload; if a row reverted, fix it and save again.
+golden:
+  - exec: sh
+    args: ["-c", "cd /root/app && for x in '101 Dana normal' '102 Dana high' '104 Priya normal' '105 Priya high' '107 Sam high' '109 Dana normal' '110 Dana high' '112 Dana high'; do set -- $x; curl -s -o /dev/null -X POST -H 'content-type: application/json' -d \"{\\\"assignee\\\":\\\"$2\\\",\\\"priority\\\":\\\"$3\\\"}\" http://127.0.0.1:8080/api/tickets/$1; done"]
+checks:
+  # Routing: one check per open ticket that needs an owner.
+  - { name: "101 Acme Ltd → Dana",            type: exec, cmd: python3, args: ["/root/app/check.py", "field", "101", "assignee", "Dana"],  stdout_contains: "OK" }
+  - { name: "102 Acme Ltd → Dana (was Sam)",  type: exec, cmd: python3, args: ["/root/app/check.py", "field", "102", "assignee", "Dana"],  stdout_contains: "OK" }
+  - { name: "104 Acme Logistics → Priya",     type: exec, cmd: python3, args: ["/root/app/check.py", "field", "104", "assignee", "Priya"], stdout_contains: "OK" }
+  - { name: "105 Acme Logistics → Priya (was Dana, the other Acme's owner)", type: exec, cmd: python3, args: ["/root/app/check.py", "field", "105", "assignee", "Priya"], stdout_contains: "OK" }
+  - { name: "107 Globex → Sam",               type: exec, cmd: python3, args: ["/root/app/check.py", "field", "107", "assignee", "Sam"],   stdout_contains: "OK" }
+  - { name: "109 Initech → Dana",             type: exec, cmd: python3, args: ["/root/app/check.py", "field", "109", "assignee", "Dana"],  stdout_contains: "OK" }
+  - { name: "110 Initech → Dana (was Priya)", type: exec, cmd: python3, args: ["/root/app/check.py", "field", "110", "assignee", "Dana"],  stdout_contains: "OK" }
+  - { name: "112 Acme Ltd → Dana",            type: exec, cmd: python3, args: ["/root/app/check.py", "field", "112", "assignee", "Dana"],  stdout_contains: "OK" }
+  # The SLA rule: raised where older than three days, left alone where not.
+  - { name: "102 open 6 days → high",         type: exec, cmd: python3, args: ["/root/app/check.py", "field", "102", "priority", "high"],  stdout_contains: "OK" }
+  - { name: "105 open 8 days → high",         type: exec, cmd: python3, args: ["/root/app/check.py", "field", "105", "priority", "high"],  stdout_contains: "OK" }
+  - { name: "110 open 7 days → high",         type: exec, cmd: python3, args: ["/root/app/check.py", "field", "110", "priority", "high"],  stdout_contains: "OK" }
+  - { name: "112 open 4 days → high",         type: exec, cmd: python3, args: ["/root/app/check.py", "field", "112", "priority", "high"],  stdout_contains: "OK" }
+  - { name: "101 open 1 day stays normal",    type: exec, cmd: python3, args: ["/root/app/check.py", "field", "101", "priority", "normal"], stdout_contains: "OK", invariant: true }
+  - { name: "104 open 2 days stays normal",   type: exec, cmd: python3, args: ["/root/app/check.py", "field", "104", "priority", "normal"], stdout_contains: "OK", invariant: true }
+  - { name: "109 open 2 days stays normal",   type: exec, cmd: python3, args: ["/root/app/check.py", "field", "109", "priority", "normal"], stdout_contains: "OK", invariant: true }
+  - { name: "107 already high stays high",    type: exec, cmd: python3, args: ["/root/app/check.py", "field", "107", "priority", "high"],  stdout_contains: "OK", invariant: true }
+  # Guards: what must not happen.
+  - { name: "106 already correct, untouched", type: exec, cmd: python3, args: ["/root/app/check.py", "untouched", "106"],           stdout_contains: "OK", invariant: true }
+  - { name: "closed tickets untouched",       type: exec, cmd: python3, args: ["/root/app/check.py", "untouched", "103", "108", "111"], stdout_contains: "OK", invariant: true }
+  - { name: "twelve tickets, none deleted",   type: exec, cmd: python3, args: ["/root/app/check.py", "count", "12"],                 stdout_contains: "OK", invariant: true }
+max_steps: 80

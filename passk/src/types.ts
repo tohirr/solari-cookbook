@@ -194,6 +194,17 @@ export interface BenchResult {
   provenance: Provenance;
   /** Absent on benches run with --no-validate, on resumed benches, and on benches that predate the fold. */
   validation?: ValidationSummary;
+  /** False when classification was switched off for the run, so an empty `failures` is not mistaken for "nothing to explain". */
+  classified?: boolean;
+}
+
+/** One check across the scored runs of a bench: how often it passed. */
+export interface CheckStat {
+  label: string;
+  invariant: boolean;
+  passed: number;
+  /** Runs where this check ran without erroring. */
+  n: number;
 }
 
 export interface BenchMetrics {
@@ -239,4 +250,6 @@ export interface BenchMetrics {
   costPerSuccessUsd: number | null;
   /** Mean spend of the passing runs alone: how much a run costs when it goes well. Always <= costPerSuccessUsd. */
   costPerPassingRunUsd: number | null;
+  /** Pass count per check, in task order. Turns a pass rate into which rule fails. */
+  checks: CheckStat[];
 }

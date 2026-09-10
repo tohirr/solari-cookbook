@@ -751,7 +751,15 @@
     "p95DurationMs": 105498,
     "totalCostUsd": 0.0255146,
     "costPerSuccessUsd": 0.0051029199999999995,
-    "costPerPassingRunUsd": 0.0051029199999999995
+    "costPerPassingRunUsd": 0.0051029199999999995,
+    "checks": [
+      {
+        "label": "exec sh -c cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null",
+        "invariant": false,
+        "passed": 5,
+        "n": 5
+      }
+    ]
   },
   "failures": [],
   "provenance": {

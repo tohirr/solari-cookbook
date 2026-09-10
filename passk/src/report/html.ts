@@ -54,6 +54,7 @@ function runCard(b: BenchResult, r: RunResult, id: boolean): string {
     <div>
       <div class="checks">${checks}${r.error ? `<div class="bad">${esc(r.error)}</div>` : ""}</div>
       ${film ? `<div class="film">${film}</div>` : ""}
+      <div class="acts">${esc(actionSummary(r))}</div>
       ${f ? `<div class="hyp"><b>Hypothesis: ${esc(f.cause.replace(/_/g, " "))}</b> · ${esc(f.confidence)} confidence${f.divergenceStep !== null ? ` · diverges from the passing reference at step ${f.divergenceStep}` : f.referencePassed ? "" : " · no passing run to compare against"}<div style="margin-top:4px">${esc(f.explanation)}</div></div>` : ""}
       ${r.finalMessage ? `<div class="note">Agent's own claim: “${esc(r.finalMessage.slice(0, 200))}” — not used for grading.</div>` : ""}
       <details><summary>trace (${r.steps.length} actions)</summary><pre>${esc(r.steps.map((s) => `${String(s.index).padStart(2)}  ${s.name.padEnd(16)} ${JSON.stringify(s.input)}${s.error ? "   !! " + s.error : ""}`).join("\n"))}</pre></details>
@@ -83,13 +84,12 @@ ${attention.length ? `<div class="runs">${attention.map((r) => runCard(b, r, tru
  * into a diagnosis: which rule the agent gets wrong, and how often.
  */
 function checksSection(b: BenchResult, scorable: RunResult[]): string {
-  const checks = b.provenance?.task?.checks ?? [];
-  if (checks.length < 2 || !scorable.length) return "";
-  const rows = checks.map((c, i) => {
+  const stats = b.metrics.checks?.length ? b.metrics.checks : (b.provenance?.task?.checks ?? []).map((c, i) => {
     const seen = scorable.filter((r) => r.checks[i] && !r.checks[i].errored);
-    const passed = seen.filter((r) => r.checks[i].passed).length;
-    return { label: checkLabel(c), invariant: !!c.invariant, passed, n: seen.length, rate: seen.length ? passed / seen.length : 1 };
-  }).sort((x, y) => x.rate - y.rate);
+    return { label: checkLabel(c), invariant: !!c.invariant, passed: seen.filter((r) => r.checks[i].passed).length, n: seen.length };
+  });
+  if (stats.length < 2 || !scorable.length) return "";
+  const rows = stats.map((s) => ({ ...s, rate: s.n ? s.passed / s.n : 1 })).sort((x, y) => x.rate - y.rate);
   const worst = rows.filter((r) => r.n && r.passed < r.n);
   return `<h2>Checks</h2>
 <div class="card">
@@ -98,6 +98,14 @@ function checksSection(b: BenchResult, scorable: RunResult[]): string {
   ${rows.map((r) => `<tr class="${r.passed < r.n ? "miss" : ""}"><td>${esc(r.label)}${r.invariant ? ` <span class="pill inv">guard</span>` : ""}</td><td class="num">${r.passed}/${r.n}</td><td><div class="bar"><i style="width:${(r.rate * 100).toFixed(0)}%"></i></div></td></tr>`).join("\n  ")}
   </tbody></table>
 </div>`;
+}
+
+/** "click 22 · keypress 24 · type 12": the trace in one line, so a hypothesis about strategy can be checked against what the run actually did. */
+function actionSummary(r: RunResult): string {
+  const counts = new Map<string, number>();
+  for (const s of r.steps) counts.set(s.name, (counts.get(s.name) ?? 0) + 1);
+  const failed = r.steps.filter((s) => s.error).length;
+  return `actions: ${[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(" · ")}${failed ? ` · ${failed} not delivered by the harness` : ""}`;
 }
 
 export function renderReport(b: BenchResult): string {
@@ -162,6 +170,7 @@ ${checksSection(b, scorable)}
   <div class="note">Every point is one run from the same snapshot. A wide spread on a task that always passes is behavior variability: same result, different routes, different cost.</div>
 </div>
 
+${b.classified === false && b.runs.some((r) => r.status === "failed") ? `<div class="note" style="margin:24px 0 -20px">Failures in this bench carry no hypothesis: classification was switched off for the run. <code>passk classify &lt;bench dir&gt;</code> adds one to each failed run.</div>` : ""}
 ${runsSection(b)}
 
 <div class="foot">

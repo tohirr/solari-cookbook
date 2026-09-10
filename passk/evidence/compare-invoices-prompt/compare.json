@@ -54,7 +54,27 @@
       "p95DurationMs": 238753.2,
       "totalCostUsd": 0.0681132,
       "costPerSuccessUsd": 0.01362264,
-      "costPerPassingRunUsd": 0.01362264
+      "costPerPassingRunUsd": 0.01362264,
+      "checks": [
+        {
+          "label": "exec sh -c ls /root/Documents/invoices/archive | grep -c invoice",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        },
+        {
+          "label": "file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        },
+        {
+          "label": "file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null
@@ -114,7 +134,27 @@
       "p95DurationMs": 281989.4,
       "totalCostUsd": 0.1015664,
       "costPerSuccessUsd": 0.02031328,
-      "costPerPassingRunUsd": 0.02031328
+      "costPerPassingRunUsd": 0.02031328,
+      "checks": [
+        {
+          "label": "exec sh -c ls /root/Documents/invoices/archive | grep -c invoice",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        },
+        {
+          "label": "file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        },
+        {
+          "label": "file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null
@@ -137,5 +177,46 @@
     "medianDurationMs": 8345,
     "costPerSuccessUsd": 0.0066906399999999994
   },
-  "fisherP": 1
+  "fisherP": 1,
+  "checks": [
+    {
+      "label": "exec sh -c ls /root/Documents/invoices/archive | grep -c invoice",
+      "invariant": false,
+      "a": {
+        "passed": 5,
+        "n": 5
+      },
+      "b": {
+        "passed": 5,
+        "n": 5
+      },
+      "delta": 0
+    },
+    {
+      "label": "file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt",
+      "invariant": false,
+      "a": {
+        "passed": 5,
+        "n": 5
+      },
+      "b": {
+        "passed": 5,
+        "n": 5
+      },
+      "delta": 0
+    },
+    {
+      "label": "file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt",
+      "invariant": false,
+      "a": {
+        "passed": 5,
+        "n": 5
+      },
+      "b": {
+        "passed": 5,
+        "n": 5
+      },
+      "delta": 0
+    }
+  ]
 }

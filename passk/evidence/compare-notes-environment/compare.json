@@ -54,7 +54,15 @@
       "p95DurationMs": 111694.6,
       "totalCostUsd": 0.10352460000000001,
       "costPerSuccessUsd": 0.051762300000000004,
-      "costPerPassingRunUsd": 0.0277332
+      "costPerPassingRunUsd": 0.0277332,
+      "checks": [
+        {
+          "label": "exec sh -c cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null",
+          "invariant": false,
+          "passed": 2,
+          "n": 5
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null
@@ -114,7 +122,15 @@
       "p95DurationMs": 105498,
       "totalCostUsd": 0.0255146,
       "costPerSuccessUsd": 0.0051029199999999995,
-      "costPerPassingRunUsd": 0.0051029199999999995
+      "costPerPassingRunUsd": 0.0051029199999999995,
+      "checks": [
+        {
+          "label": "exec sh -c cat /root/Documents/notes.txt /home/desktop/Documents/notes.txt 2>/dev/null; ls -la /root/Documents /home/desktop/Documents 2>/dev/null",
+          "invariant": false,
+          "passed": 5,
+          "n": 5
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null

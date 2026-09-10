@@ -189,7 +189,15 @@
       "p95DurationMs": 71908.1,
       "totalCostUsd": 0.3504068000000001,
       "costPerSuccessUsd": 0.007455463829787235,
-      "costPerPassingRunUsd": 0.0072854212765957466
+      "costPerPassingRunUsd": 0.0072854212765957466,
+      "checks": [
+        {
+          "label": "exec python3 /root/app/check.py",
+          "invariant": false,
+          "passed": 47,
+          "n": 50
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null
@@ -381,7 +389,15 @@
       "p95DurationMs": 78635.6,
       "totalCostUsd": 0.40428899999999995,
       "costPerSuccessUsd": 0.008250795918367346,
-      "costPerPassingRunUsd": 0.008250795918367346
+      "costPerPassingRunUsd": 0.008250795918367346,
+      "checks": [
+        {
+          "label": "exec python3 /root/app/check.py",
+          "invariant": false,
+          "passed": 49,
+          "n": 49
+        }
+      ]
     },
     "systemPromptHash": null,
     "safety": null

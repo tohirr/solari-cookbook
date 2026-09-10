@@ -101,6 +101,7 @@ a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink-2);outline-offset:1
 .film img{height:84px;border-radius:6px;border:1px solid var(--line);display:block;background:#000}
 .film a.final img{border-color:var(--good)}.film a.diverge img{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn)}
 .film em{position:absolute;left:4px;bottom:4px;font:10px var(--mono);font-style:normal;background:rgba(0,0,0,.65);color:#fff;padding:1px 5px;border-radius:4px}
+.acts{color:var(--ink-3);font-size:12px;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 .hyp{overflow-wrap:anywhere;margin-top:10px;padding:10px 12px;background:var(--surface-2);border-radius:var(--radius-s);font-size:13px;color:var(--ink-2)}
 .hyp b{color:var(--ink);font-weight:600}
 details{margin-top:8px}summary{cursor:pointer;color:var(--ink-3);font-size:12px}

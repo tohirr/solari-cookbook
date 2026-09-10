@@ -1,4 +1,5 @@
-import type { BenchMetrics, RunResult } from "./types.js";
+import { checkLabel } from "./checker.js";
+import type { BenchMetrics, CheckStat, RunResult } from "./types.js";
 
 function choose(n: number, k: number): number {
   if (k < 0 || k > n) return 0;
@@ -85,6 +86,13 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
   // before the tenth pass are not free. Lost runs (infra) are excluded here
   // and in n, and their spend is only in totalCostUsd.
   const costScored = runs.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0);
+  // Per check, across the scored runs: which rule fails, not just how often runs do.
+  const checkCount = Math.max(0, ...runs.map((r) => r.checks.length));
+  const checks: CheckStat[] = Array.from({ length: checkCount }, (_, i) => {
+    const seen = runs.filter((r) => r.checks[i] && !r.checks[i].errored);
+    const c = (seen[0] ?? runs.find((r) => r.checks[i]))?.checks[i].check;
+    return { label: c ? checkLabel(c) : `check ${i}`, invariant: !!c?.invariant, passed: seen.filter((r) => r.checks[i].passed).length, n: seen.length };
+  });
   return {
     requested,
     n,
@@ -110,6 +118,7 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
     totalCostUsd: allRuns.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0),
     costPerSuccessUsd: passedRuns.length ? costScored / passedRuns.length : null,
     costPerPassingRunUsd: passedRuns.length ? costPassed / passedRuns.length : null,
+    checks,
   };
 }
 

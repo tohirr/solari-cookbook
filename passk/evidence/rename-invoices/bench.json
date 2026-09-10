@@ -1406,7 +1406,27 @@
     "p95DurationMs": 238753.2,
     "totalCostUsd": 0.0681132,
     "costPerSuccessUsd": 0.01362264,
-    "costPerPassingRunUsd": 0.01362264
+    "costPerPassingRunUsd": 0.01362264,
+    "checks": [
+      {
+        "label": "exec sh -c ls /root/Documents/invoices/archive | grep -c invoice",
+        "invariant": false,
+        "passed": 5,
+        "n": 5
+      },
+      {
+        "label": "file_exists /root/Documents/invoices/archive/invoice-2024-11-03.txt",
+        "invariant": false,
+        "passed": 5,
+        "n": 5
+      },
+      {
+        "label": "file_exists /root/Documents/invoices/archive/invoice-2025-01-15.txt",
+        "invariant": false,
+        "passed": 5,
+        "n": 5
+      }
+    ]
   },
   "failures": [],
   "provenance": {

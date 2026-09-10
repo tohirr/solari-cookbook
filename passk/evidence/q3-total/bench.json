@@ -2667,7 +2667,33 @@
     "p95DurationMs": 237499.65,
     "totalCostUsd": 0.16400479999999998,
     "costPerSuccessUsd": 0.01640048,
-    "costPerPassingRunUsd": 0.01640048
+    "costPerPassingRunUsd": 0.01640048,
+    "checks": [
+      {
+        "label": "exec sh -c head -1 /root/Documents/q3-sales.csv",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "exec sh -c grep -c . /root/Documents/q3-sales.csv",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "exec sh -c grep -E '^Port Harcourt,675$' /root/Documents/q3-sales.csv",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "exec sh -c tail -1 /root/Documents/q3-sales.csv",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      }
+    ]
   },
   "failures": [],
   "provenance": {

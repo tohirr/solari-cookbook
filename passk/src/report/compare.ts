@@ -111,6 +111,13 @@ ${tail && tailA !== null && tailB !== null
 <tr><td>Fisher exact p (pass/fail)</td><td class="num" colspan="3" style="text-align:left">${c.fisherP.toFixed(3)} — ${c.fisherP < 0.05 ? "unlikely to be noise" : "consistent with noise at this sample size; effort and cost may still be informative"}</td></tr>
 </table></div>
 
+${c.checks ? `<h2>By check</h2>
+<div class="card" style="padding:0;overflow-x:auto"><table>
+<tr><th>check</th><th class="num">A</th><th class="num">B</th><th class="num">Δ B − A</th></tr>
+${c.checks.map((x) => `<tr><td>${esc(x.label)}${x.invariant ? ` <span class="pill inv">guard</span>` : ""}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num">${delta(Math.round(x.delta * 100), "up", (v) => `${v} pts`)}</td></tr>`).join("\n")}
+</table></div>
+<div class="note" style="margin-top:8px">Same checks on both sides, so each row is one rule under two conditions: what the change fixed, and what it did not touch.</div>` : ""}
+
 ${repA.length || repB.length ? `<h2>What the desktop looked like when each side stopped</h2>
 <div class="two">
   <div style="display:grid;gap:12px">${repA.map((f) => frame(c.a.dir, "a", f)).join("")}</div>

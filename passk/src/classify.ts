@@ -49,10 +49,29 @@ export function divergencePoint(a: TraceStep[], b: TraceStep[]): number | null {
   return a.length === b.length ? null : n;
 }
 
+/** Action names with counts, e.g. { click: 22, keypress: 24, type: 12 }. */
+export function actionCounts(run: RunResult): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const s of run.steps) out[s.name] = (out[s.name] ?? 0) + 1;
+  return out;
+}
+
+/**
+ * Every scored run on one line each, passed and failed, with its action counts.
+ * The classifier sees one pair of traces; this is the bench-wide evidence a
+ * claim about strategy has to survive ("the failing runs typed into the
+ * dropdowns" is false if the passing runs typed just as much).
+ */
+export function benchActionTable(runs: RunResult[]): string {
+  const scored = runs.filter((r) => lostKind(r) === null);
+  return scored.map((r) => `run ${r.runIndex} ${r.status.padEnd(6)} ${String(r.steps.length).padStart(3)} steps: ${Object.entries(actionCounts(r)).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${v}`).join(", ")}`).join("\n");
+}
+
 export async function classifyFailures(task: Task, runs: RunResult[], benchDir: string): Promise<FailureAnalysis[]> {
   const passing = runs.filter((r) => r.status === "passed");
   const failing = runs.filter((r) => r.status !== "passed");
   if (!failing.length) return [];
+  const table = benchActionTable(runs);
   // Shortest passing run is the cleanest reference. With no passing run there is
   // nothing to diverge from: the shortest failure stands in for trace context
   // only, and every hypothesis is capped at low confidence.
@@ -70,7 +89,7 @@ export async function classifyFailures(task: Task, runs: RunResult[], benchDir: 
     }
     const d = referencePassed && run !== ref ? divergencePoint(ref.steps, run.steps) : null;
     try {
-      const verdict = await judge(task, ref, run, d, benchDir, referencePassed);
+      const verdict = await judge(task, ref, run, d, benchDir, referencePassed, table);
       const confidence = referencePassed ? verdict.confidence : "low";
       out.push({ runIndex: run.runIndex, divergenceStep: d, referencePassed, cause: verdict.cause, confidence, explanation: verdict.explanation });
     } catch (err) {
@@ -94,7 +113,7 @@ function screenshotAt(run: RunResult, benchDir: string, around: number | null): 
   return fs.readFileSync(p);
 }
 
-async function judge(task: Task, ref: RunResult, run: RunResult, d: number | null, benchDir: string, refPassed: boolean) {
+async function judge(task: Task, ref: RunResult, run: RunResult, d: number | null, benchDir: string, refPassed: boolean, table: string) {
   const prompt = `Task given to the agent:
 """${task.prompt}"""
 
@@ -106,6 +125,10 @@ ${traceText(run)}
 
 Checks: ${run.checks.map((c) => `${c.passed ? "✓" : "✗"} ${JSON.stringify(c.check)} ${c.detail ?? ""}`).join("; ")}
 First divergence from the reference: ${!refPassed ? "not applicable (no passing run to diverge from)" : d === null ? "none (same actions, different outcome)" : `step ${d}`}.
+Action counts for every scored run in this bench, passed and failed:
+${table}
+A claim about interaction strategy (typing into a control instead of selecting by key, scrolling, refreshing) must be consistent with this table: if the passing runs did the same thing as often, it is not the cause. Prefer what the checks and the traces show about which rows were saved.
+
 Checks are evaluated inside the VM after the agent stops; the agent's own claim of success carries no weight.
 This is a hypothesis, not a verdict: the first differing action is where traces part ways, which need not be the action that caused the failure. If the evidence does not single out one cause, answer "unknown" with low confidence rather than guessing.
 
