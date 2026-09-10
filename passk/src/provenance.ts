@@ -7,6 +7,7 @@ import { createHash } from "node:crypto";
 import { execSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { config } from "./config.js";
+import { DEFAULT_SYSTEM } from "./agent/index.js";
 import type { Check, Provenance, Task } from "./types.js";
 
 const require = createRequire(import.meta.url);
@@ -37,11 +38,22 @@ function gitCommit(): string | null {
   try { return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim(); } catch { return null; }
 }
 
+/** True when tracked files differ from HEAD; null outside a repository. */
+function gitDirty(): boolean | null {
+  try { return execSync("git status --porcelain --untracked-files=no", { stdio: ["ignore", "pipe", "ignore"] }).toString().trim().length > 0; } catch { return null; }
+}
+
+export const systemPromptHash = (text: string): string => createHash("sha256").update(text).digest("hex").slice(0, 16);
+
 export function collectProvenance(task: Task, concurrency: number, budgetUsd: number | null): Provenance {
   return {
     passkVersion: pkgVersion("../package.json") === "unknown" ? (require("../package.json") as { version: string }).version : pkgVersion("../package.json"),
     gitCommit: gitCommit(),
+    gitDirty: gitDirty(),
     provider: config.provider,
+    agent: `src/agent/${config.provider}.ts`,
+    systemPromptHash: systemPromptHash(DEFAULT_SYSTEM),
+    safety: config.safety,
     model: config.model,
     effort: config.effort,
     concurrency,

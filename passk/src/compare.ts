@@ -44,6 +44,8 @@ interface Side {
   snapshotId: string;
   taskHash: string | null;
   checks: string;
+  systemPromptHash: string | null;
+  safety: string | null;
   metrics: BenchMetrics;
 }
 
@@ -61,6 +63,7 @@ function side(dir: string, b: BenchResult): Side {
   return {
     dir, taskId: b.taskId, taskName: b.taskName, prompt: b.prompt.trim(), model: b.model, snapshotId: b.snapshotId,
     taskHash: b.provenance?.taskHash ?? null, checks, metrics: b.metrics,
+    systemPromptHash: b.provenance?.systemPromptHash ?? null, safety: b.provenance?.safety ?? null,
   };
 }
 
@@ -73,6 +76,9 @@ export function compareBenches(dirA: string, dirB: string): Comparison {
   cmp("prompt", A.prompt, B.prompt);
   cmp("model", A.model, B.model);
   cmp("checks", A.checks, B.checks);
+  // Recorded only since 0.1.1; older benches cannot be compared on these, and silence is not "held fixed".
+  if (A.systemPromptHash && B.systemPromptHash) cmp("system prompt", A.systemPromptHash, B.systemPromptHash);
+  if (A.safety && B.safety) cmp("safety", A.safety, B.safety);
   if (A.checks === "null" || B.checks === "null") warnings.push("one side predates provenance capture; its checks are not recorded, so 'checks held fixed' cannot be verified");
   if (changed.length === 0) warnings.push("nothing differs between these benches except the runs themselves; this measures run-to-run noise, which is still useful");
   if (changed.length > 1) warnings.push(`more than one thing changed (${changed.join(", ")}); the comparison cannot attribute the difference to a single cause`);

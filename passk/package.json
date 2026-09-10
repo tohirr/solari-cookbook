@@ -1,6 +1,6 @@
 {
   "name": "passk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Reliability bench for computer-use agents: fork one Solari desktop snapshot k times, run the same task on every fork, measure pass^k, and classify why runs diverge.",

@@ -31,7 +31,7 @@ function detectProvider(): "anthropic" | "openai" | "scripted" {
 const DEFAULT_MODEL = { anthropic: "claude-opus-5", openai: "gpt-5.6", scripted: "scripted" } as const;
 
 export const config = {
-  version: "0.1.0",
+  version: "0.1.1",
   get solariApiKey() { return need("SOLARI_API_KEY"); },
   get anthropicApiKey() { return need("ANTHROPIC_API_KEY"); },
   get openaiApiKey() { return need("OPENAI_API_KEY"); },

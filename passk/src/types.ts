@@ -154,6 +154,14 @@ export interface Provenance {
   /** The full task definition as run, so the checks that produced this result are never in doubt. */
   task: Task;
   budgetUsd: number | null;
+  /** Uncommitted changes in the working tree at run time: two benches can share a commit and run different code. Absent on benches before 0.1.1. */
+  gitDirty?: boolean | null;
+  /** sha256 prefix of the system prompt the agent loop was given. Absent on benches before 0.1.1. */
+  systemPromptHash?: string;
+  /** What the loop did when the model raised a safety check. Absent on benches before 0.1.1. */
+  safety?: "allow" | "deny";
+  /** Which agent loop ran: the provider's file in src/agent/. Absent on benches before 0.1.1. */
+  agent?: string;
 }
 
 /**

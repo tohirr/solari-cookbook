@@ -142,7 +142,7 @@ ${runsSection(b)}
 
 <div class="foot">
   <div>Grading: a run passes only if every check passes when evaluated inside the desktop after the agent stops. The agent's own report of success is shown but never counted.</div>
-  <div style="margin-top:8px">${esc(p.provider)} · ${esc(p.model)} · effort ${esc(p.effort)} · concurrency ${p.concurrency} · passk ${esc(p.passkVersion)}${p.gitCommit ? ` @ ${esc(p.gitCommit)}` : ""} · node ${esc(p.node)} · ${Object.entries(p.packages).map(([k, v]) => `${k}@${v}`).join(", ") || "packages not recorded"}</div>
+  <div style="margin-top:8px">${esc(p.provider)} · ${esc(p.model)} · effort ${esc(p.effort)} · concurrency ${p.concurrency} · passk ${esc(p.passkVersion)}${p.gitCommit ? ` @ ${esc(p.gitCommit)}${p.gitDirty ? " (dirty tree)" : ""}` : ""}${p.safety ? ` · safety ${esc(p.safety)}` : ""}${p.systemPromptHash ? ` · system prompt ${esc(p.systemPromptHash)}` : ""} · node ${esc(p.node)} · ${Object.entries(p.packages).map(([k, v]) => `${k}@${v}`).join(", ") || "packages not recorded"}</div>
   <div style="margin-top:4px">task hash <code>${esc(p.taskHash)}</code>${p.budgetUsd !== null ? ` · budget $${p.budgetUsd}` : ""}</div>
   ${b.validation ? `<div style="margin-top:4px">verifier validated before the bench: ${esc(b.validation.notes.join("; "))}</div>` : ""}
   <details><summary>checks as run</summary><pre>${esc(p.task.checks.length ? p.task.checks.map((c) => JSON.stringify(c)).join("\n") : "(not recorded)")}</pre></details>
