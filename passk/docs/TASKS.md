@@ -191,7 +191,8 @@ the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. Comparison folders hold the paired results.
 `passk export runs/<dir> evidence/<name>` copies a bench with only the
 screenshots that carry proof; `sh scripts/curate-evidence.sh` rebuilds the
-whole directory from `runs/`.
+whole directory from `runs/`. `npm run assets` redraws the two still images
+in `docs/` (failure evidence, how it works) from the same bench files.
 
 ## Benching your own agent
 

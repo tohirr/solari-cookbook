@@ -16,6 +16,7 @@
     "showcase": "tsx scripts/showcase.ts",
     "landing": "tsx scripts/landing.ts",
     "site:build": "npm run showcase && npm run landing",
+    "assets": "tsx scripts/assets.ts",
     "studio": "tsx src/cli.ts studio"
   },
   "dependencies": {
