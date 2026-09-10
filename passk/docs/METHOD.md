@@ -99,6 +99,39 @@ there is no leaderboard. passk can compare two models on one snapshot the
 way a test suite can compare two compilers; that is incidental, not the
 point.
 
+## Prior art, and where this differs
+
+passk is a narrow tool assembled from ideas that exist elsewhere.
+
+- **OSWorld** (Xie et al., 2024) established execution-based verification
+  for computer-use agents: set an application up, let the agent act, read
+  the resulting state. passk keeps that rule and drops the suite. OSWorld
+  runs hundreds of tasks once each to produce a score; passk runs one task
+  many times from one snapshot to produce a reliability figure and a reason
+  for each failure, and it proves the verifier before trusting it.
+- **Terminal-Bench** packages a task as an instruction, an isolated
+  environment and a hidden test. passk's task file is the same shape, with
+  the same rule that the agent never sees the checks and its own claim of
+  success is never graded. The difference is again repetition from
+  identical state rather than breadth.
+- **hyperfine** repeats a command and reports a distribution instead of a
+  single timing. passk asks hyperfine's question about success instead of
+  speed: not "did it pass" but "how often, with what spread, and at what
+  cost." The terminal summary, the explicit run count and the prepare step
+  are borrowed from it.
+- **k6** made "repeat the workload, set a threshold, fail the build" the
+  normal way to test service reliability. `--require-lower` and `gate` are
+  that idea for agents. If passk is like any product, it is k6 for
+  computer-use agents, not a model leaderboard.
+- **Pinetree, *On the Reliability of Computer Use Agents* (2026)** supplies
+  the taxonomy the failure classifier sorts into: stochastic execution,
+  task ambiguity, behavior variability.
+
+What none of them have is the thing Solari makes cheap: a byte-identical
+starting state for every attempt. Without it, repeated runs measure the
+environment's drift as much as the agent's, and the numbers above would not
+mean what they say.
+
 ## Safety checks
 
 OpenAI's computer tool flags some actions as potentially consequential and

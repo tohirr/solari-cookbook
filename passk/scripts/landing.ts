@@ -1,6 +1,6 @@
 /**
  * Generate passk/index.html: the published front page, which is the
- * leaderboard in static mode. Every row is read from evidence/; models with
+ * results board in static mode. Every row is read from evidence/; models with
  * no evidence get a "not yet run" row with the command. `passk studio`
  * serves the same board locally with your runs and a working Run button.
  *

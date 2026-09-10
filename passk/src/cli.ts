@@ -19,7 +19,7 @@
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
- *   passk studio                              the leaderboard on localhost, with a Run button
+ *   passk studio                              the results board on localhost, with a Run button
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met or the verifier is unsound.
  */

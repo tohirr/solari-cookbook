@@ -1,5 +1,5 @@
 /**
- * `passk studio` — the leaderboard, served from this machine, with a Run
+ * `passk studio` — the results board, served from this machine, with a Run
  * button that works. Binds to 127.0.0.1 only. Keys are written to .env here
  * and never sent anywhere but Solari and the model provider by the runs you
  * start; the page is told which keys exist, never their values. Each run is

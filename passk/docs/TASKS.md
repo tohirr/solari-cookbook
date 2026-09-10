@@ -163,7 +163,7 @@ recommend` reads the failures and suggests the one change to test next.
 
 ## Studio
 
-The leaderboard, on localhost, with your keys and a working Run button:
+The results board, on localhost, with your keys and a working Run button:
 
 ```bash
 npm run studio          # http://127.0.0.1:8787, opens the browser
@@ -193,6 +193,8 @@ and of the shortest passing run. Comparison folders hold the paired results.
 screenshots that carry proof; `sh scripts/curate-evidence.sh` rebuilds the
 whole directory from `runs/`. `npm run assets` redraws the two still images
 in `docs/` (failure evidence, how it works) from the same bench files.
+`docs/demo.tape` records the no-key demo as a GIF with
+[vhs](https://github.com/charmbracelet/vhs): `vhs docs/demo.tape`.
 
 ## Benching your own agent
 

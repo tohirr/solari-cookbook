@@ -1,5 +1,5 @@
 /**
- * The leaderboard: one question, the shape of your task, and a board of
+ * The results board: one question, the shape of your task, and a board of
  * models with their pass rate, interval, pass^5 and cost. Every row is read
  * from a bench file, so the board cannot claim anything the evidence does
  * not. The same page renders in two modes: `static`, the published front
@@ -119,7 +119,7 @@ export function renderBoard(page: BoardPage): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>passk${studio ? " studio" : ""} · which model can actually do your computer task, reliably?</title>
-<meta name="description" content="A leaderboard of computer-use agents by task shape: every row is k forks of one desktop snapshot, graded inside the VM. Pass rate with its interval, pass^5 and cost per success.">
+<meta name="description" content="Results for computer-use agents by task shape: every row is k forks of one desktop snapshot, graded inside the VM. Pass rate with its interval, pass^5 and cost per success.">
 <meta property="og:title" content="passk · which model can actually do your computer task, reliably?">
 <meta property="og:description" content="${totals.runs} verified runs across ${shapes.length} task shapes. Pick yours, compare models on the chance it works every time.">
 <meta property="og:image" content="https://tohirr.github.io/solari-cookbook/passk/docs/compare-ticket-queue.jpg">

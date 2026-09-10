@@ -57,7 +57,9 @@ export async function runScriptedAgent(opts: AgentRunOptions & { runIndex?: numb
     steps.push({ index: steps.length, name, input, startedAt: new Date().toISOString(), durationMs: 1 });
     usage.inputTokens += 1000; usage.outputTokens += 20;
   };
-  const act = async (n: number) => { for (let i = 0; i < n; i++) { step(i % 2 ? "left_click" : "screenshot", i % 2 ? { coordinate: [100 + i, 100] } : {}); await fake.screenshot(); } };
+  // PASSK_SCRIPT_STEP_MS slows each step so a recording of the demo is readable; zero by default so tests stay fast.
+  const pace = Number(process.env.PASSK_SCRIPT_STEP_MS ?? 0);
+  const act = async (n: number) => { for (let i = 0; i < n; i++) { step(i % 2 ? "left_click" : "screenshot", i % 2 ? { coordinate: [100 + i, 100] } : {}); await fake.screenshot(); if (pace) await new Promise((r) => setTimeout(r, pace)); } };
 
   switch (behavior) {
     case "pass": case "slow":
