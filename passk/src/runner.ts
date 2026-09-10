@@ -157,7 +157,7 @@ async function runOne(task: Task, snapshotId: string, runIndex: number, benchDir
   try {
     desktop = await forkWithRetry(snapshotId, task, runIndex, tag);
     liveRuns.add(String(runIndex));
-    console.log(`${tag} forked → ${desktop.id}`);
+    console.log(`${tag} forked → ${desktop.id}  watch: ${desktop.streamUrl}`);
 
     const agent = await runAgent({
       desktop, prompt: task.prompt, outDir, maxSteps: task.max_steps ?? 40, checks: task.checks, runIndex,
