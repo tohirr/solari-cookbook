@@ -99,9 +99,51 @@ main{max-width:1280px}
 `);
 fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
 
+// 3. Hero: the routing experiment, one sentence measured per rule. Both
+//    conditions' dots, the delta tiles, and the by-check table, from the
+//    comparison file. This is the README's first picture.
+{
+  const { dotsHtml } = await import("../src/report/theme.js");
+  const { deltaTiles } = await import("../src/report/charts.js");
+  const routing = JSON.parse(fs.readFileSync(path.join(EV, "compare-ticket-routing-prompt", "compare.json"), "utf8")) as import("../src/compare.js").Comparison;
+  const A = bench("ticket-routing"), B = bench("ticket-routing-reload");
+  const dots = (b: BenchResult) => dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped);
+  const rows = (routing.checks ?? []).filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n);
+  const hero = page("passk · one sentence, measured per rule", `
+<div class="brand"><b>passk</b> controlled comparison · same snapshot, same checks, same model · one sentence added to the prompt</div>
+<h1 style="font-size:26px">One sentence took ${A.metrics.passed}/${A.metrics.n} to ${B.metrics.passed}/${B.metrics.n}. The table says which rows it fixed, and which it cost.</h1>
+<div class="two" style="margin-top:14px">
+  <div class="card">
+    <b style="font-size:15px">${esc(A.taskName)}</b>
+    <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 10px">${A.provenance.task.checks.length} checks · ${A.provenance.task.checks.filter((c) => c.invariant).length} guards · <code>${esc(A.model)}</code></div>
+    <div class="cap">A · baseline prompt</div>
+    ${dots(A)}
+    <div class="cap">B · prompt adds “reload and confirm”</div>
+    ${dots(B)}
+    <div style="font-size:12.5px;color:var(--ink-3);margin:12px 0 0">held fixed: ${routing.heldFixed.map((h) => `<code>${esc(h)}</code>`).join(" ")} · changed: <code>prompt</code></div>
+    ${deltaTiles([
+      { label: "passed", a: `${A.metrics.passed}/${A.metrics.n}`, b: `${B.metrics.passed}/${B.metrics.n}`, delta: Math.round(routing.delta.passAt1 * 100), unit: " pts", better: "up" },
+      { label: "median steps", a: String(A.metrics.medianSteps), b: String(B.metrics.medianSteps), delta: routing.delta.medianSteps, better: "down" },
+      { label: "$ per success", a: `$${(A.metrics.costPerSuccessUsd ?? 0).toFixed(3)}`, b: `$${(B.metrics.costPerSuccessUsd ?? 0).toFixed(3)}`, delta: routing.delta.costPerSuccessUsd ?? 0, better: "down", digits: 3 },
+    ])}
+    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">Fisher exact p = ${routing.fisherP.toFixed(3)} for the pass/fail split: ${routing.fisherP < 0.05 ? "unlikely to be noise" : "consistent with noise"} at this sample size.</div>
+  </div>
+  <div class="card">
+    <b style="font-size:15px">By check, where either side missed</b>
+    <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 10px">A → B, worst on the baseline first · ${(routing.checks ?? []).length - rows.length} other checks passed every run on both sides</div>
+    <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
+    ${rows.map((x) => `<tr class="${x.delta < 0 ? "miss" : ""}"><td>${esc(x.label)}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num" style="color:${x.delta > 0 ? "var(--good)" : x.delta < 0 ? "var(--crit)" : "var(--ink-3)"}">${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)} pts</td></tr>`).join("\n    ")}
+    </tbody></table>
+    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">Every row that was being left unsaved now saves. The price is the step budget: median effort rose to the cap, and the last open row, 112, got worse because runs ran out of steps before reaching it. Every guard held on both sides.</div>
+  </div>
+</div>
+`, `.cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:12px 0 6px} .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} table.checks .bar{display:none} main{max-width:1280px}`);
+  fs.writeFileSync(path.join(OUT, "compare-ticket-routing.html"), hero);
+}
+
 // 3. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const shots: [string, string, number][] = [["failure-ticket-queue", "docs/failure-ticket-queue.jpg", 1000], ["how-it-works", "docs/how-it-works.jpg", 560]];
+const shots: [string, string, number][] = [["failure-ticket-queue", "docs/failure-ticket-queue.jpg", 1000], ["how-it-works", "docs/how-it-works.jpg", 560], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg", 690]];
 if (fs.existsSync(chrome)) {
   for (const [name, dest, height] of shots) {
     const png = path.join(OUT, `${name}.png`);

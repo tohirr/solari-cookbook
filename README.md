@@ -41,15 +41,17 @@ forks it *k* times, runs the same agent on every fork, verifies the outcome
 inside the VM, and reports pass@k and pass^k with honest intervals. A
 `compare` command puts two conditions from the same snapshot side by side.
 
-Headline result so far, on the cheapest model available: an internal ticket
-tool went 47/50 → 47/49 → 49/49 across three prompts on one snapshot, and the
-bench explains why the middle one changed nothing. An accounts-payable entry
-task (PDF → mock ERP, with a duplicate trap and forbidden buttons) scored
-23/26 at 3.5 cents per success, failed attempts included. Every number is in
+Headline result, on the cheapest model available: a twelve-ticket routing
+task with nineteen checks went from 5/18 to 14/20 when one sentence was added
+to the prompt, on the same snapshot with the same checks (p = 0.022), and the
+comparison says per check which rows the sentence fixed and which it cost.
+An accounts-payable entry task (PDF → mock ERP, with a duplicate trap and
+forbidden buttons) scored 23/26 at 3.5 cents per success, failed attempts
+included. Every number is in
 [`passk/evidence/`](passk/evidence/) with screenshots and traces; start at
 [`passk/evidence/index.html`](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html).
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html"><img src="passk/docs/compare-ticket-queue.jpg" alt="passk comparison: three prompts on one snapshot" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="passk comparison: one sentence in the prompt, measured per check" width="100%"></a></p>
 
 ## Running an example
 
