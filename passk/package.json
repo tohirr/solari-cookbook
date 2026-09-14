@@ -3,6 +3,9 @@
   "version": "0.1.1",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "description": "Reliability bench for computer-use agents: fork one Solari desktop snapshot k times, run the same task on every fork, measure pass^k, and classify why runs diverge.",
   "bin": {
     "passk": "./src/cli.ts"

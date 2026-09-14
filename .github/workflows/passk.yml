@@ -1,0 +1,42 @@
+# passk tests itself. The unit tests cover the harness on in-memory desktops;
+# the two benches at the end run the real pipeline on the scripted provider
+# (no Solari key, no model key): one that must clear the gate and one that
+# must be refused by it. If either verdict flips, this workflow fails.
+name: passk
+on:
+  push:
+    branches: [main, passk]
+    paths: [passk/**, .github/workflows/passk.yml]
+  pull_request:
+    paths: [passk/**, .github/workflows/passk.yml]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: passk
+    env:
+      PASSK_PROVIDER: scripted
+      PASSK_CLASSIFY: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: passk/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - name: a 10/10 agent clears --require-lower 0.7 (the bound 10/10 can prove is 72%)
+        run: npm run passk run tasks/fake.yaml -- --k 10 --concurrency 4 --require-lower 0.7
+      - name: an 8/10 agent is refused by --require 0.9 (exit 2)
+        env:
+          PASSK_SCRIPT: "pass*6,fail,pass,claim_only,pass"
+        run: |
+          set +e
+          npm run passk run tasks/fake.yaml -- --k 10 --concurrency 4 --require 0.9
+          code=$?
+          set -e
+          test "$code" -eq 2 || { echo "expected exit 2 from the gate, got $code"; exit 1; }

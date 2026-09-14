@@ -6,3 +6,6 @@ __pycache__/
 .venv/
 venv/
 screenshot.png
+
+# passk is a real package, not an example: its lockfile is part of the reproducibility claim.
+!passk/package-lock.json
