@@ -109,6 +109,9 @@ passk is a narrow tool assembled from ideas that exist elsewhere.
   runs hundreds of tasks once each to produce a score; passk runs one task
   many times from one snapshot to produce a reliability figure and a reason
   for each failure, and it proves the verifier before trusting it.
+  OSWorld-Verified, the 2025 revision, went back through the suite and
+  repaired checkers that had been silently miscounting; `passk validate` is
+  that audit done by the tool, on every task, before any bench starts.
 - **Terminal-Bench** packages a task as an instruction, an isolated
   environment and a hidden test. passk's task file is the same shape, with
   the same rule that the agent never sees the checks and its own claim of
@@ -134,6 +137,14 @@ passk is a narrow tool assembled from ideas that exist elsewhere.
   resolve ambiguity through interaction (`probe`), and favor strategies that
   stay stable across runs (`compare`). The paper measures this on OSWorld;
   passk measures it on your workflow.
+- **Khanal, Tao and Zhou, [*Beyond pass@1: A Reliability Science Framework
+  for Long-Horizon LLM Agents*](https://arxiv.org/abs/2603.29231)
+  (arXiv:2603.29231, 2026)** show, over 23,392 episodes, that capability and
+  reliability diverge as tasks get longer and that pass@1 on short tasks
+  cannot see it. Their reliability decay curve is why passk records steps
+  and duration per run and reports the spread, not just the pass count, and
+  why a step cap is treated as a finding about the task rather than a
+  verdict on the agent.
 
 What none of them have is the thing Solari makes cheap: a byte-identical
 starting state for every attempt. Without it, repeated runs measure the
