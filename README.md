@@ -1,11 +1,59 @@
-# Solari Cookbook
+# passk — does your computer-use agent pass twice?
 
-Short, runnable examples for [Solari](https://getsolari.com) — cloud browsers,
-sandboxes, and desktops behind one API key.
+An agent that passes a demo once tells you nothing about the tenth try.
+passk snapshots one [Solari](https://getsolari.com) desktop, forks it *k*
+times, runs the same agent on every fork, grades the outcome **inside the
+VM** after the agent stops, and reports pass@k and pass^k with honest
+intervals. Nothing the agent says about its own success counts.
 
-Every example in this repo is a complete program you can run in under a minute.
-They are deliberately small: one idea each, no framework, no scaffolding to read
-past. Copy one into your project and change the parts you care about.
+**One sentence, measured per rule.** On a twelve-ticket routing task with
+nineteen checks, the cheapest model available passed **5 of 18** runs.
+Adding *"when you are done, reload the page and confirm each row"* to the
+prompt took it to **14 of 20** on the same snapshot with the same checks
+(Fisher p = 0.022). The comparison says which checks the sentence fixed
+(every row that was being left unsaved now saves), and what it cost (median
+effort rose from 56 steps to the cap of 80, and the last open row got worse
+because runs ran out of steps before reaching it).
+
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="passk comparison: one sentence in the prompt took a twelve-ticket routing task from 5/18 to 14/20 on the same snapshot; the by-check table shows every unsaved row now saves and the last row got worse from the step cap" width="100%"></a></p>
+
+**[The routing comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
+· [Every bench and screenshot](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
+· [How it works](passk/docs/TASKS.md#what-run-does)
+· [The method](passk/docs/METHOD.md)
+· [Notes for Solari's team](passk/docs/SOLARI-NOTES.md)**
+
+252 verified runs across eleven tasks and three Solari templates, two
+controlled prompt experiments, and a mock accounts-payable workflow with a
+duplicate trap and buttons that must not be pressed (23/26 at 3.5 cents per
+success, failed attempts included), for $4.64 of model spend in total. Every
+number links to the bench file, the checks as run, and the screenshots.
+
+The question is from Gonzalez-Pumariega et al., [*On the Reliability of
+Computer Use Agents*](https://arxiv.org/abs/2604.17849) (2026), which
+measures it on OSWorld. passk measures it on *your* workflow, and Solari's
+snapshot-and-fork is what makes every attempt start byte-identical and
+fifty runs cost about a dollar.
+
+No keys, forty seconds, the whole pipeline on in-memory desktops:
+
+```bash
+git clone https://github.com/tohirr/solari-cookbook.git && cd solari-cookbook/passk && npm install
+PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
+```
+
+The real thing needs a Solari key and an OpenAI or Anthropic key; start at
+[`passk/README.md`](passk/README.md).
+
+---
+
+## The Solari cookbook
+
+This repository is a fork of
+[solari-sdk/solari-cookbook](https://github.com/solari-sdk/solari-cookbook),
+short runnable examples for Solari's cloud browsers, sandboxes, and desktops.
+The examples below are the upstream ones, unchanged; passk is built on the
+desktop snapshot and fork APIs they introduce.
 
 ## Examples
 
@@ -32,26 +80,6 @@ past. Copy one into your project and change the parts you care about.
 | Example | Language | What it shows |
 | --- | --- | --- |
 | [desktop-computer-use-py](examples/desktop-computer-use-py) | Python | Screenshot, click, and type on a Linux GUI |
-
-## passk — does your computer-use agent pass twice?
-
-[`passk/`](passk/) is reliability regression testing for computer-use agents, built on
-the desktop snapshot and fork APIs in this repo. It snapshots one desktop,
-forks it *k* times, runs the same agent on every fork, verifies the outcome
-inside the VM, and reports pass@k and pass^k with honest intervals. A
-`compare` command puts two conditions from the same snapshot side by side.
-
-Headline result, on the cheapest model available: a twelve-ticket routing
-task with nineteen checks went from 5/18 to 14/20 when one sentence was added
-to the prompt, on the same snapshot with the same checks (p = 0.022), and the
-comparison says per check which rows the sentence fixed and which it cost.
-An accounts-payable entry task (PDF → mock ERP, with a duplicate trap and
-forbidden buttons) scored 23/26 at 3.5 cents per success, failed attempts
-included. Every number is in
-[`passk/evidence/`](passk/evidence/) with screenshots and traces; start at
-[`passk/evidence/index.html`](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html).
-
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="passk comparison: one sentence in the prompt, measured per check" width="100%"></a></p>
 
 ## Running an example
 
