@@ -123,9 +123,17 @@ passk is a narrow tool assembled from ideas that exist elsewhere.
   normal way to test service reliability. `--require-lower` and `gate` are
   that idea for agents. If passk is like any product, it is k6 for
   computer-use agents, not a model leaderboard.
-- **Pinetree, *On the Reliability of Computer Use Agents* (2026)** supplies
-  the taxonomy the failure classifier sorts into: stochastic execution,
-  task ambiguity, behavior variability.
+- **Gonzalez-Pumariega, Agashe, Yang, Li and Wang, [*On the Reliability of
+  Computer Use Agents*](https://arxiv.org/abs/2604.17849) (arXiv:2604.17849,
+  2026)** asked the question passk is built around: an agent that succeeds
+  once may fail on a repeat of the same task, so what stops it from doing so
+  reliably? It supplies the taxonomy the failure classifier sorts into
+  (stochasticity during execution, ambiguity in task specification,
+  variability in agent behavior) and three recommendations that map onto
+  three commands here: evaluate under repeated execution (`run`), let agents
+  resolve ambiguity through interaction (`probe`), and favor strategies that
+  stay stable across runs (`compare`). The paper measures this on OSWorld;
+  passk measures it on your workflow.
 
 What none of them have is the thing Solari makes cheap: a byte-identical
 starting state for every attempt. Without it, repeated runs measure the

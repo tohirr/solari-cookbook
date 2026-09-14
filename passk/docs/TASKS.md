@@ -137,8 +137,9 @@ thing is the shape: existing records to search, a duplicate to avoid, required
 fields, dropdowns, a file upload, a business rule ("pending review"), and a
 consequential action that must not happen.
 
-The ticket queue is the shape of task Pinetree describes: a proprietary
-dashboard with no API. Because the app lives in the snapshot, fifty runs cost
+The ticket queue is the shape of task Solari's own site lists under portal
+automation: "enter data, submit forms, and complete workflows inside portals
+that don't expose the APIs". Because the app lives in the snapshot, fifty runs cost
 about a dollar on a budget model.
 
 The shipped tasks are examples of the format, not a suite, and there is no

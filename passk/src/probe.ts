@@ -1,8 +1,8 @@
 /**
  * `passk probe <task>` — the dry-run twin.
  *
- * Pinetree's reliability paper recommends letting agents resolve ambiguity
- * through interaction instead of guessing. Before you spend k runs, fork one
+ * Gonzalez-Pumariega et al. (arXiv:2604.17849) recommend letting agents
+ * resolve ambiguity through interaction instead of guessing. Before you spend k runs, fork one
  * throwaway desktop, let the agent LOOK (but not act destructively), and have
  * it list every question it would ask a human. Tighten the prompt, re-probe,
  * then bench.

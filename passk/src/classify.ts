@@ -1,8 +1,9 @@
 /**
  * Why did a run fail when its siblings passed?
  *
- * Following Pinetree's "On the Reliability of Computer Use Agents" (2026), we
- * sort each failure into one of three sources:
+ * Following Gonzalez-Pumariega et al., "On the Reliability of Computer Use
+ * Agents" (arXiv:2604.17849, 2026), we sort each failure into one of three
+ * sources:
  *   - stochastic_execution   the plan was right, the world flinched (a click
  *                            landed before the window mapped, a race, a timeout)
  *   - task_ambiguity         the agent read the instruction differently than

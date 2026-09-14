@@ -156,7 +156,7 @@ const html = `<!doctype html>
   </div>
 </div>
 
-<h2>The workflow Pinetree describes</h2>
+<h2>The workflow Solari describes: a portal with no API</h2>
 <div class="card finding" style="max-width:none">
   <h3>Accounts payable: PDF → mock ERP, with a duplicate trap and buttons that must not be pressed</h3>
   <div class="big">${I.passed}/${I.n} <small>passed · ${pct(I.passAt1Lower)}–${pct(I.passAt1Upper)} · ${usd(I.costPerSuccessUsd)} per success · ${I.minSteps}–${I.maxSteps} steps</small></div>
