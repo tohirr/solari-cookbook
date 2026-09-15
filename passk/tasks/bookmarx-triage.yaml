@@ -1,0 +1,159 @@
+# yaml-language-server: $schema=../schema/task.schema.json
+# bookmarx (bookmarx.space) is a search over saved posts. Before a library is
+# shown in public, someone sweeps it for what should not be there — a job of
+# judgement calls with a consequential action, which is the shape of task the
+# per-check table diagnoses. This runs the product inside the desktop (see
+# tasks/bookmarx-lite/README.md): its review queue holds seventeen posts,
+# nine that the rules say to remove — three sexual, two political, one
+# hateful, one violent, one local-only, one personal — and eight guards that
+# look risky at a glance and are clean. Which post is which lives only in the
+# uploaded answer key; the check names carry the category, never the post.
+# The bare rules, as a user would state them.
+id: bookmarx-triage
+name: Sweep a library's review queue before a public demo
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/app"]
+  # One upload: the export from `pnpm demo:export` in bookmarx (the two
+  # prerendered pages, the static chunks, every picture, the seed). Built
+  # locally and never committed; see tasks/bookmarx-lite/README.md.
+  - upload: tasks/bookmarx-lite/bookmarx-box.tar.gz
+    to: /root/app/box.tar.gz
+  - upload: tasks/bookmarx-lite/server.py
+    to: /root/app/server.py
+  - upload: tasks/bookmarx-lite/check.py
+    to: /root/app/check.py
+  - upload: tasks/bookmarx-lite/golden.py
+    to: /root/app/golden.py
+  - exec: sh
+    args: ["-c", "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"]
+  - exec: sh
+    args: ["-c", "cd /root/app && nohup python3 server.py 8080 /root/app/box >/root/app/server.log 2>&1 & sleep 3; curl -sf http://127.0.0.1:8080/api/state >/dev/null"]
+  # The template's Chrome, relaunched with a DevTools port and its "Can't
+  # update Chrome" bubble clicked shut — the line proven on the live-site
+  # tasks, verbatim but for the URL.
+  - exec: sh
+    args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'http://127.0.0.1:8080/box/triage' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
+  - wait: 3
+prompt: >
+  The review queue is open in the browser: posts flagged for a look before my
+  saved-posts library goes public in a portfolio demo. Go through every post
+  in the queue and press Remove or Keep on each one. Remove anything sexual or
+  suggestive; anything about politics, elections or politicians; anything
+  hateful or that mocks a group; anything gory or violent for shock; anything
+  that only makes sense to one local community, like local gossip or local
+  celebrities; and anything about my own friends, family or private life.
+  Keep everything else, including things that only look edgy: scenes from
+  films and anime, cosplay, sport, history, and ordinary jokes and memes.
+  Only decide posts in the queue; leave the rest of the library alone.
+golden:
+  - exec: python3
+    args: ["/root/app/golden.py"]
+checks:
+  - name: "removed: sexual (target 1)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "1"]
+    stdout_contains: "PASS"
+  - name: "removed: sexual (target 2)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "2"]
+    stdout_contains: "PASS"
+  - name: "removed: sexual (target 3)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "3"]
+    stdout_contains: "PASS"
+  - name: "removed: political (target 4)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "4"]
+    stdout_contains: "PASS"
+  - name: "removed: political (target 5)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "5"]
+    stdout_contains: "PASS"
+  - name: "removed: hateful (target 6)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "6"]
+    stdout_contains: "PASS"
+  - name: "removed: violent (target 7)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "7"]
+    stdout_contains: "PASS"
+  - name: "removed: local (target 8)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "8"]
+    stdout_contains: "PASS"
+  - name: "removed: personal (target 9)"
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "target", "9"]
+    stdout_contains: "PASS"
+  - name: "kept: a film fight scene (guard 1)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "1"]
+    stdout_contains: "PASS"
+  - name: "kept: cosplay (guard 2)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "2"]
+    stdout_contains: "PASS"
+  - name: "kept: cosplay at an anime fest (guard 3)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "3"]
+    stdout_contains: "PASS"
+  - name: "kept: a knife in an anime (guard 4)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "4"]
+    stdout_contains: "PASS"
+  - name: "kept: a crime told as history (guard 5)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "5"]
+    stdout_contains: "PASS"
+  - name: "kept: a meme in English from Nigeria (guard 6)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "6"]
+    stdout_contains: "PASS"
+  - name: "kept: a photograph of a landmark (guard 7)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "7"]
+    stdout_contains: "PASS"
+  - name: "kept: a martial arts bout (guard 8)"
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "guard", "8"]
+    stdout_contains: "PASS"
+  - name: nothing beyond the targets removed
+    invariant: true
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "collateral"]
+    stdout_contains: "PASS"
+  - name: every post in the queue decided
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "reviewed"]
+    stdout_contains: "PASS"
+max_steps: 80

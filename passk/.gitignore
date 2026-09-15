@@ -2,3 +2,9 @@ node_modules/
 runs/
 .env
 .passk/
+
+# bookmarx-in-a-box: the export is built locally (pnpm demo:export in bookmarx)
+# and names real posts; it never goes in.
+tasks/bookmarx-lite/bookmarx-box.tar.gz
+tasks/bookmarx-lite/state.json
+__pycache__/

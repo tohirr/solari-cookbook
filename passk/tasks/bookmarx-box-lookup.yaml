@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=../schema/task.schema.json
+# bookmarx (bookmarx.space) is a search over saved posts, built to answer a
+# fuzzy memory with the post you meant. This runs the product *inside* the
+# desktop: the real UI as static files and its retrieval reimplemented in a
+# stdlib Python server over a 269-post slice of the demo library, so every
+# fork starts from the same bytes and no live database is touched. See
+# tasks/bookmarx-lite/README.md.
+# This memory is a four-word lookup; the post ranks first, in the box as on the live site.
+# A card click records the click (the app's own relevance signal) in
+# state.json inside the VM, which is what the check reads.
+id: bookmarx-box-lookup
+name: Find a saved post from a short memory, in the box
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "mkdir -p /root/app"]
+  # One upload: the export from `pnpm demo:export` in bookmarx (the two
+  # prerendered pages, the static chunks, every picture, the seed). Built
+  # locally and never committed; see tasks/bookmarx-lite/README.md.
+  - upload: tasks/bookmarx-lite/bookmarx-box.tar.gz
+    to: /root/app/box.tar.gz
+  - upload: tasks/bookmarx-lite/server.py
+    to: /root/app/server.py
+  - upload: tasks/bookmarx-lite/check.py
+    to: /root/app/check.py
+  - upload: tasks/bookmarx-lite/golden.py
+    to: /root/app/golden.py
+  - exec: sh
+    args: ["-c", "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"]
+  - exec: sh
+    args: ["-c", "cd /root/app && nohup python3 server.py 8080 /root/app/box >/root/app/server.log 2>&1 & sleep 3; curl -sf http://127.0.0.1:8080/api/state >/dev/null"]
+  # The template's Chrome, relaunched with a DevTools port and its "Can't
+  # update Chrome" bubble clicked shut — the line proven on the live-site
+  # tasks, verbatim but for the URL.
+  - exec: sh
+    args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'http://127.0.0.1:8080/box' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
+  - wait: 3
+prompt: >
+  bookmarx is open in the browser: a search over my saved posts. Find the post
+  I mean: "winter soldier best fight scene". Search for it, pick the result that matches, and open the
+  post itself on X (clicking a card opens it in a new tab). Leave that tab
+  open when you are done.
+golden:
+  - exec: sh
+    args: ["-c", "curl -s -X POST -H 'content-type: application/json' -d '{\"clicked\":{\"query\":\"winter soldier best fight scene\",\"bookmarkId\":\"1890154497357611360\"}}' http://127.0.0.1:8080/api/search"]
+checks:
+  - name: the post 1890154497357611360 was opened from the results
+    type: exec
+    cmd: python3
+    args: ["/root/app/check.py", "clicked", "1890154497357611360"]
+    stdout_contains: "PASS"
+max_steps: 40
