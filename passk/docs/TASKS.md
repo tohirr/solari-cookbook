@@ -402,7 +402,11 @@ describing the real loop. If your repo already depends on `@solarisdk/sdk`, its
 `Desktop` is assignable to the published one and you can use either.
 
 The module resolves against the working directory and imports from your repo's
-`node_modules`, so install your repo before the bench. Any model or none:
+`node_modules`, so install your repo before the bench. The bench records the
+module's absolute path as its agent (`provenance.agent`), which is a record of
+what ran and not a place to look: it can name a worktree, a checkout, or a
+directory that has since moved. What identifies the agent across benches is the
+commit in `provenance.gitCommit` and the code in your repo, not that path. Any model or none:
 the bench's `model` is `PASSK_MODEL` if set, else `custom`, and cost is
 estimated only when a price is known for it. Two rules make the bench
 honest and are not negotiable: the agent never sees the task's checks (they
