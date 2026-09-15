@@ -243,6 +243,10 @@
       "const": "private",
       "description": "Set to `private` to keep every screenshot inside runs/: `passk export` copies none of them and the exported report shows none. For a task whose screens carry real content that must not be published. The checks and the task-declared evidence files are still exported."
     },
+    "labels": {
+      "type": "string",
+      "description": "A guest file of { identifier: label }. Every run keeps a copy beside its trace, never exported; `passk export` rewrites the bench and its evidence files so each identifier appears only as its label. For evidence that must name real things to grade and must not name them in public."
+    },
     "golden": {
       "type": "array",
       "description": "Steps that produce the correct end state without an agent. `passk validate` proves the checks fail before them and pass after them.",

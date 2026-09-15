@@ -161,6 +161,28 @@ copies none and references none, and `export-inspect --images` embeds none.
 Grade such a task from an `evidence` file instead, the way `bookmarx-triage`
 is graded from its decisions map. This too is out of the task hash.
 
+**Identifiers a run may not publish.** An evidence file that grades honestly
+often names real things: the decisions map is keyed by post id. `labels`
+names a guest file of `{ identifier: label }`:
+
+```yaml
+labels: /root/app/labels.json   # { "1844896946642878650": "target 6 (hateful)", … }
+```
+
+Every run keeps a copy beside its trace, never exported. `passk export`
+then rewrites the bench and every evidence file it copies so each identifier
+appears only as its label — in check details, in the agent's own words, in
+the hypotheses, and as the keys of a decisions map, which stays valid JSON.
+A reader learns which labelled thing got which decision and never which
+real thing that was. Once a map is in play the export is all or nothing: an
+identifier-shaped token the map misses stops it, naming the identifier and
+where it still appears, because a label file that misses one post is the
+case this exists to catch. `passk export --labels file.json` applies a map
+to a bench recorded before its task declared one; `--no-screenshots` is the
+same for frames. Neither edits what the run wrote down. The boxed bookmarx
+tasks declare both; `tasks/bookmarx-lite/labels.py` is the map builder, and
+the exported report says how many identifiers became labels.
+
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
 Prefer several checks that each grade one fact over one script that grades
@@ -287,7 +309,7 @@ no frame leaves `runs/`: none is copied, the exported report shows none, and
 declared evidence files are exported as usual, so the bench is still auditable
 — the `bookmarx-triage` pair is graded from `state.json`, the decisions
 themselves, rather than from pictures of someone's library. Like `evidence`,
-the declaration cannot change an outcome, so it is not in the task hash.
+the declaration cannot change an outcome, so it is not in the task hash. `labels: <guest file>` does the same for identifiers inside the evidence — post ids become `target 6 (hateful)` on the way out — and the export refuses if one is missed; `--labels file.json` applies a map at publish time.
 (In `bench.json`, spend per run is `usage.costUsd` and spend for the bench is
 `metrics.totalCostUsd`; there is no `metrics.costUsd`.) `passk export-inspect runs/<dir> [out dir]`
 writes the bench as an [Inspect AI](https://inspect.aisi.org.uk/) eval log:

@@ -146,5 +146,7 @@ max_steps: 80
 # targets, so no frame leaves runs/. state.json — the decisions themselves —
 # carries the diagnosis instead.
 screenshots: private
+# Post ids leave only as labels: target 6 (hateful), guard 5, library post 212.
+labels: /root/app/labels.json
 evidence:
   - /root/app/state.json

@@ -20,7 +20,7 @@ const require = createRequire(import.meta.url);
  * two benches stay comparable when a task starts keeping a state file.
  */
 export function taskHash(task: Task): string {
-  const { evidence: _evidence, screenshots: _screenshots, ...graded } = task;
+  const { evidence: _evidence, screenshots: _screenshots, labels: _labels, ...graded } = task;
   return createHash("sha256").update(canonical({ ...graded, checks: unlabelled(task.checks) })).digest("hex").slice(0, 16);
 }
 

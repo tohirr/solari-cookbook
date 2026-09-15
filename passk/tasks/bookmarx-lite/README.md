@@ -17,6 +17,7 @@ get Node or Postgres. It gets:
 | `server.py` | Serves the pages and answers `/api/...` in the standard library. Retrieval follows `src/server/search/` in bookmarx: IDF-weighted term coverage with the 0.25 floor and the filler list, cosine with the 0.62 floor, reciprocal rank fusion with the length-dependent weights, the boosts, the reasons on each card and the trace behind the inspector. The Porter2 stemmer in it agrees with Postgres's `english_stem` on every word in the seed (5,255 checked). State the agent changes goes to `state.json`. |
 | `check.py` | One fact per invocation, from `state.json` and `expected.json`: a target is removed, a guard is present, nothing beyond the targets is removed, every queued post is decided, a result was clicked. Never the screen. |
 | `golden.py` | The correct outcome of the review task through the same API the page uses, so `validate` can prove the checks. |
+| `labels.py` | The labels a published bench uses instead of post ids: `target 6 (hateful)`, `guard 5`, `library post 212`. The server writes `labels.json` from it at startup, every run collects that file, and `passk export` replaces every id with its label — in `state.json`, in check details, in the agent's own words — and refuses to publish if one is missed. Frames never leave either (`screenshots: private`). What a reader gets is which labelled thing got which decision, and never which real post that was. |
 
 Two departures from the live ranker, both in `server.py`'s header: the
 vector half answers only queries whose embeddings the export precomputed

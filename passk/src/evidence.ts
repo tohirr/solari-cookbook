@@ -16,6 +16,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Desktop } from "@solarisdk/sdk";
 import { withReconnect } from "./desktop.js";
+import { LABELS_FILE } from "./redact.js";
 import type { EvidenceFile } from "./types.js";
 
 /** Where a run keeps the files its task declared, relative to the run directory. */
@@ -76,4 +77,22 @@ export function fileSize(bytes: number): string {
 /** "state.json 12 KB · /root/app/server.log ✗ ENOENT" — one line for the run log. */
 export function evidenceSummary(files: EvidenceFile[]): string {
   return files.map((f) => (f.file ? `${path.basename(f.file)} ${fileSize(f.bytes ?? 0)}` : `${f.path} ✗ ${f.error ?? "not copied"}`)).join(" · ");
+}
+
+/**
+ * The task's label file, kept at the run directory's root rather than under
+ * evidence/, so nothing that copies evidence carries it along. Same
+ * best-effort rules as evidence: a missing file is recorded, never raised.
+ */
+export async function collectLabels(desktop: Desktop, guestPath: string | undefined, outDir: string): Promise<EvidenceFile | undefined> {
+  if (!guestPath) return undefined;
+  try {
+    const data = await withReconnect(desktop, () => desktop.fs.read(guestPath));
+    if (data.byteLength > MAX_EVIDENCE_BYTES) return { path: guestPath, error: `${(data.byteLength / 1e6).toFixed(1)} MB is over the ${MAX_EVIDENCE_BYTES / 1e6} MB cap; not copied` };
+    JSON.parse(new TextDecoder().decode(data)); // must be JSON now, not at export
+    fs.writeFileSync(path.join(outDir, LABELS_FILE), data);
+    return { path: guestPath, file: LABELS_FILE, bytes: data.byteLength };
+  } catch (err) {
+    return { path: guestPath, error: (err as Error).message };
+  }
 }

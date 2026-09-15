@@ -17,17 +17,27 @@
 import fs from "node:fs";
 import path from "node:path";
 import { loadBench } from "./compare.js";
+import { loadLabels, redactBench, redactFileText, unredacted } from "./redact.js";
 import { renderReport } from "./report/html.js";
 import type { BenchResult } from "./types.js";
 
 const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 
-export function exportBench(srcDir: string, outDir: string, forcePrivate = false): { bench: BenchResult; files: number; evidence: number; bytes: number; privateShots: boolean } {
-  const bench = loadBench(srcDir);
-  // The task's declaration is the default nobody can forget; `--no-screenshots`
-  // is the same decision taken at publish time, for a bench recorded before the
-  // task declared it. Neither edits what the run wrote down.
-  const privateShots = forcePrivate || bench.provenance?.task?.screenshots === "private";
+export interface ExportOptions {
+  /** Copy no screenshot, whatever the task says. */
+  noScreenshots?: boolean;
+  /** A labels file to apply in addition to whatever the runs collected, for a bench recorded before its task declared one. */
+  labels?: string;
+}
+
+export function exportBench(srcDir: string, outDir: string, opts: ExportOptions = {}): { bench: BenchResult; files: number; evidence: number; bytes: number; privateShots: boolean; redacted: number } {
+  let bench = loadBench(srcDir);
+  // The task's declarations are the defaults nobody can forget; the options are
+  // the same decisions taken at publish time, for a bench recorded before the
+  // task declared them. Neither edits what the run wrote down.
+  const privateShots = !!opts.noScreenshots || bench.provenance?.task?.screenshots === "private";
+  const labels = loadLabels(srcDir, bench.runs.map((r) => r.runIndex), opts.labels);
+  const copiedEvidence: string[] = [];
   fs.mkdirSync(outDir, { recursive: true });
   const shortestPass = bench.runs.filter((r) => r.status === "passed").sort((a, b) => a.steps.length - b.steps.length)[0];
   let files = 0, evidence = 0, bytes = 0;
@@ -65,12 +75,37 @@ export function exportBench(srcDir: string, outDir: string, forcePrivate = false
       const to = path.join(outDir, runDir(r.runIndex), e.file);
       fs.mkdirSync(path.dirname(to), { recursive: true });
       fs.copyFileSync(from, to);
+      copiedEvidence.push(to);
       evidence++; bytes += fs.statSync(from).size;
     }
     // Trim what a reviewer does not need per run: the raw base64 never lived here, but long inputs can.
     for (const s of r.steps) if (typeof (s.input as { text?: string })?.text === "string" && (s.input as { text: string }).text.length > 500) (s.input as { text: string }).text = (s.input as { text: string }).text.slice(0, 500) + "…";
   }
+  // Identifiers become labels: in the bench (check details, errors, the
+  // agent's own words, the hypotheses) and in every evidence file copied.
+  // Once a map is in play, anything identifier-shaped that survives fails the
+  // export: a label file that misses one post is the case this exists to catch.
+  let redacted = 0;
+  if (Object.keys(labels).length) {
+    ({ bench, replaced: redacted } = redactBench(bench, labels));
+    bench.redacted = redacted;
+    const leftovers = new Map<string, Set<string>>(); // identifier → where it still appears
+    const note = (id: string, where: string) => (leftovers.get(id) ?? leftovers.set(id, new Set()).get(id)!).add(where);
+    for (const file of copiedEvidence) {
+      let text: string;
+      try { text = fs.readFileSync(file, "utf8"); } catch { continue; }
+      if (/[\u0000-\u0008]/.test(text)) continue; // binary: nothing to redact by text
+      const out = redactFileText(text, labels);
+      fs.writeFileSync(file, out);
+      for (const id of unredacted(out)) note(id, path.relative(outDir, file));
+    }
+    for (const id of unredacted(JSON.stringify(bench))) note(id, "bench");
+    if (leftovers.size) {
+      const lines = [...leftovers].slice(0, 8).map(([id, where]) => `${id}  (${[...where].join(", ")})`);
+      throw new Error(`export refused: ${leftovers.size} identifier${leftovers.size === 1 ? "" : "s"} not in the labels map would be published:\n  ${lines.join("\n  ")}${leftovers.size > 8 ? "\n  …" : ""}\nAdd them to the labels file (or the task's labels: file) and export again.`);
+    }
+  }
   fs.writeFileSync(path.join(outDir, "bench.json"), JSON.stringify(bench, null, 2));
   fs.writeFileSync(path.join(outDir, "report.html"), renderReport(bench));
-  return { bench, files, evidence, bytes, privateShots };
+  return { bench, files, evidence, bytes, privateShots, redacted };
 }

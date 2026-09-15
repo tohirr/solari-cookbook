@@ -198,6 +198,7 @@ ${runsSection(b)}
   <div style="margin-top:8px">${esc(p.provider)} · ${esc(p.model)} · effort ${esc(p.effort)} · concurrency ${p.concurrency} · passk ${esc(p.passkVersion)}${p.gitCommit ? ` @ ${esc(p.gitCommit)}${p.gitDirty ? " (dirty tree)" : ""}` : ""}${p.safety ? ` · safety ${esc(p.safety)}` : ""}${p.systemPromptHash ? ` · system prompt ${esc(p.systemPromptHash)}` : ""} · node ${esc(p.node)} · ${Object.entries(p.packages).map(([k, v]) => `${k}@${v}`).join(", ") || "packages not recorded"}</div>
   <div style="margin-top:4px">task hash <code>${esc(p.taskHash)}</code>${p.budgetUsd !== null ? ` · budget $${p.budgetUsd}` : ""}</div>
   ${b.validation ? `<div style="margin-top:4px">verifier validated before the bench: ${esc(b.validation.notes.join("; "))}</div>` : ""}
+  ${b.redacted ? `<div style="margin-top:4px">identifiers replaced by labels before publication: ${b.redacted}. A label names a labelled thing — a target, a guard, a library post — never the real one.</div>` : ""}
   <details><summary>checks as run</summary><pre>${esc(p.task.checks.length ? p.task.checks.map((c) => JSON.stringify(c)).join("\n") : "(not recorded)")}</pre></details>
 </div>
 <script type="application/json" id="bench">${JSON.stringify(b).replace(/</g, "\\u003c")}</script>

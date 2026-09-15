@@ -849,6 +849,16 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8080
+    # The labels a published bench uses instead of post ids (see labels.py).
+    # Written beside this file so passk can collect it with `labels:`; the
+    # server never serves it and the agent never sees it.
+    try:
+        sys.path.insert(0, HERE)
+        from labels import build as build_labels
+        with open(os.path.join(HERE, "labels.json"), "w") as f:
+            json.dump(build_labels(BOX), f)
+    except Exception as e:  # a missing labels.py must not stop the app; export will refuse instead
+        print("labels.json not written: %s" % e, flush=True)
     print("bookmarx-in-a-box: %d posts, %d embedded queries, serving %s on 127.0.0.1:%d" %
           (len(POSTS), len(QUERIES), SITE, port), flush=True)
     ThreadingHTTPServer(("127.0.0.1", port), Handler).serve_forever()

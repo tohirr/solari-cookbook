@@ -21,6 +21,10 @@
   to: /root/app/check.py
 - upload: tasks/bookmarx-lite/golden.py
   to: /root/app/golden.py
+# The labels a published bench uses instead of post ids; the server writes
+# labels.json from it at startup and the tasks collect that file.
+- upload: tasks/bookmarx-lite/labels.py
+  to: /root/app/labels.py
 - exec: sh
   args: ["-c", "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"]
 - exec: sh

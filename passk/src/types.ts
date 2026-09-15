@@ -72,6 +72,15 @@ export interface Task {
    * `evidence`, it cannot change an outcome, so it is not in the task hash.
    */
   screenshots?: "private";
+  /**
+   * A guest file of `{ identifier: label }`. Every run keeps a copy beside
+   * its trace, never exported, and `export` rewrites the bench and its
+   * evidence files so each identifier appears only as its label — "target 6
+   * (hateful)" rather than the post's id. For evidence that must name real
+   * things to grade honestly and must not name them in public. Not in the
+   * task hash: it cannot change an outcome.
+   */
+  labels?: string;
 }
 
 /** One file copied out of a fork after grading. `file` and `bytes` are absent when the copy failed. */
@@ -142,6 +151,8 @@ export interface RunResult {
   usage: { inputTokens: number; outputTokens: number; costUsd?: number };
   /** The task's `evidence` paths as copied out of this fork. Absent on benches run before the field existed. */
   evidence?: EvidenceFile[];
+  /** The task's `labels` file as copied out of this fork, kept beside the trace and never exported. */
+  labels?: EvidenceFile;
   error?: string;
 }
 
@@ -225,6 +236,8 @@ export interface BenchResult {
   validation?: ValidationSummary;
   /** False when classification was switched off for the run, so an empty `failures` is not mistaken for "nothing to explain". */
   classified?: boolean;
+  /** Set by export when a labels map was applied: how many identifier occurrences became labels. */
+  redacted?: number;
 }
 
 /** One check across the scored runs of a bench: how often it passed. */

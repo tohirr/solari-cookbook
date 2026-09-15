@@ -35,5 +35,7 @@ checks:
 max_steps: 40
 # What the app recorded, kept per run: which query was searched and which
 # card was clicked, not just whether the right one was.
+# Post ids leave only as labels: library post 212, never the real post.
+labels: /root/app/labels.json
 evidence:
   - /root/app/state.json
