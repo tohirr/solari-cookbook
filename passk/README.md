@@ -95,9 +95,9 @@ what is out of scope are in [the manual](docs/TASKS.md).
 ## Change one thing, compare
 
 ```bash
-npm run passk run tasks/ticket-routing.yaml -- --k 20
-npm run passk run tasks/ticket-routing-reload.yaml -- --k 20 --snapshot snap_…   # same snapshot
-npm run passk compare runs/ticket-routing-2*/ runs/ticket-routing-reload-*/
+npm run passk run tasks/bookmarx-triage.yaml -- --k 10
+npm run passk run tasks/bookmarx-triage-keep.yaml -- --k 10 --snapshot snap_…   # same snapshot
+npm run passk compare runs/bookmarx-triage-2*/ runs/bookmarx-triage-keep-*/
 ```
 
 `compare` puts two conditions from one snapshot side by side: what was held
@@ -106,23 +106,34 @@ same delta per check, and Fisher's exact p for the pass/fail split. It
 refuses to attribute a difference when more than one thing changed, and it
 says when the sample is too small to say anything.
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-bookmarx-triage-prompt/compare.html"><img src="docs/compare-bookmarx-triage.jpg" alt="A passk comparison page for a real app: bookmarx's sweeping agent reviewing a queue of seventeen saved posts under two prompts, 4/10 against 2/10, with the by-check table showing fifteen of nineteen rules holding every run and the hateful post removed in half" width="100%"></a></p>
 
-The picture is [one worked example](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
-from `evidence/`, run while building the tool on one budget model at small
-*k*. Read it as a demonstration of what the pages contain, not as a finding;
-it will be re-run.
-
-The second example is a real app. [bookmarx](https://bookmarx.space), a
-search over saved posts, runs *inside* the desktop as static pages and a
-stdlib server ([`tasks/bookmarx-lite/`](tasks/bookmarx-lite/)), and its own
+The picture is a real app. [bookmarx](https://bookmarx.space), a search
+over saved posts, runs *inside* the desktop as static pages and a stdlib
+server ([`tasks/bookmarx-lite/`](tasks/bookmarx-lite/)), and its own
 sweeping agent reviews a queue of seventeen posts before a public demo:
-remove nine, keep eight guards that only look risky. Ten runs each under two
-prompts: 4/10 and 2/10, a split consistent with noise; what the per-check
-table shows is that fifteen of nineteen rules hold every time and one
-judgment, the hateful post, holds in half the runs. Published without frames
-or post ids (`screenshots: private`, `labels`), graded from the decisions
-map itself.
+remove nine, keep eight guards that only look risky. Ten runs each under
+two prompts, the bare rules and the rules plus "when unsure, keep it": 4/10
+and 2/10, a split consistent with noise (p = 0.63). What the per-check
+table does show is that fifteen of nineteen rules hold in every run and one
+judgment, the hateful post, holds in half — reproduced in a second sample of
+ten. A single demo run has a 40% chance of passing, and if it passes you
+ship believing it works. Published without frames or post ids
+(`screenshots: private`, `labels`), graded from the decisions map itself.
+
+The first version of this comparison read 4/10 against 0/10 and looked like
+one sentence breaking the agent. Two of those ten runs were network
+failures the agent had reported as its own faults; passk scored them
+against it. With the classification fixed and a fresh sample the effect is
+gone. The instrument caught its own artifact, which is the point of having
+one.
+
+The other example is a mock: an internal ticket queue served from inside
+the VM, twelve tickets and nineteen checks, one sentence added to the
+prompt. [The comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
+went 5/18 to 14/20 and the table says which rows the sentence fixed and
+which it cost; it was run while building the tool, on one budget model, and
+is a demonstration of the pages rather than a finding.
 
 ## Ten things learned about Solari
 

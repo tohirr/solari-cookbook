@@ -142,9 +142,54 @@ fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
   fs.writeFileSync(path.join(OUT, "compare-ticket-routing.html"), hero);
 }
 
+// 3b. Hero: a real app, its own agent, ten runs under two prompts. Drawn from
+//     the exported evidence, which carries no frame and no post id, so the
+//     picture cannot either. This is the README's first picture.
+if (fs.existsSync(path.join(EV, "compare-bookmarx-triage-prompt", "compare.json"))) {
+  const { dotsHtml } = await import("../src/report/theme.js");
+  const { deltaTiles } = await import("../src/report/charts.js");
+  const c = JSON.parse(fs.readFileSync(path.join(EV, "compare-bookmarx-triage-prompt", "compare.json"), "utf8")) as import("../src/compare.js").Comparison;
+  const A = bench("bookmarx-triage"), B = bench("bookmarx-triage-keep");
+  const dots = (b: BenchResult) => dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped);
+  const rows = (c.checks ?? []).filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n);
+  const clean = (A.metrics.checks ?? []).filter((x) => x.passed === x.n).length, total = (A.metrics.checks ?? []).length;
+  const worst = [...(A.metrics.checks ?? [])].filter((x) => x.n).sort((x, y) => x.passed / x.n - y.passed / y.n)[0];
+  const noise = c.fisherP < 0.05 ? "unlikely to be noise" : "consistent with noise";
+  const hero = page("passk · a real app, its own agent", `
+<div class="brand"><b>passk</b> controlled comparison · bookmarx, running inside the desktop · its own sweeping agent · same snapshot, same checks, same model · one sentence added to the prompt</div>
+<h1 style="font-size:26px">Sweep seventeen saved posts before a public demo, ten times under each prompt: ${A.metrics.passed}/${A.metrics.n} and ${B.metrics.passed}/${B.metrics.n}. ${clean} of ${total} rules hold every run; one judgment holds in ${worst?.passed}/${worst?.n}.</h1>
+<div class="two" style="margin-top:14px">
+  <div class="card">
+    <b style="font-size:15px">${esc(A.taskName)}</b>
+    <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 10px">${A.provenance.task.checks.length} checks · ${A.provenance.task.checks.filter((k) => k.invariant).length} guards · <code>${esc(A.model)}</code> · no frame or post id leaves the run</div>
+    <div class="cap">A · the rules</div>
+    ${dots(A)}
+    <div class="cap">B · the rules, plus “when you are unsure about a post, keep it”</div>
+    ${dots(B)}
+    <div style="font-size:12.5px;color:var(--ink-3);margin:12px 0 0">held fixed: ${c.heldFixed.map((h) => `<code>${esc(h)}</code>`).join(" ")} · changed: <code>prompt</code></div>
+    ${deltaTiles([
+      { label: "passed", a: `${A.metrics.passed}/${A.metrics.n}`, b: `${B.metrics.passed}/${B.metrics.n}`, delta: Math.round(c.delta.passAt1 * 100), unit: " pts", better: "up" },
+      { label: "median steps", a: String(A.metrics.medianSteps), b: String(B.metrics.medianSteps), delta: c.delta.medianSteps, better: "down" },
+      { label: "$ per success", a: `$${(A.metrics.costPerSuccessUsd ?? 0).toFixed(3)}`, b: `$${(B.metrics.costPerSuccessUsd ?? 0).toFixed(3)}`, delta: c.delta.costPerSuccessUsd ?? 0, better: "down", digits: 3 },
+    ])}
+    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">Fisher exact p = ${c.fisherP.toFixed(2)} for the pass/fail split: ${noise} at this sample size. The sentence did not measurably move the sweep.</div>
+  </div>
+  <div class="card">
+    <b style="font-size:15px">By check, where either side missed</b>
+    <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 10px">A → B, worst on A first · ${(c.checks ?? []).length - rows.length} other checks passed every run on both sides</div>
+    <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
+    ${rows.map((x) => `<tr class="${x.delta < 0 ? "miss" : ""}"><td>${esc(x.label)}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num" style="color:${x.delta > 0 ? "var(--good)" : x.delta < 0 ? "var(--crit)" : "var(--ink-3)"}">${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)} pts</td></tr>`).join("\n    ")}
+    </tbody></table>
+    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">The number a demo hides: a single run passes ${pct(A.metrics.passAt1)} of the time, and when it passes it looks reliable. The check that carries the failures, <b>${esc(worst?.label ?? "")}</b>, held in ${worst?.passed}/${worst?.n}. Published from the decisions map: post ids leave only as target 6 (hateful), guard 5, library post 212.</div>
+  </div>
+</div>
+`, `.cap{font:12.5px var(--sans);color:var(--ink-3);margin:12px 0 6px} .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} table.checks .bar{display:none} main{max-width:1280px}`);
+  fs.writeFileSync(path.join(OUT, "compare-bookmarx-triage.html"), hero);
+}
+
 // 4. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const shots: [string, string][] = [["failure-ticket-routing", "docs/failure-ticket-routing.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"]];
+const shots: [string, string][] = [["failure-ticket-routing", "docs/failure-ticket-routing.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"], ...(fs.existsSync(path.join(OUT, "compare-bookmarx-triage.html")) ? [["compare-bookmarx-triage", "docs/compare-bookmarx-triage.jpg"] as [string, string]] : [])];
 if (fs.existsSync(chrome)) {
   for (const [name, dest] of shots) {
     const png = path.join(OUT, `${name}.png`);

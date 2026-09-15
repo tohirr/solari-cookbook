@@ -31,7 +31,7 @@ git clone https://github.com/tohirr/solari-cookbook.git && cd solari-cookbook/pa
 PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 ```
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-bookmarx-triage-prompt/compare.html"><img src="passk/docs/compare-bookmarx-triage.jpg" alt="A passk comparison page for a real app: bookmarx's sweeping agent reviewing a queue of seventeen saved posts under two prompts, 4/10 against 2/10, with the by-check table showing fifteen of nineteen rules holding every run and the hateful post removed in half" width="100%"></a></p>
 
 **[passk/README.md](passk/README.md)
 · [Ten things learned about Solari](passk/docs/SOLARI-NOTES.md)
@@ -41,9 +41,12 @@ PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 
 The bench is the instrument and `compare` is the point: two conditions on
 one snapshot, what was held fixed, what changed, the delta per check, and
-Fisher's exact p. The example above was run while building the tool, on one
-budget model at small *k*; it shows what the pages contain and is not a
-finding. The question is from Gonzalez-Pumariega et al.,
+Fisher's exact p. The picture is a real app: [bookmarx](https://bookmarx.space),
+a search over saved posts, running inside the desktop, and its own sweeping
+agent reviewing seventeen saved posts before a public demo under two
+prompts. 4/10 and 2/10, a split consistent with noise; fifteen of nineteen
+rules hold every run and one judgment, the hateful post, holds in half —
+twice. Published without frames or post ids. The question is from Gonzalez-Pumariega et al.,
 [*On the Reliability of Computer Use Agents*](https://arxiv.org/abs/2604.17849)
 (2026), which measures it on OSWorld; passk measures it on your workflow.
 
