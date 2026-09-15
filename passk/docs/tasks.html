@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>passk · writing and running tasks</title>
+<meta name="description" content="passk: reliability regression testing for computer-use agents on Solari desktops. Fork one snapshot k times, grade every run inside the VM, report pass@k and pass^k with intervals.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet"><style>
+:root{
+  --bg:#fbfaf7;--surface:#fbfaf7;--surface-2:#f1efe8;--line:#e3e0d7;--line-2:#c9c5b9;
+  --ink:#1c1b18;--ink-2:#4f4c45;--ink-3:#6f6a5c;
+  --good:#0ca30c;--good-ink:#006300;--good-dim:rgba(12,163,12,.14);
+  --crit:#d03b3b;--crit-ink:#a52a2a;--crit-dim:rgba(208,59,59,.12);
+  --warn:#9a6700;--warn-dim:rgba(154,103,0,.12);
+  --a:#2a78d6;--a-dim:rgba(42,120,214,.14);--b:#d95926;--b-dim:rgba(217,89,38,.14);
+  --serif:"Source Serif 4","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:4px;--radius-s:3px;--measure:68ch;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line-2);text-underline-offset:2px}a:hover{text-decoration-color:var(--ink)}
+main{max-width:920px;margin:0 auto;padding:52px 32px 96px}
+h1{font:600 34px/1.15 var(--serif);letter-spacing:-.01em;margin:0 0 8px;max-width:var(--measure)}
+h2{font:600 22px/1.25 var(--serif);margin:52px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font:600 18px/1.3 var(--serif);margin:0 0 6px}
+p{max-width:var(--measure)}
+code{font:13.5px var(--mono);background:var(--surface-2);padding:1px 5px;border-radius:var(--radius-s);color:var(--ink-2)}
+.brand{display:flex;align-items:center;gap:10px;font:13.5px var(--sans);color:var(--ink-3);margin-bottom:26px}
+.brand b{color:var(--ink);font-weight:600}
+.meta{font:14px var(--sans);color:var(--ink-3);margin-bottom:26px}.meta code{font-size:12.5px}
+.prompt{border-left:2px solid var(--line-2);padding:4px 18px;margin:0 0 28px;color:var(--ink-2);font-style:italic;max-width:var(--measure)}
+.verdict{font-size:21px;line-height:1.45;margin:0 0 34px;max-width:var(--measure)}
+.verdict b{font-weight:600}
+.card{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 0}
+table.checks{width:100%;border-collapse:collapse;font:14px var(--sans)}
+table.checks th{text-align:left;color:var(--ink-3);font-weight:400;font-size:12.5px;padding:0 10px 6px 0;border-bottom:1px solid var(--line)}
+table.checks td{padding:6px 10px 6px 0;border-top:1px solid var(--line);vertical-align:middle}
+table.checks tr:first-child td{border-top:0}
+table.checks td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2);font-family:var(--mono);font-size:13px}
+table.checks tr.miss td:first-child{color:var(--ink);font-weight:600}
+table.checks .bar{width:120px;height:5px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+table.checks .bar i{display:block;height:100%;background:var(--good);opacity:.8}
+table.checks tr.miss .bar i{background:var(--crit);opacity:1}
+.pill.inv{background:var(--surface-2);color:var(--ink-3)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 28px}
+.kpi b{display:block;font:600 30px/1.05 var(--sans);letter-spacing:-.01em;margin-bottom:6px}
+.kpi span{display:block;font:13px/1.4 var(--sans);color:var(--ink-3)}
+.kpi .sub{color:var(--ink-2)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:11px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:20px;height:20px;border-radius:50%;border:0;display:inline-grid;place-items:center;font:700 11px/1 var(--mono);text-decoration:none}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink);outline-offset:1px}
+.dot.passed{background:var(--good-dim);color:var(--good-ink)}
+.dot.failed{background:var(--crit);color:#fff}
+.dot.errored{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3);color:var(--ink-3)}
+.dot.skipped{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font:600 28px/1.05 var(--sans);letter-spacing:-.01em}
+.headline span{font:13.5px var(--sans);color:var(--ink-2)}
+.runrow{margin:0;border:0;border-top:1px solid var(--line);background:transparent}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 0;font:14px var(--sans);color:var(--ink-2);font-variant-numeric:tabular-nums;cursor:pointer}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12.5px}
+.runrow>.card{border:0;padding:6px 0 18px}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:2px solid var(--line-2);padding:4px 18px;color:var(--ink-2);margin:0 0 24px;max-width:var(--measure);line-height:1.65}
+.diff del{background:var(--crit-dim);color:var(--crit-ink);text-decoration:line-through;border-radius:2px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good-ink);text-decoration:none;border-radius:2px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
+.legend{display:flex;gap:16px;font:12.5px var(--sans);color:var(--ink-3);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.range{position:relative;height:8px;background:var(--surface-2);border-radius:4px;margin:16px 0 6px}
+.range i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--good);opacity:.22}
+.range b{position:absolute;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--good);border:2px solid var(--bg);transform:translateX(-50%)}
+.range-labels{display:flex;justify-content:space-between;font:11.5px var(--mono);color:var(--ink-3)}
+.strip{position:relative;height:44px;margin:6px 0 2px}
+.strip .axis{position:absolute;left:0;right:0;top:22px;height:1px;background:var(--line-2)}
+.strip .tick{position:absolute;top:28px;transform:translateX(-50%);font:11px var(--mono);color:var(--ink-3)}
+.strip .pt{position:absolute;top:15px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--bg);cursor:default}
+.strip .pt.passed{background:var(--good)}.strip .pt.failed{background:var(--crit)}
+.strip .pt.a{background:var(--a)}.strip .pt.b{background:var(--b)}
+.strip .pt.hollow{background:var(--bg)!important;border:2.5px solid;box-shadow:inset 0 0 0 2px var(--bg)}.strip .pt.a.hollow{border-color:var(--a)}.strip .pt.b.hollow{border-color:var(--b)}
+.strip .med{position:absolute;top:8px;width:2px;height:28px;background:var(--ink);transform:translateX(-50%)}
+.strip .med.a{background:var(--a)}.strip .med.b{background:var(--b)}.strip .med.b:after{top:auto;bottom:-16px}
+.strip .med:after{content:attr(data-label);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font:10.5px var(--mono);color:var(--ink-2);white-space:nowrap}
+.runs{display:grid;gap:18px}
+.run{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}.run>div{min-width:0}
+.run .id{font:13px var(--sans);color:var(--ink-3)}
+.run .id b{display:block;font:600 16px var(--sans);color:var(--ink);margin-bottom:4px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font:600 12px/1.5 var(--sans);background:var(--surface-2);color:var(--ink-2);vertical-align:middle;white-space:nowrap}
+.pill.passed{background:var(--good-dim);color:var(--good-ink)}.pill.failed{background:var(--crit-dim);color:var(--crit-ink)}.pill.errored{background:var(--surface-2);color:var(--ink-2)}
+.pill.a,.pill.b{color:var(--ink)}.pill.a{background:var(--a-dim)}.pill.b{background:var(--b-dim)}
+.pill.a::before,.pill.b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+.pill.a::before{background:var(--a)}.pill.b::before{background:var(--b)}
+.pill.neutral{background:var(--surface-2);color:var(--ink-2)}
+.checks{display:flex;flex-direction:column;gap:3px;font:12.5px var(--mono);color:var(--ink-2)}
+.checks .ok{color:var(--good-ink)}.checks .bad{color:var(--crit-ink)}
+.checks .detail{color:var(--ink-3);white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto}
+.film{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:thin}
+.film a{flex:none;position:relative}
+.film img{height:84px;border-radius:var(--radius-s);border:1px solid var(--line);display:block;background:#000}
+.film a.final img{border-color:var(--good)}.film a.diverge img{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn)}
+.film em{position:absolute;left:4px;bottom:4px;font:10px var(--mono);font-style:normal;background:rgba(0,0,0,.65);color:#fff;padding:1px 5px;border-radius:3px}
+.acts{font:12.5px var(--sans);color:var(--ink-3);margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.hyp{overflow-wrap:anywhere;margin-top:12px;padding:6px 16px;border-left:2px solid var(--line-2);font-size:15px;line-height:1.55;color:var(--ink-2);max-width:var(--measure)}
+.hyp b{color:var(--ink);font-weight:600}
+details{margin-top:8px}summary{cursor:pointer;font:13px var(--sans);color:var(--ink-3)}
+pre{white-space:pre-wrap;font:12.5px/1.5 var(--mono);color:var(--ink-2);margin:8px 0 0;background:var(--surface-2);padding:10px 12px;border-radius:var(--radius);overflow:auto}
+.foot{font:13.5px/1.55 var(--sans);color:var(--ink-3);margin-top:60px;border-top:1px solid var(--line);padding-top:16px}
+.foot code{font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px 32px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.run{grid-template-columns:1fr}main{padding:36px 20px 72px}body{font-size:16px}}
+table{width:100%;border-collapse:collapse;font:14px var(--sans);font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px 9px 0;text-align:left;border-top:1px solid var(--line);vertical-align:top}th{color:var(--ink-3);font-weight:400;border-top:0;border-bottom:1px solid var(--line);font-size:12.5px}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
+.delta.up{color:var(--good-ink)}.delta.down{color:var(--crit-ink)}.delta.flat{color:var(--ink-3)}
+.note{font:13.5px/1.5 var(--sans);color:var(--ink-3);margin-top:8px;max-width:var(--measure)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font:12px var(--mono);padding:5px 8px;border-radius:4px;transform:translate(-50%,-130%);opacity:0;transition:opacity .08s;white-space:nowrap;z-index:9}
+@media print{main{max-width:none;padding:0}body{font-size:11pt}a{text-decoration:none}.film{display:none}details{display:none}}
+
+.docnav{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;font:13.5px var(--sans);color:var(--ink-3);margin-bottom:36px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.docnav a{text-decoration:none;color:var(--ink-2)}.docnav a:hover{color:var(--ink)}.docnav a.on{color:var(--ink);font-weight:600}
+.docnav b{color:var(--ink);font-weight:600;margin-right:6px;font-size:14px}
+.docnav .gh{margin-left:auto}
+.doc h1{margin-bottom:18px}.doc h2{margin-top:44px}.doc h3{margin-top:28px}
+.doc p,.doc li{max-width:var(--measure)}.doc ul,.doc ol{padding-left:22px}.doc li{margin:4px 0}
+.doc pre{background:var(--surface-2);padding:12px 14px;font:13px/1.55 var(--mono);color:var(--ink);overflow:auto;border-radius:var(--radius);margin:12px 0 18px}
+.doc pre code{background:transparent;padding:0;font-size:13px;color:inherit}
+.doc table{font:14px var(--sans);margin:12px 0 18px;display:block;overflow-x:auto}
+.doc table td,.doc table th{padding:8px 14px 8px 0;vertical-align:top}
+.doc img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:var(--radius-s)}
+.doc blockquote{border-left:2px solid var(--line-2);margin:0 0 18px;padding:4px 18px;color:var(--ink-2);font-style:italic}
+.doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+.doc strong{font-weight:600}
+</style></head><body><main>
+<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html" class="on">Tasks</a><a href="method.html">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a href="../board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<article class="doc">
+<h1 id="writing-and-running-tasks">Writing and running tasks</h1>
+<p>The operator&#39;s manual: setup, the task format, what <code>run</code> does, the shipped tasks, experiments, benching your own agent, and what is in and out of scope. Companion to the <a href="../index.html">README</a> and <a href="method.html">Method</a>.</p>
+<h2 id="setup">Setup</h2>
+<p>You need Node 20 or newer, a Solari account, and one model key.</p>
+<pre><code class="language-bash">git clone https://github.com/tohirr/solari-cookbook.git
+cd solari-cookbook/passk
+npm install
+cp .env.example .env
+</code></pre>
+<p>Open <code>.env</code> and fill in:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Where it comes from</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SOLARI_API_KEY</code></td>
+<td><a href="https://console.getsolari.com">console.getsolari.com</a> → API keys. The free tier allows 1 concurrent desktop; Starter allows 2 and includes $20 of credit.</td>
+</tr>
+<tr>
+<td><code>OPENAI_API_KEY</code> <strong>or</strong> <code>ANTHROPIC_API_KEY</code></td>
+<td>Your model provider. With both set, Claude is used unless <code>PASSK_PROVIDER=openai</code>.</td>
+</tr>
+<tr>
+<td><code>PASSK_MODEL</code></td>
+<td>Optional. <code>gpt-5.6-luna</code> is the budget tier every result here was produced on; leave unset for the provider&#39;s default.</td>
+</tr>
+<tr>
+<td><code>PASSK_SAFETY=allow</code></td>
+<td>Set this for benches: it lets the OpenAI loop acknowledge its own safety checks inside the disposable VM. Never set it anywhere real.</td>
+</tr>
+<tr>
+<td><code>PASSK_CONCURRENCY</code></td>
+<td>Optional. Defaults to 2. Match your Solari plan.</td>
+</tr>
+</tbody></table>
+<p>Then confirm everything talks to everything:</p>
+<pre><code class="language-bash">npm run passk doctor
+</code></pre>
+<p>It checks the keys, reaches Solari, boots and kills one desktop, sends the
+model a one-token request, and prints what a run would use. Fix anything it
+marks ✗ before going further. The commands in these docs are written as
+<code>passk …</code>; run them as <code>npm run passk -- …</code> or set <code>alias passk=&quot;npx tsx src/cli.ts&quot;</code>
+inside the <code>passk/</code> folder.</p>
+<p>Results land in <code>runs/&lt;task&gt;-&lt;timestamp&gt;/</code> (ignored by git); the curated,
+committed copies live in <a href="../evidence"><code>evidence/</code></a>.</p>
+<p>The Claude agent loop is written but was not exercised during development
+for want of a working key; every published result came from the OpenAI loop.</p>
+<h2 id="task-status">Task status</h2>
+<p>Every task carries a <code>golden</code> block, the recipe for a correct outcome with
+no agent involved, so <code>passk validate</code> can prove its checks fail before and
+pass after. Status is one of <strong>validated</strong> (live runs published in
+<code>evidence/</code>), <strong>ready</strong> (validated verifier, no published runs), or
+<strong>illustrative</strong> (a sketch). An unrun task is never presented as evidence.</p>
+<h2 id="writing-a-task">Writing a task</h2>
+<pre><code class="language-yaml">id: notes
+name: Save a note in Mousepad
+template: default          # default | office | code | your custom template
+setup:                      # runs once, before the snapshot
+  - open: mousepad
+  - wait: 4
+prompt: &gt;                   # exactly what a user would type
+  Type &quot;hello&quot; and save it as notes.txt in Documents.
+golden:                     # the correct outcome with no agent; run proves the checks against it
+  - write: /root/Documents/notes.txt
+    content: hello
+checks:                     # evaluated INSIDE the desktop after the agent stops
+  - type: file_contains
+    path: /root/Documents/notes.txt
+    text: hello
+</code></pre>
+<p>Setup steps: <code>exec</code> (argv, no shell), <code>open</code> (launch a GUI app by name),
+<code>write</code> (text to a guest path), <code>upload</code> (local file to a guest path), <code>click</code>
+(x, y), <code>press</code> (a key or &quot;+&quot;-joined chord), <code>type</code> (literal text), <code>wait</code>
+(seconds). Everything runs once, before the snapshot, so forks pay none of it.</p>
+<p>Check types: <code>file_exists</code>, <code>file_contains</code>, <code>file_equals</code>, <code>exec</code> (exit code +
+stdout), <code>screenshot_judge</code> (the model grades the final screen against a rubric).
+Prefer several checks that each grade one fact over one script that grades
+everything: a run still passes only if all of them pass, but the report then
+carries a Checks table, pass count per check across the bench, worst first,
+so a pass rate turns into a diagnosis. <code>tasks/ticket-routing.yaml</code> is the
+example, with nineteen.
+Any check may carry a <code>name</code> (&quot;Invoice was created&quot;); reports show it in
+place of the raw path or command, which stays available for audit. Naming a
+check changes neither grading nor the task hash.</p>
+<p align="center"><a href="../evidence/invoice-entry/report.html"><img src="report-invoice-entry.jpg" alt="Invoice entry report: 23/26 passed, every run a dot in rows of ten, the numbers, effort per run" width="100%"></a></p>
+
+<h2 id="what-run-does">What <code>run</code> does</h2>
+<pre><code>passk run tasks/notes.yaml --k 10
+
+  prepare    no snapshot for this task yet? boot the template, run setup, snapshot, kill
+  validate   fork once: the checks must fail untouched, agree with themselves twice,
+             and pass after the golden steps. Unsound → exit 2, no bench.
+  bench      fork ×k from the snapshot, agent loop on each, checks inside the VM, kill
+  report     pass@1 with its interval, pass^k, divergence and cause per failure, report.html
+</code></pre>
+<p>Every step of that is also a command on its own (<code>prepare</code>, <code>validate</code>,
+<code>report</code>, <code>classify</code>), for when you want one piece: <code>--prepare</code> forces a fresh
+snapshot, <code>--no-validate</code> skips the verifier check while you iterate on a task,
+<code>--resume</code> finishes an interrupted bench or extends a finished one with a
+larger <code>--k</code>. The validation result is recorded on the bench and shown in its
+report, so a number always says whether its verifier was proven.</p>
+<p>The verifier check is the step that would have caught both verifier bugs
+found during this work, and it is why an unsound task cannot produce a
+number. It costs one desktop boot and no model calls unless a check is a
+screenshot judge.</p>
+<p><code>passk sweep</code> kills anything tagged passk that an interrupted bench left
+running. Task files carry a <code>yaml-language-server</code> schema hint; with the YAML
+extension in VS Code you get completion and validation from
+<code>schema/task.schema.json</code>.</p>
+<h2 id="tasks-that-ship">Tasks that ship</h2>
+<p>Every task is <strong>validated</strong>: its verifier proved sound and its live runs
+published in <a href="../evidence"><code>evidence/</code></a>.</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Template</th>
+<th>Status</th>
+<th>What it exercises</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>notes</code> / <code>notes-nodir</code></td>
+<td>default</td>
+<td>validated, 5 + 5 runs</td>
+<td>Save-dialog handling; an environment pair (folder present vs missing)</td>
+</tr>
+<tr>
+<td><code>rename-invoices</code> / <code>-clarified</code></td>
+<td>default</td>
+<td>validated, 5 + 5 runs</td>
+<td>File manager; a prompt pair (ambiguous vs spelled out)</td>
+</tr>
+<tr>
+<td><code>q3-total</code></td>
+<td>office</td>
+<td>validated, 10 runs</td>
+<td>LibreOffice Calc, formulas, the CSV &quot;keep format&quot; dialog</td>
+</tr>
+<tr>
+<td><code>ticket-queue</code> / <code>-verify</code> / <code>-reload</code></td>
+<td>default</td>
+<td>validated, 50 + 50 + 50 runs</td>
+<td>An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer&#39;s tickets is closed and must not be touched. Three prompt conditions on one snapshot.</td>
+</tr>
+<tr>
+<td><code>ticket-routing</code> / <code>-reload</code></td>
+<td>default</td>
+<td>validated, 20 + 20 runs</td>
+<td>The ticket queue, harder: twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report&#39;s Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check.</td>
+</tr>
+<tr>
+<td><code>invoice-entry</code></td>
+<td>office</td>
+<td>validated, 30 runs</td>
+<td>Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment&#39;s sha256.</td>
+</tr>
+<tr>
+<td><code>fake</code></td>
+<td>none</td>
+<td>harness test</td>
+<td>Runs on the scripted provider; exercises the pipeline with no VM or model</td>
+</tr>
+</tbody></table>
+<p>LedgerDesk and the ticket queue are mocks on purpose. A mock lets the bench
+own the state, plant a trap, and verify exactly. What they keep from the real
+thing is the shape: existing records to search, a duplicate to avoid, required
+fields, dropdowns, a file upload, a business rule (&quot;pending review&quot;), and a
+consequential action that must not happen.</p>
+<p>The ticket queue is the shape of task Solari&#39;s own site lists under portal
+automation: &quot;enter data, submit forms, and complete workflows inside portals
+that don&#39;t expose the APIs&quot;. Because the app lives in the snapshot, fifty runs cost
+about a dollar on a budget model.</p>
+<p>The shipped tasks are examples of the format, not a suite, and there is no
+leaderboard of models. passk asks whether <em>your</em> agent is dependable on
+<em>your</em> workflow; the argument is in <a href="method.html#not-a-model-benchmark">Method</a>.</p>
+<h2 id="change-one-thing-measure-again">Change one thing, measure again</h2>
+<p>The bench is the instrument; the experiment is the point. Fork the same
+snapshot under two conditions, then compare:</p>
+<pre><code class="language-bash">passk run tasks/rename-invoices.yaml --k 5                                   # ambiguous prompt
+passk run tasks/rename-invoices-clarified.yaml --k 5 --snapshot snap_…        # clarified prompt, same snapshot
+passk compare runs/rename-invoices-*/ runs/rename-invoices-clarified-*/
+</code></pre>
+<p><code>compare</code> says what was held fixed (snapshot, checks, model), what changed
+(prompt, environment), the observed delta in passes, steps, time and cost per
+success, and Fisher&#39;s exact p-value for the pass/fail split. It refuses to
+attribute a difference when more than one thing changed. Note how little
+small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.</p>
+<p>Before spending k runs on a new prompt, <code>passk probe</code> forks one throwaway
+desktop, lets the agent look around, and has it list every question it would
+ask a human. Tighten the prompt, re-probe, then bench. After a bench, <code>passk recommend</code> reads the failures and suggests the one change to test next.</p>
+<h2 id="studio">Studio</h2>
+<p>The results board, on localhost, with your keys and a working Run button:</p>
+<pre><code class="language-bash">npm run studio          # http://127.0.0.1:8787, opens the browser
+</code></pre>
+<p>Paste your Solari key and a model key into the form; they are written to
+<code>passk/.env</code> on this machine and go only to Solari and the model provider,
+by the runs you start. Pick a shape, a model, k, a budget, and Start. Each
+run is <code>passk run</code> in a child process with exactly the command the board
+shows, so the button and the docs never disagree. Runs execute one at a
+time; a second Start queues behind the first, so two benches never compete
+for your Solari concurrency. The row appears as &quot;local&quot; when it finishes,
+with its report. The board is served only on 127.0.0.1; nothing about a run
+leaves your machine unless you export the bench into <code>evidence/</code> and send it
+as a pull request, which is how the published board gains a row.</p>
+<p>Try it with no keys: choose the model <code>scripted</code> and the row runs the
+harness on in-memory desktops in a few seconds.</p>
+<h2 id="evidence">Evidence</h2>
+<p><a href="../evidence"><code>evidence/</code></a> holds every bench cited in the README: <code>bench.json</code>
+with every action, check, provenance record and task hash; the report page;
+the final screenshot of every run; and every screenshot of every failed run
+and of the shortest passing run. Comparison folders hold the paired results.
+<code>passk export runs/&lt;dir&gt; evidence/&lt;name&gt;</code> copies a bench with only the
+screenshots that carry proof. <code>passk export-inspect runs/&lt;dir&gt; [out.json]</code>
+writes the bench as an <a href="https://inspect.aisi.org.uk/">Inspect AI</a> eval log:
+one task, one sample, each run an epoch, the checks as the scorer, lost runs
+unscored, every step a tool call, so <code>inspect view</code> opens it beside whatever
+else a team evaluates there (<code>--images</code> embeds the screenshots as data URLs); <code>sh scripts/curate-evidence.sh</code> rebuilds the
+whole directory from <code>runs/</code>. <code>npm run assets</code> redraws the two still images
+in <code>docs/</code> (failure evidence, how it works) from the same bench files.
+<code>docs/demo.tape</code> records the no-key demo as a GIF with
+<a href="https://github.com/charmbracelet/vhs">vhs</a>: <code>vhs docs/demo.tape</code>.</p>
+<h2 id="benching-your-own-agent">Benching your own agent</h2>
+<p>The bundled loops are one Claude loop and one OpenAI loop, chosen by
+<code>PASSK_PROVIDER</code>. A team with its own agent writes a third file in
+<code>src/agent/</code> implementing the same interface (<code>AgentRunOptions → AgentRunOutput</code> in <code>src/agent/index.ts</code>): it receives a live desktop handle,
+the prompt, a step budget and an output directory, and returns the trace of
+actions it took, its token usage, and how it stopped. Two rules make the
+bench honest and are not negotiable: the agent never sees the task&#39;s checks,
+and the agent&#39;s own claim of success is recorded but never graded. The
+scripted agent in <code>src/agent/scripted.ts</code> is the smallest example.</p>
+<h2 id="what-passk-can-and-cannot-do-today">What passk can and cannot do today</h2>
+<p><strong>Supported.</strong> Anything whose meaningful state lives inside the desktop, because
+that is what a Solari snapshot isolates and a fork resets: LibreOffice and
+other desktop applications, PDFs and files, local web tools served from the
+VM, multi-application workflows across the three templates, custom templates,
+benches of 50+ runs, and controlled comparisons of prompts on one snapshot.
+Every result in <a href="../evidence"><code>evidence/</code></a> is one of these.</p>
+<p><strong>Experimental.</strong> Written but not exercised: the Claude agent loop (no working
+key during development). Architecturally supported but not demonstrated:
+comparing two models on one snapshot. Likely to work with care: longer
+workflows of 60 to 100 steps (raise <code>max_steps</code>, expect context growth and
+higher cost per run), and local instances of heavier software such as an
+Odoo container (longer boot, more memory).</p>
+<p><strong>Unsupported.</strong> Anything where the state the agent changes lives outside the
+desktop. A snapshot resets the VM; it does not reset Gmail, Shopify, GitHub,
+Salesforce, or a shared test database. Five forks told to &quot;create an invoice
+for Acme&quot; against a live SaaS account will create five invoices, and the
+checker cannot see any of them. Also out of scope: real payments, messages,
+bookings or publishing; regulated or customer data; production enterprise
+systems; multi-hour unattended tasks; adversarial task definitions; and
+anything where a wrong action is irreversible.</p>
+<p><strong>External state, if you need it.</strong> The extension point is documented, not
+built. A task that touches an external system would declare it and supply
+lifecycle hooks:</p>
+<pre><code class="language-yaml">isolation: external          # default is &quot;snapshot&quot;
+before_each:                 # reset or seed external state; runs on the host, not in the VM
+  - exec: ./scripts/reset-test-tenant.sh
+after_each:
+  - exec: ./scripts/delete-test-records.sh --run ${RUN_ID}
+checks:
+  - type: http_json          # a verifier that queries the system from outside the agent&#39;s desktop
+    url: ${LEDGER_TEST_API}/invoices/NOS-1047
+    expect: { status: pending_review, total: 1333.0 }
+</code></pre>
+<p>The principle that must hold for any of it: verification runs from passk&#39;s
+host process with credentials the agent never sees, and each run acts on
+records it can identify as its own. Until those hooks exist, passk should not
+be pointed at a system that other people can see.</p>
+
+</article>
+<div class="foot">This page is <code>docs/TASKS.md</code> in the repository, typeset. Built on <a href="https://getsolari.com">Solari</a>.</div>
+</main></body></html>

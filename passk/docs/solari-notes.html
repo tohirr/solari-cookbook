@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · does your computer-use agent pass twice?</title>
+<title>passk · notes from building on Solari</title>
 <meta name="description" content="passk: reliability regression testing for computer-use agents on Solari desktops. Fork one snapshot k times, grade every run inside the VM, report pass@k and pass^k with intervals.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet"><style>
 :root{
@@ -135,112 +135,52 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 .doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 .doc strong{font-weight:600}
 </style></head><body><main>
-<nav class="docnav"><b>passk</b><a href="index.html" class="on">Manual</a><a href="docs/tasks.html">Tasks</a><a href="docs/method.html">Method</a><a href="docs/solari-notes.html">Solari notes</a><a href="evidence/index.html">Evidence</a><a href="board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html">Tasks</a><a href="method.html">Method</a><a href="solari-notes.html" class="on">Solari notes</a><a href="../evidence/index.html">Evidence</a><a href="../board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
 <article class="doc">
-<h1 id="passk">passk</h1>
-<p><strong>Does your computer-use agent pass twice?</strong></p>
-<p>An agent that passes a demo once tells you nothing about the tenth try. passk
-snapshots one Solari desktop, forks it <em>k</em> times, runs the same agent on every
-fork, verifies the outcome inside the VM, and reports pass@k and pass^k with
-honest intervals, plus the step where each failure parted ways with a passing run.</p>
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="One sentence in the prompt took a twelve-ticket routing task from 5/18 to 14/20 on the same snapshot; the by-check table shows every unsaved row now saves and the last row got worse from the step cap" width="100%"></a></p>
-
-<p>One sentence, measured per rule. On a twelve-ticket routing task with nineteen
-checks, the cheapest model available passed 5 of 18 runs. Adding &quot;when you are
-done, reload the page and confirm each row&quot; to the prompt took it to 14 of 20
-on the same snapshot with the same checks (Fisher p = 0.022). The comparison
-says which checks the sentence fixed: every row that was being left unsaved
-now saves. It also says what it cost: median effort rose from 56 steps to the
-cap of 80, and the last open row got worse because runs ran out of steps
-before reaching it. Every guard held on both sides.</p>
-<p>The simpler ticket queue told the same story at smaller scale: three prompts
-went 47/50, 47/49, 49/49. The failures were a Save click that did not land
-followed by a confident claim of success; asking the agent to verify on screen
-changed nothing, asking it to reload fixed it, and on fifty runs the split
-alone is still consistent with noise (p = 0.24). The mechanism is the
-evidence, and the interval says so.</p>
-<p><strong><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html">The routing comparison</a>
-· <a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html">The ticket-queue comparison</a>
-· <a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html">Every bench and screenshot</a>
-· <a href="docs/tasks.html#what-run-does">How it works</a>
-· <a href="docs/solari-notes.html">Notes for Solari&#39;s team</a></strong></p>
-<h2 id="one-command">One command</h2>
-<p>No keys, forty seconds, the whole pipeline on in-memory desktops:</p>
-<pre><code class="language-bash">git clone https://github.com/tohirr/solari-cookbook.git &amp;&amp; cd solari-cookbook/passk &amp;&amp; npm install
-PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
-</code></pre>
-<p align="center"><img src="docs/demo.gif" alt="Terminal recording: passk snapshots the task, proves the verifier, forks ten desktops, grades each run, prints pass@1 with its interval and pass^k, and the gate refuses an 80% agent" width="100%"></p>
-
-<p>The real thing, with a <a href="https://console.getsolari.com">Solari key</a> and an
-OpenAI or Anthropic key in <code>.env</code> (copy <code>.env.example</code>; <code>doctor</code> checks both):</p>
-<pre><code class="language-bash">npm run passk doctor
-npm run passk run tasks/ticket-queue.yaml -- --k 10
-open runs/ticket-queue-*/report.html
-</code></pre>
-<p><code>run</code> does everything. It boots the template and runs the task&#39;s setup once,
-snapshots it, proves the verifier on one fork (the checks must fail on the
-untouched state and pass after the task&#39;s golden steps, or the bench does not
-start), forks the snapshot <em>k</em> times, runs the agent on every fork, grades each
-run inside its own VM, and writes the report. Fifty runs of the ticket queue
-cost about a dollar on a budget model.</p>
-<p align="center"><img src="docs/how-it-works.jpg" alt="How passk works: task and verifier, prepare one Solari desktop, snapshot, validate the verifier, fork k times, agent and checks on each fork, reliability report" width="100%"></p>
-
-<h2 id="what-the-report-says">What the report says</h2>
+<h1 id="notes-from-building-on-solari">Notes from building on Solari</h1>
+<p>Everything below was found on a live VM while building passk, and cost an afternoon each. Solari&#39;s team may find the first four worth a changelog entry.</p>
 <ul>
-<li><strong>Observed passes with a 95% interval.</strong> 10/10 is a lower bound of 72%, not proof of 100%.</li>
-<li><strong>pass^k</strong>, the chance all <em>k</em> attempts in a row succeed. 80% pass@1 is 33% pass^5. This is the number a user feels.</li>
-<li><strong>For each failure</strong>, the first step where it diverged from a passing sibling, and a cause hypothesis: stochastic execution, task ambiguity, or behavior variability.</li>
-<li><strong>Steps, seconds and model spend</strong> per run, and cost per success.</li>
-<li><strong>Runs lost to infrastructure</strong>, listed but never scored against the agent.</li>
-<li><strong>Every screenshot, every action, the checks as run</strong>, and a hash of the task, so the number is auditable.</li>
-</ul>
-<p>Nothing the agent says about its own success counts. Grading happens inside the VM after it stops.</p>
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-queue.jpg" alt="Failure evidence: a passing run and a failing run of the ticket queue on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
-
-<h2 id="evidence">Evidence</h2>
-<p>Eleven tasks across three Solari templates, 250+ verified runs, two controlled
-prompt experiments, a model comparison, a mock accounts-payable workflow with
-a duplicate trap, all for under $5 of model spend. Every number is in
-<a href="evidence"><code>evidence/</code></a> with screenshots and traces, rendered at
-<a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html">the showcase</a>
-and summarized on <a href="https://tohirr.github.io/solari-cookbook/passk/">the front page</a>.</p>
-<h2 id="write-your-own-task">Write your own task</h2>
-<pre><code class="language-yaml">id: notes
-name: Save a note in Mousepad
-setup:                      # runs once, before the snapshot
-  - open: mousepad
-  - wait: 4
-prompt: &gt;                   # exactly what a user would type
-  Type &quot;hello&quot; and save it as notes.txt in Documents.
-golden:                     # the correct outcome with no agent, so run can prove the checks
-  - write: /root/Documents/notes.txt
-    content: hello
-checks:                     # graded inside the desktop after the agent stops
-  - type: file_contains
-    path: /root/Documents/notes.txt
-    text: hello
-</code></pre>
-<p>Anything whose state lives inside the desktop works: desktop applications,
-files and PDFs, a web tool served from inside the VM. Setup can exec, upload,
-open apps, click and type; checks can read files, run any command, or as a
-last resort have the model judge the final screen. The format, the shipped
-tasks, and what is out of scope are in <a href="docs/tasks.html">the operator&#39;s manual</a>.</p>
-<h2 id="after-the-first-bench">After the first bench</h2>
-<pre><code class="language-bash">npm run passk compare runs/A runs/B        # what changed, what moved, and whether it could be noise
-npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
-npm run passk probe tasks/x.yaml           # what would the agent ask a human before acting?
-npm run passk recommend runs/dir           # what to change next, and what to keep fixed
-npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, for `inspect view`
-npm run studio                             # the results board on localhost, with a Run button
-</code></pre>
-<h2 id="docs">Docs</h2>
-<ul>
-<li><a href="docs/tasks.html">Writing and running tasks</a>: setup, the task format, the shipped tasks, experiments, benching your own agent, scope.</li>
-<li><a href="docs/method.html">Method</a>: intervals, who gets blamed for what, how many runs, resume, testing the harness, safety.</li>
-<li><a href="docs/solari-notes.html">Notes from building on Solari</a>: the gotchas, for Solari&#39;s team as much as for users.</li>
-<li><a href="evidence/index.html">Evidence</a>: every bench, every comparison, every screenshot that carries proof.</li>
+<li><strong>Key chords must be one string.</strong> <code>keyboard.press([&quot;ctrl&quot;, &quot;s&quot;])</code> presses
+ctrl, then s, and you get a literal &quot;s&quot;. <code>keyboard.press(&quot;ctrl+s&quot;)</code> is the
+chord. <code>keyboard.hotkey(&quot;ctrl&quot;, &quot;s&quot;)</code> has the same bug. <code>down</code>/<code>up</code> do hold
+modifiers correctly. Key names are xdotool&#39;s: <code>Return</code>, <code>BackSpace</code>,
+<code>Page_Down</code> — not <code>enter</code>.</li>
+<li><strong>Home is <code>/home/desktop</code>, and GUI apps run as root.</strong> Mousepad shows a red
+root warning; file dialogs default to <code>/home/desktop</code>. <code>exec</code> runs with an
+empty <code>$HOME</code>, so use absolute paths in setup and checks.</li>
+<li><strong>The SDK&#39;s <code>mouse.scroll</code> has no direction.</strong> X11 scroll is buttons 4–7 and
+the typed <code>MouseButton</code> can&#39;t express them, so passk scrolls through
+<code>xdotool click 4|5|6|7</code>, which the default template ships.</li>
+<li><strong><code>sandboxes.createDesktop</code>, not <code>desktops.create</code>, for forks.</strong> Only the
+sandbox-flavoured route accepts <code>fromSnapshot</code>.</li>
+<li><strong>Lowercase the letters in chords.</strong> <code>ctrl+A</code> reaches xdotool as
+ctrl+shift+a, which in Chrome opens the tab-search panel and silently
+swallows everything typed next. One capital letter cost a whole run.</li>
+<li><strong>The control channel can drop right after a fork</strong> on the office template:
+up for <code>connect()</code> and <code>health()</code>, gone by the first action. passk reconnects
+once and retries the action instead of failing the run.</li>
+<li><strong>Chrome will not upload a file from <code>/root</code>.</strong> A form with a file input
+chosen from under <code>/root</code> fails with <code>ERR_ACCESS_DENIED</code> on submit and never
+reaches the server; the same file under <code>/home/desktop</code> or <code>/tmp</code> uploads
+fine. Put task inputs the agent must attach under the desktop user&#39;s home.</li>
+<li><strong>Verify the verifier.</strong> An <code>exec</code> check that ran <code>cat</code> on two candidate
+paths failed with exit 1 whenever the first path was missing, even though the
+second printed the right text. Two real passes were scored as failures until
+the forensics in the report showed the file sitting exactly where it should
+be. <code>exec</code> checks with <code>stdout_contains</code> now judge output only unless an
+<code>exit_code</code> is given.</li>
+<li><strong>Clipboard readback is empty</strong> (<code>xclip -o</code> exits 1) even after a real copy.
+Verify results through the filesystem instead.</li>
+<li><strong>A snapshot id can come back before the snapshot exists.</strong> Once, <code>snapshot()</code>
+returned an id, <code>createDesktop({ fromSnapshot })</code> booted a fork from it, and
+the fork&#39;s first <code>exec</code> hung until passk&#39;s five-minute action timeout. A
+later fork of the same id got <code>404 Snapshot not found</code>. Re-running <code>prepare</code>
+produced a snapshot that forked and exec&#39;d normally in under a second.
+passk treats a fork whose first action never returns as a lost run, not an
+agent failure; a short readiness probe after <code>fromSnapshot</code>, or a status
+field on the snapshot, would let it retry the fork instead.</li>
 </ul>
 
 </article>
-<div class="foot">This page is <code>README.md</code> in the repository, typeset. Built on <a href="https://getsolari.com">Solari</a>.</div>
+<div class="foot">This page is <code>docs/SOLARI-NOTES.md</code> in the repository, typeset. Built on <a href="https://getsolari.com">Solari</a>.</div>
 </main></body></html>

@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>passk · method</title>
+<meta name="description" content="passk: reliability regression testing for computer-use agents on Solari desktops. Fork one snapshot k times, grade every run inside the VM, report pass@k and pass^k with intervals.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet"><style>
+:root{
+  --bg:#fbfaf7;--surface:#fbfaf7;--surface-2:#f1efe8;--line:#e3e0d7;--line-2:#c9c5b9;
+  --ink:#1c1b18;--ink-2:#4f4c45;--ink-3:#6f6a5c;
+  --good:#0ca30c;--good-ink:#006300;--good-dim:rgba(12,163,12,.14);
+  --crit:#d03b3b;--crit-ink:#a52a2a;--crit-dim:rgba(208,59,59,.12);
+  --warn:#9a6700;--warn-dim:rgba(154,103,0,.12);
+  --a:#2a78d6;--a-dim:rgba(42,120,214,.14);--b:#d95926;--b-dim:rgba(217,89,38,.14);
+  --serif:"Source Serif 4","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --radius:4px;--radius-s:3px;--measure:68ch;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line-2);text-underline-offset:2px}a:hover{text-decoration-color:var(--ink)}
+main{max-width:920px;margin:0 auto;padding:52px 32px 96px}
+h1{font:600 34px/1.15 var(--serif);letter-spacing:-.01em;margin:0 0 8px;max-width:var(--measure)}
+h2{font:600 22px/1.25 var(--serif);margin:52px 0 14px;padding-top:14px;border-top:1px solid var(--line)}
+h3{font:600 18px/1.3 var(--serif);margin:0 0 6px}
+p{max-width:var(--measure)}
+code{font:13.5px var(--mono);background:var(--surface-2);padding:1px 5px;border-radius:var(--radius-s);color:var(--ink-2)}
+.brand{display:flex;align-items:center;gap:10px;font:13.5px var(--sans);color:var(--ink-3);margin-bottom:26px}
+.brand b{color:var(--ink);font-weight:600}
+.meta{font:14px var(--sans);color:var(--ink-3);margin-bottom:26px}.meta code{font-size:12.5px}
+.prompt{border-left:2px solid var(--line-2);padding:4px 18px;margin:0 0 28px;color:var(--ink-2);font-style:italic;max-width:var(--measure)}
+.verdict{font-size:21px;line-height:1.45;margin:0 0 34px;max-width:var(--measure)}
+.verdict b{font-weight:600}
+.card{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 0}
+table.checks{width:100%;border-collapse:collapse;font:14px var(--sans)}
+table.checks th{text-align:left;color:var(--ink-3);font-weight:400;font-size:12.5px;padding:0 10px 6px 0;border-bottom:1px solid var(--line)}
+table.checks td{padding:6px 10px 6px 0;border-top:1px solid var(--line);vertical-align:middle}
+table.checks tr:first-child td{border-top:0}
+table.checks td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink-2);font-family:var(--mono);font-size:13px}
+table.checks tr.miss td:first-child{color:var(--ink);font-weight:600}
+table.checks .bar{width:120px;height:5px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+table.checks .bar i{display:block;height:100%;background:var(--good);opacity:.8}
+table.checks tr.miss .bar i{background:var(--crit);opacity:1}
+.pill.inv{background:var(--surface-2);color:var(--ink-3)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 28px}
+.kpi b{display:block;font:600 30px/1.05 var(--sans);letter-spacing:-.01em;margin-bottom:6px}
+.kpi span{display:block;font:13px/1.4 var(--sans);color:var(--ink-3)}
+.kpi .sub{color:var(--ink-2)}
+.dots{display:grid;gap:6px}
+.dotrow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.dotrow em{width:26px;flex:none;font:11px var(--mono);font-style:normal;color:var(--ink-3);text-align:right;padding-right:2px}
+.dot{width:20px;height:20px;border-radius:50%;border:0;display:inline-grid;place-items:center;font:700 11px/1 var(--mono);text-decoration:none}
+a.dot{cursor:pointer}a.dot:hover{outline:2px solid var(--ink);outline-offset:1px}
+.dot.passed{background:var(--good-dim);color:var(--good-ink)}
+.dot.failed{background:var(--crit);color:#fff}
+.dot.errored{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-3);color:var(--ink-3)}
+.dot.skipped{background:transparent;box-shadow:inset 0 0 0 1.5px var(--line-2)}
+.headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.headline b{font:600 28px/1.05 var(--sans);letter-spacing:-.01em}
+.headline span{font:13.5px var(--sans);color:var(--ink-2)}
+.runrow{margin:0;border:0;border-top:1px solid var(--line);background:transparent}
+.runrow>summary{list-style:none;display:flex;gap:14px;align-items:center;padding:10px 0;font:14px var(--sans);color:var(--ink-2);font-variant-numeric:tabular-nums;cursor:pointer}
+.runrow>summary::-webkit-details-marker{display:none}
+.runrow>summary b{color:var(--ink);font-weight:600;min-width:64px}
+.runrow>summary .more{margin-left:auto;color:var(--ink-3);font-size:12.5px}
+.runrow>.card{border:0;padding:6px 0 18px}
+.runrow.attention>summary{cursor:default}
+.diff{border-left:2px solid var(--line-2);padding:4px 18px;color:var(--ink-2);margin:0 0 24px;max-width:var(--measure);line-height:1.65}
+.diff del{background:var(--crit-dim);color:var(--crit-ink);text-decoration:line-through;border-radius:2px;padding:0 2px}
+.diff ins{background:var(--good-dim);color:var(--good-ink);text-decoration:none;border-radius:2px;padding:0 2px}
+.checks .raw{color:var(--ink-3);font-size:11px;margin-left:6px;cursor:help}
+.legend{display:flex;gap:16px;font:12.5px var(--sans);color:var(--ink-3);margin-top:10px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.range{position:relative;height:8px;background:var(--surface-2);border-radius:4px;margin:16px 0 6px}
+.range i{position:absolute;top:0;bottom:0;border-radius:4px;background:var(--good);opacity:.22}
+.range b{position:absolute;top:-5px;width:18px;height:18px;border-radius:50%;background:var(--good);border:2px solid var(--bg);transform:translateX(-50%)}
+.range-labels{display:flex;justify-content:space-between;font:11.5px var(--mono);color:var(--ink-3)}
+.strip{position:relative;height:44px;margin:6px 0 2px}
+.strip .axis{position:absolute;left:0;right:0;top:22px;height:1px;background:var(--line-2)}
+.strip .tick{position:absolute;top:28px;transform:translateX(-50%);font:11px var(--mono);color:var(--ink-3)}
+.strip .pt{position:absolute;top:15px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2px solid var(--bg);cursor:default}
+.strip .pt.passed{background:var(--good)}.strip .pt.failed{background:var(--crit)}
+.strip .pt.a{background:var(--a)}.strip .pt.b{background:var(--b)}
+.strip .pt.hollow{background:var(--bg)!important;border:2.5px solid;box-shadow:inset 0 0 0 2px var(--bg)}.strip .pt.a.hollow{border-color:var(--a)}.strip .pt.b.hollow{border-color:var(--b)}
+.strip .med{position:absolute;top:8px;width:2px;height:28px;background:var(--ink);transform:translateX(-50%)}
+.strip .med.a{background:var(--a)}.strip .med.b{background:var(--b)}.strip .med.b:after{top:auto;bottom:-16px}
+.strip .med:after{content:attr(data-label);position:absolute;top:-16px;left:50%;transform:translateX(-50%);font:10.5px var(--mono);color:var(--ink-2);white-space:nowrap}
+.runs{display:grid;gap:18px}
+.run{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}.run>div{min-width:0}
+.run .id{font:13px var(--sans);color:var(--ink-3)}
+.run .id b{display:block;font:600 16px var(--sans);color:var(--ink);margin-bottom:4px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font:600 12px/1.5 var(--sans);background:var(--surface-2);color:var(--ink-2);vertical-align:middle;white-space:nowrap}
+.pill.passed{background:var(--good-dim);color:var(--good-ink)}.pill.failed{background:var(--crit-dim);color:var(--crit-ink)}.pill.errored{background:var(--surface-2);color:var(--ink-2)}
+.pill.a,.pill.b{color:var(--ink)}.pill.a{background:var(--a-dim)}.pill.b{background:var(--b-dim)}
+.pill.a::before,.pill.b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:0}
+.pill.a::before{background:var(--a)}.pill.b::before{background:var(--b)}
+.pill.neutral{background:var(--surface-2);color:var(--ink-2)}
+.checks{display:flex;flex-direction:column;gap:3px;font:12.5px var(--mono);color:var(--ink-2)}
+.checks .ok{color:var(--good-ink)}.checks .bad{color:var(--crit-ink)}
+.checks .detail{color:var(--ink-3);white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto}
+.film{display:flex;gap:6px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:thin}
+.film a{flex:none;position:relative}
+.film img{height:84px;border-radius:var(--radius-s);border:1px solid var(--line);display:block;background:#000}
+.film a.final img{border-color:var(--good)}.film a.diverge img{border-color:var(--warn);box-shadow:0 0 0 2px var(--warn)}
+.film em{position:absolute;left:4px;bottom:4px;font:10px var(--mono);font-style:normal;background:rgba(0,0,0,.65);color:#fff;padding:1px 5px;border-radius:3px}
+.acts{font:12.5px var(--sans);color:var(--ink-3);margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.hyp{overflow-wrap:anywhere;margin-top:12px;padding:6px 16px;border-left:2px solid var(--line-2);font-size:15px;line-height:1.55;color:var(--ink-2);max-width:var(--measure)}
+.hyp b{color:var(--ink);font-weight:600}
+details{margin-top:8px}summary{cursor:pointer;font:13px var(--sans);color:var(--ink-3)}
+pre{white-space:pre-wrap;font:12.5px/1.5 var(--mono);color:var(--ink-2);margin:8px 0 0;background:var(--surface-2);padding:10px 12px;border-radius:var(--radius);overflow:auto}
+.foot{font:13.5px/1.55 var(--sans);color:var(--ink-3);margin-top:60px;border-top:1px solid var(--line);padding-top:16px}
+.foot code{font-size:12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px 32px}
+@media(max-width:760px){.two{grid-template-columns:1fr}.run{grid-template-columns:1fr}main{padding:36px 20px 72px}body{font-size:16px}}
+table{width:100%;border-collapse:collapse;font:14px var(--sans);font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px 9px 0;text-align:left;border-top:1px solid var(--line);vertical-align:top}th{color:var(--ink-3);font-weight:400;border-top:0;border-bottom:1px solid var(--line);font-size:12.5px}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
+.delta.up{color:var(--good-ink)}.delta.down{color:var(--crit-ink)}.delta.flat{color:var(--ink-3)}
+.note{font:13.5px/1.5 var(--sans);color:var(--ink-3);margin-top:8px;max-width:var(--measure)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font:12px var(--mono);padding:5px 8px;border-radius:4px;transform:translate(-50%,-130%);opacity:0;transition:opacity .08s;white-space:nowrap;z-index:9}
+@media print{main{max-width:none;padding:0}body{font-size:11pt}a{text-decoration:none}.film{display:none}details{display:none}}
+
+.docnav{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;font:13.5px var(--sans);color:var(--ink-3);margin-bottom:36px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.docnav a{text-decoration:none;color:var(--ink-2)}.docnav a:hover{color:var(--ink)}.docnav a.on{color:var(--ink);font-weight:600}
+.docnav b{color:var(--ink);font-weight:600;margin-right:6px;font-size:14px}
+.docnav .gh{margin-left:auto}
+.doc h1{margin-bottom:18px}.doc h2{margin-top:44px}.doc h3{margin-top:28px}
+.doc p,.doc li{max-width:var(--measure)}.doc ul,.doc ol{padding-left:22px}.doc li{margin:4px 0}
+.doc pre{background:var(--surface-2);padding:12px 14px;font:13px/1.55 var(--mono);color:var(--ink);overflow:auto;border-radius:var(--radius);margin:12px 0 18px}
+.doc pre code{background:transparent;padding:0;font-size:13px;color:inherit}
+.doc table{font:14px var(--sans);margin:12px 0 18px;display:block;overflow-x:auto}
+.doc table td,.doc table th{padding:8px 14px 8px 0;vertical-align:top}
+.doc img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:var(--radius-s)}
+.doc blockquote{border-left:2px solid var(--line-2);margin:0 0 18px;padding:4px 18px;color:var(--ink-2);font-style:italic}
+.doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
+.doc strong{font-weight:600}
+</style></head><body><main>
+<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html">Tasks</a><a href="method.html" class="on">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a href="../board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<article class="doc">
+<h1 id="method">Method</h1>
+<p>How passk turns repeated runs into numbers you can act on, and what it refuses to claim. Companion to the <a href="../index.html">README</a> and the <a href="tasks.html">operator&#39;s manual</a>.</p>
+<h2 id="reading-the-numbers-honestly">Reading the numbers honestly</h2>
+<p>Ten passes out of ten is an observation, not a proof of 100% reliability. Every
+bench reports the observed count, a 95% Wilson interval on the pass rate (10/10
+puts the lower bound near 72%), and pass^k both as a point estimate and as that
+lower bound raised to the k. Two denominators are kept: <strong>pass@1</strong> is passes
+over runs the agent actually attempted, and <strong>end-to-end</strong> is passes over the
+runs you asked for, so a fork that never booted counts against the
+infrastructure but not against the agent. Failure causes are labelled as
+hypotheses with a confidence, and when no run passed there is nothing to
+diverge from, so they are capped at low confidence. Every <code>bench.json</code> carries
+the full task definition, a hash of it, and the model, package and commit
+versions that produced it.</p>
+<h2 id="who-gets-blamed-for-what">Who gets blamed for what</h2>
+<p>A run that does not complete normally is put in one of four bins, and only
+the first is scored against the agent:</p>
+<table>
+<thead>
+<tr>
+<th>Kind</th>
+<th>Meaning</th>
+<th>Scored?</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>agent</code></td>
+<td>the agent&#39;s own doing: gave up, malformed action, crashed on its own logic</td>
+<td>yes, as a failure</td>
+</tr>
+<tr>
+<td><code>provider</code></td>
+<td>the model API failed after bounded retries (429, 5xx, connection)</td>
+<td>no, listed as lost</td>
+</tr>
+<tr>
+<td><code>solari</code></td>
+<td>the desktop never came up, or its channel was lost</td>
+<td>no, listed as lost</td>
+</tr>
+<tr>
+<td><code>verifier</code></td>
+<td>the checker itself could not run; the outcome is unknown</td>
+<td>no, listed as lost</td>
+</tr>
+</tbody></table>
+<p>Model calls retry up to three times with exponential backoff and jitter on
+provider-side errors before a run is written off. A checker that cannot reach
+the VM marks its check <code>errored</code>, and that run is a verifier loss, never an
+agent failure. All lost runs count in end-to-end completion, so the report
+always shows what the user got as well as what the agent did.</p>
+<h2 id="how-many-runs-and-what-to-change">How many runs, and what to change</h2>
+<p>Both are yours to decide. passk&#39;s job is to make each choice legible before
+you pay for it, and to keep the experiment honest afterwards.</p>
+<p><strong>How many runs.</strong> Every run is one execution; a <em>condition</em> is k runs with
+nothing changed between them. What an all-pass condition can establish:</p>
+<table>
+<thead>
+<tr>
+<th align="right">Runs per condition</th>
+<th align="right">Lower bound if every run passes</th>
+<th>Good for</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="right">3</td>
+<td align="right">44%</td>
+<td>does the task work at all</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td align="right">57%</td>
+<td>choosing between two interventions</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td align="right">72%</td>
+<td>the configuration you keep</td>
+</tr>
+<tr>
+<td align="right">35</td>
+<td align="right">90%</td>
+<td>a &quot;90% reliable&quot; claim</td>
+</tr>
+<tr>
+<td align="right">73</td>
+<td align="right">95%</td>
+<td>a &quot;95% reliable&quot; claim</td>
+</tr>
+</tbody></table>
+<p><code>passk run</code> prints this for the k you chose, and with <code>--require-lower</code> it
+refuses to start a sample that could not meet the requirement even if every
+run passed. Start small, then extend: <code>--resume</code> with a larger <code>--k</code> adds
+runs to a finished bench on the same snapshot.</p>
+<p><strong>What to change.</strong> Exactly one thing per experiment, on the same snapshot
+with the same checks: a prompt, an environment detail, a model, a plan. The
+failure evidence from the last bench says which. <code>passk recommend runs/&lt;dir&gt;</code> reads a finished bench and suggests the category of the next
+experiment with what to keep fixed; it is a recommendation, not a diagnosis,
+and it will never rewrite your prompt or switch your model. Roughly:</p>
+<table>
+<thead>
+<tr>
+<th>The evidence shows</th>
+<th>Try next</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>failures reported success anyway</td>
+<td>a verification step that reads state back, not a screenshot</td>
+</tr>
+<tr>
+<td>runs interpreted the task differently</td>
+<td>one clarification at a time (<code>passk probe</code> lists candidates)</td>
+</tr>
+<tr>
+<td>same plan, environment flinched</td>
+<td>an environment change, not a prompt change</td>
+</tr>
+<tr>
+<td>same goal, different routes</td>
+<td>a prompt that names the short strategy; compare effort and cost</td>
+</tr>
+<tr>
+<td>every failure hit the step cap</td>
+<td>a higher cap before blaming the agent</td>
+</tr>
+<tr>
+<td>losses to infrastructure or the verifier</td>
+<td>fix that first; the agent is not the variable</td>
+</tr>
+</tbody></table>
+<p><strong>The loop that produced the results in <code>evidence/</code>:</strong> validate the
+verifier; run a baseline at k=3; read the failed runs; choose one
+intervention; run A against B at k=5 each; compare pass rate, interval,
+effort and cost; decide; run k=10 or more only for the configuration you
+keep, and save it as the regression baseline. Nothing stops automatically:
+the planned k and the completed count are both recorded, and stopping is
+your call.</p>
+<p><strong>Who decides what.</strong> You: which workflow matters, what counts as success,
+acceptable risk, budget, k, which change to test, whether to ship. passk:
+equivalent runs, whether checks passed, intervals, whether a comparison
+changed more than one thing, whether a claim exceeds the evidence, a
+failure hypothesis, a suggested next experiment, and whether a gate passes.
+Never passk: rewriting a prompt, switching a model, declaring anything safe
+for production, or ignoring a failed check.</p>
+<h2 id="not-a-model-benchmark">Not a model benchmark</h2>
+<p>A benchmark asks which model is best across a fixed public task set and ends
+in a score. passk asks whether <em>your</em> agent is dependable enough on <em>your</em>
+workflow, and whether your latest change helped, and ends in a decision.
+Every comparison in <a href="../evidence"><code>evidence/</code></a> holds the model fixed and
+changes something else: a folder, a sentence, a verification instruction.
+The tasks that ship are examples of the format, not a canonical suite, and
+there is no leaderboard. passk can compare two models on one snapshot the
+way a test suite can compare two compilers; that is incidental, not the
+point.</p>
+<h2 id="prior-art-and-where-this-differs">Prior art, and where this differs</h2>
+<p>passk is a narrow tool assembled from ideas that exist elsewhere.</p>
+<ul>
+<li><strong>OSWorld</strong> (Xie et al., 2024) established execution-based verification
+for computer-use agents: set an application up, let the agent act, read
+the resulting state. passk keeps that rule and drops the suite. OSWorld
+runs hundreds of tasks once each to produce a score; passk runs one task
+many times from one snapshot to produce a reliability figure and a reason
+for each failure, and it proves the verifier before trusting it.
+OSWorld-Verified, the 2025 revision, went back through the suite and
+repaired checkers that had been silently miscounting; <code>passk validate</code> is
+that audit done by the tool, on every task, before any bench starts.</li>
+<li><strong>Terminal-Bench</strong> packages a task as an instruction, an isolated
+environment and a hidden test. passk&#39;s task file is the same shape, with
+the same rule that the agent never sees the checks and its own claim of
+success is never graded. The difference is again repetition from
+identical state rather than breadth.</li>
+<li><strong>hyperfine</strong> repeats a command and reports a distribution instead of a
+single timing. passk asks hyperfine&#39;s question about success instead of
+speed: not &quot;did it pass&quot; but &quot;how often, with what spread, and at what
+cost.&quot; The terminal summary, the explicit run count and the prepare step
+are borrowed from it.</li>
+<li><strong>k6</strong> made &quot;repeat the workload, set a threshold, fail the build&quot; the
+normal way to test service reliability. <code>--require-lower</code> and <code>gate</code> are
+that idea for agents. If passk is like any product, it is k6 for
+computer-use agents, not a model leaderboard.</li>
+<li><strong>Gonzalez-Pumariega, Agashe, Yang, Li and Wang, <a href="https://arxiv.org/abs/2604.17849"><em>On the Reliability of
+Computer Use Agents</em></a> (arXiv:2604.17849,
+2026)</strong> asked the question passk is built around: an agent that succeeds
+once may fail on a repeat of the same task, so what stops it from doing so
+reliably? It supplies the taxonomy the failure classifier sorts into
+(stochasticity during execution, ambiguity in task specification,
+variability in agent behavior) and three recommendations that map onto
+three commands here: evaluate under repeated execution (<code>run</code>), let agents
+resolve ambiguity through interaction (<code>probe</code>), and favor strategies that
+stay stable across runs (<code>compare</code>). The paper measures this on OSWorld;
+passk measures it on your workflow.</li>
+<li><strong>Khanal, Tao and Zhou, <a href="https://arxiv.org/abs/2603.29231"><em>Beyond pass@1: A Reliability Science Framework
+for Long-Horizon LLM Agents</em></a>
+(arXiv:2603.29231, 2026)</strong> show, over 23,392 episodes, that capability and
+reliability diverge as tasks get longer and that pass@1 on short tasks
+cannot see it. Their reliability decay curve is why passk records steps
+and duration per run and reports the spread, not just the pass count, and
+why a step cap is treated as a finding about the task rather than a
+verdict on the agent.</li>
+</ul>
+<p>What none of them have is the thing Solari makes cheap: a byte-identical
+starting state for every attempt. Without it, repeated runs measure the
+environment&#39;s drift as much as the agent&#39;s, and the numbers above would not
+mean what they say.</p>
+<h2 id="safety-checks">Safety checks</h2>
+<p>OpenAI&#39;s computer tool flags some actions as potentially consequential and
+asks the caller to acknowledge them. passk <strong>stops the run by default</strong>
+(<code>stoppedBy: &quot;safety_check&quot;</code>, scored as a failure with its reason). Set
+<code>PASSK_SAFETY=allow</code> or pass <code>--safety allow</code> to acknowledge automatically.
+That is only defensible inside a disposable VM with no route to real
+systems, which is what every bench in this repo is, and nowhere else.</p>
+<h2 id="when-a-bench-dies-halfway">When a bench dies halfway</h2>
+<p>Every run writes its own <code>run.json</code> the moment it finishes, and the bench&#39;s
+<code>bench.json</code> is written before the first fork and rewritten after every run,
+with <code>status: &quot;running&quot;</code> until the end. If the process dies at run 43 of 50
+(laptop sleep, network loss, a provider outage), the 43 verified runs are on
+disk and:</p>
+<pre><code class="language-bash">npm run passk run tasks/ticket-queue.yaml -- --k 50 --resume
+</code></pre>
+<p>finds the newest unfinished bench for that task and executes only the
+missing indices. Nothing runs twice; infrastructure losses are recorded at
+their index so a resume does not quietly retry them and shift the sample.
+<code>report</code>, <code>gate</code> and <code>compare</code> work on a partial bench at any time.</p>
+<h2 id="testing-the-harness-without-a-vm-or-a-model">Testing the harness without a VM or a model</h2>
+<p><code>PASSK_PROVIDER=scripted</code> swaps in an in-memory desktop and a scripted agent
+whose behavior per run comes from <code>PASSK_SCRIPT</code>:</p>
+<pre><code class="language-bash">PASSK_PROVIDER=scripted PASSK_SCRIPT=&quot;pass*15,fail*3,hang,claim_only&quot; \
+  npm run passk run tasks/fake.yaml -- --k 20
+</code></pre>
+<p>Behaviors: <code>pass</code>, <code>fail</code> (wrong state, claims success), <code>claim_only</code>
+(no state change, claims success), <code>hang</code> (runs to the step cap),
+<code>provider_err</code> (the model API fails), <code>crash_after</code> (task done, agent dies),
+<code>slow</code>. The real runner, checker, metrics, persistence and report run
+unchanged, so <code>test/resume.test.ts</code> can kill a 20-run bench halfway and
+resume it, prove no index ran twice, check every stop reason is accounted
+for, enforce a budget, and push 200 runs through at concurrency 16 in a few
+seconds, all for no money.</p>
+
+</article>
+<div class="foot">This page is <code>docs/METHOD.md</code> in the repository, typeset. Built on <a href="https://getsolari.com">Solari</a>.</div>
+</main></body></html>
