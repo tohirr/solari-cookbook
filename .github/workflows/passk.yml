@@ -1,7 +1,8 @@
 # passk tests itself. The unit tests cover the harness on in-memory desktops;
-# the two benches at the end run the real pipeline on the scripted provider
-# (no Solari key, no model key): one that must clear the gate and one that
-# must be refused by it. If either verdict flips, this workflow fails.
+# the two benches run the real pipeline on the scripted provider (no Solari
+# key, no model key): one that must clear the gate and one that must be
+# refused by it. The second job runs the same two benches through the
+# GitHub Action, so the action is proven here before anyone else uses it.
 name: passk
 on:
   push:
@@ -40,3 +41,40 @@ jobs:
           code=$?
           set -e
           test "$code" -eq 2 || { echo "expected exit 2 from the gate, got $code"; exit 1; }
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: a 10/10 agent clears --require-lower 0.7 through the action
+        id: pass
+        uses: ./passk
+        with:
+          task: passk/tasks/fake.yaml
+          provider: scripted
+          k: 10
+          concurrency: 4
+          require-lower: 0.7
+          artifact-name: passk-action-pass
+      - name: outputs are set
+        run: |
+          test "${{ steps.pass.outputs.passed }}" = "10"
+          test "${{ steps.pass.outputs.n }}" = "10"
+          test "${{ steps.pass.outputs.exit-code }}" = "0"
+      - name: an 8/10 agent is refused by --require 0.9 through the action
+        id: miss
+        uses: ./passk
+        continue-on-error: true
+        env:
+          PASSK_SCRIPT: "pass*6,fail,pass,claim_only,pass"
+        with:
+          task: passk/tasks/fake.yaml
+          provider: scripted
+          k: 10
+          concurrency: 4
+          require: 0.9
+          artifact-name: passk-action-miss
+      - name: the refusal is exit 2 and the step failed
+        run: |
+          test "${{ steps.miss.outcome }}" = "failure"
+          test "${{ steps.miss.outputs.exit-code }}" = "2"
+          test "${{ steps.miss.outputs.passed }}" = "8"

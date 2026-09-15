@@ -1,0 +1,143 @@
+# passk as a GitHub Action: fork one Solari desktop snapshot k times on every
+# push, run your agent on every fork, grade each run inside the VM, and fail
+# the job unless the pass rate clears the bar. The runner never needs a
+# display; the desktops are Solari's. The bench (report.html, every check,
+# every screenshot) is uploaded as an artifact, and the numbers go to the
+# job summary and the step outputs.
+#
+#   - uses: tohirr/solari-cookbook/passk@main
+#     with:
+#       task: tasks/ticket-queue.yaml
+#       k: 10
+#       require-lower: 0.7
+#     env:
+#       SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
+#       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}   # or ANTHROPIC_API_KEY
+name: passk
+description: Reliability CI for computer-use agents. Fork one Solari desktop snapshot k times, run the agent on every fork, grade inside the VM, gate on the pass rate.
+author: tohirr
+branding:
+  icon: repeat
+  color: green
+inputs:
+  task:
+    description: Path to the task file, relative to the workspace.
+    required: true
+  k:
+    description: Runs to fork from the snapshot.
+    default: "5"
+  require:
+    description: Fail unless the observed pass rate is at least this (0–1).
+    required: false
+  require-lower:
+    description: Fail unless the 95% lower bound on the pass rate is at least this (0–1). The stricter gate.
+    required: false
+  provider:
+    description: anthropic, openai, or scripted. Default picks from the keys present; scripted needs no keys and no Solari, and exercises the pipeline on in-memory desktops.
+    required: false
+  model:
+    description: Model id for the provider (PASSK_MODEL). Default is the provider's default.
+    required: false
+  concurrency:
+    description: Forks in flight at once. Match your Solari plan.
+    default: "2"
+  budget:
+    description: Stop launching new runs once estimated model spend reaches this many dollars.
+    required: false
+  snapshot:
+    description: Fork this snapshot id instead of preparing one from the task. Skips the boot-and-setup step and keeps paired runs on one environment.
+    required: false
+  safety:
+    description: What to do when the model raises a safety check on an action. allow acknowledges it inside the disposable VM; deny stops the run.
+    default: allow
+  classify:
+    description: Ask the model for a cause hypothesis per failed run. Costs model calls.
+    default: "false"
+  upload:
+    description: Upload the bench directory as a workflow artifact.
+    default: "true"
+  artifact-name:
+    description: Name of that artifact.
+    default: passk-bench
+outputs:
+  passed:
+    description: Runs whose checks all passed.
+    value: ${{ steps.bench.outputs.passed }}
+  n:
+    description: Runs scored (attempted runs not lost to infrastructure).
+    value: ${{ steps.bench.outputs.n }}
+  pass-at-1:
+    description: Observed pass rate, 0–1.
+    value: ${{ steps.bench.outputs.pass_at_1 }}
+  pass-at-1-lower:
+    description: 95% lower bound on the pass rate.
+    value: ${{ steps.bench.outputs.pass_at_1_lower }}
+  pass-at-1-upper:
+    description: 95% upper bound on the pass rate.
+    value: ${{ steps.bench.outputs.pass_at_1_upper }}
+  pass-pow-5:
+    description: Estimated chance that five runs in a row all pass.
+    value: ${{ steps.bench.outputs.pass_pow_5 }}
+  cost-usd:
+    description: Estimated model spend for the bench.
+    value: ${{ steps.bench.outputs.cost_usd }}
+  bench-dir:
+    description: The bench directory (bench.json, report.html, one folder per run).
+    value: ${{ steps.bench.outputs.bench_dir }}
+  exit-code:
+    description: 0 passed the gate, 2 missed it, 1 crashed.
+    value: ${{ steps.bench.outputs.code }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+    - name: install passk
+      shell: bash
+      run: npm ci --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund --loglevel error
+    - name: bench
+      id: bench
+      shell: bash
+      # Runs from the workspace so task files can reference their own uploads;
+      # the exit code is recorded, not raised, so the artifact always uploads.
+      env:
+        PASSK_RUNS_DIR: ${{ github.workspace }}/passk-runs
+        PASSK_STATE_DIR: ${{ runner.temp }}/passk-state
+        PASSK_PROVIDER: ${{ inputs.provider }}
+        PASSK_MODEL: ${{ inputs.model }}
+        PASSK_SAFETY: ${{ inputs.safety }}
+        PASSK_CLASSIFY: ${{ inputs.classify == 'true' && '1' || '0' }}
+        IN_TASK: ${{ inputs.task }}
+        IN_K: ${{ inputs.k }}
+        IN_REQUIRE: ${{ inputs.require }}
+        IN_REQUIRE_LOWER: ${{ inputs.require-lower }}
+        IN_CONCURRENCY: ${{ inputs.concurrency }}
+        IN_BUDGET: ${{ inputs.budget }}
+        IN_SNAPSHOT: ${{ inputs.snapshot }}
+      run: |
+        set -u
+        [ -n "$PASSK_PROVIDER" ] || unset PASSK_PROVIDER
+        [ -n "$PASSK_MODEL" ] || unset PASSK_MODEL
+        TSX="$GITHUB_ACTION_PATH/node_modules/.bin/tsx"
+        case "$IN_TASK" in /*) TASK="$IN_TASK" ;; *) TASK="$GITHUB_WORKSPACE/$IN_TASK" ;; esac
+        args=(run "$TASK" --k "$IN_K" --concurrency "$IN_CONCURRENCY")
+        [ -n "$IN_REQUIRE" ] && args+=(--require "$IN_REQUIRE")
+        [ -n "$IN_REQUIRE_LOWER" ] && args+=(--require-lower "$IN_REQUIRE_LOWER")
+        [ -n "$IN_BUDGET" ] && args+=(--budget "$IN_BUDGET")
+        [ -n "$IN_SNAPSHOT" ] && args+=(--snapshot "$IN_SNAPSHOT")
+        set +e
+        "$TSX" "$GITHUB_ACTION_PATH/src/cli.ts" "${args[@]}"
+        code=$?
+        set -e
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        "$TSX" "$GITHUB_ACTION_PATH/scripts/ci-summary.ts" "$PASSK_RUNS_DIR" "$code"
+    - uses: actions/upload-artifact@v4
+      if: ${{ always() && inputs.upload == 'true' }}
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ github.workspace }}/passk-runs
+        if-no-files-found: ignore
+    - name: gate
+      shell: bash
+      run: exit "${{ steps.bench.outputs.code }}"
