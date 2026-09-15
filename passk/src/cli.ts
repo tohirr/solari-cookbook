@@ -101,7 +101,8 @@ async function main() {
     }
     case "validate": {
       const task = loadTask(must(target));
-      if (!readSnapshots()[task.id] && !flag("snapshot")) await prepareTask(task);
+      // --prepare re-snapshots so an edited setup is what gets validated, as it does for run.
+      if (!flag("snapshot") && (has("prepare") || !readSnapshots()[task.id])) await prepareTask(task);
       const v = await printValidation(task, flag("snapshot"));
       process.exitCode = v.ok ? 0 : 2;
       return;
@@ -185,7 +186,7 @@ async function main() {
   passk doctor
 
   pieces of run, on their own:
-  passk prepare <task.yaml>      passk validate <task.yaml> [--snapshot snap_…]      passk report <runs/dir>
+  passk prepare <task.yaml>      passk validate <task.yaml> [--prepare | --snapshot snap_…]      passk report <runs/dir>
   passk classify <runs/dir>      passk export <runs/dir> <evidence/dir>              passk sweep
   passk export-inspect <runs/dir> [out dir] [--images]    the bench as an Inspect AI eval log`);
       process.exit(cmd ? 1 : 0);
