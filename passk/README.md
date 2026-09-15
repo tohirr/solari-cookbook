@@ -11,7 +11,7 @@ the agent says about its own success counts.
 ## In your agent's CI
 
 ```yaml
-- uses: tohirr/solari-cookbook/passk@v0.1
+- uses: tohirr/solari-cookbook/passk@v0.2
   with:
     task: tasks/ticket-queue.yaml
     k: 10

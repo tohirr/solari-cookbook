@@ -190,7 +190,7 @@ for want of a working key; every published result came from the OpenAI loop.</p>
 <h2 id="in-ci">In CI</h2>
 <p>The GitHub Action runs <code>passk run</code> on a runner with no display; the desktops
 are Solari&#39;s. Secrets arrive as <code>env</code>, never as inputs.</p>
-<pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@v0.1
+<pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@v0.2
   with:
     task: tasks/ticket-queue.yaml     # path in your repo
     k: 10
