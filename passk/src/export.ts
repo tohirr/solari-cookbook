@@ -8,6 +8,11 @@
  * kept for every run: they are capped at 2 MB when collected, and they are the
  * only record of what the app inside the VM actually ended up holding.
  * bench.json and report.html are rewritten to reference only what was copied.
+ *
+ * A task that declares `screenshots: private` keeps every frame in `runs/`:
+ * none is copied and the exported report shows none, because the screens
+ * carry content that must not be published. Its checks, its numbers and its
+ * task-declared evidence files are exported as usual.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,8 +22,9 @@ import type { BenchResult } from "./types.js";
 
 const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 
-export function exportBench(srcDir: string, outDir: string): { bench: BenchResult; files: number; evidence: number; bytes: number } {
+export function exportBench(srcDir: string, outDir: string): { bench: BenchResult; files: number; evidence: number; bytes: number; privateShots: boolean } {
   const bench = loadBench(srcDir);
+  const privateShots = bench.provenance?.task?.screenshots === "private";
   fs.mkdirSync(outDir, { recursive: true });
   const shortestPass = bench.runs.filter((r) => r.status === "passed").sort((a, b) => a.steps.length - b.steps.length)[0];
   let files = 0, evidence = 0, bytes = 0;
@@ -38,10 +44,16 @@ export function exportBench(srcDir: string, outDir: string): { bench: BenchResul
   };
   for (const r of bench.runs) {
     const keepAll = r.status !== "passed" || r === shortestPass;
-    if (r.finalScreenshot && !copy(r.runIndex, r.finalScreenshot)) r.finalScreenshot = undefined;
-    for (const s of r.steps) {
-      if (!s.screenshot) continue;
-      if (!keepAll || !copy(r.runIndex, s.screenshot)) s.screenshot = undefined;
+    if (privateShots) {
+      // Not copied, and not referenced: an exported report must never point at a frame it was not allowed to carry.
+      r.finalScreenshot = undefined;
+      for (const s of r.steps) s.screenshot = undefined;
+    } else {
+      if (r.finalScreenshot && !copy(r.runIndex, r.finalScreenshot)) r.finalScreenshot = undefined;
+      for (const s of r.steps) {
+        if (!s.screenshot) continue;
+        if (!keepAll || !copy(r.runIndex, s.screenshot)) s.screenshot = undefined;
+      }
     }
     for (const e of r.evidence ?? []) {
       if (!e.file) continue;
@@ -57,5 +69,5 @@ export function exportBench(srcDir: string, outDir: string): { bench: BenchResul
   }
   fs.writeFileSync(path.join(outDir, "bench.json"), JSON.stringify(bench, null, 2));
   fs.writeFileSync(path.join(outDir, "report.html"), renderReport(bench));
-  return { bench, files, evidence, bytes };
+  return { bench, files, evidence, bytes, privateShots };
 }

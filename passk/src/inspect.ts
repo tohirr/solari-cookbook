@@ -58,6 +58,9 @@ function sample(b: BenchResult, r: RunResult, dir: string, images: boolean) {
 }
 
 export function toInspectLog(b: BenchResult, dir: string, images = false): Record<string, unknown> {
+  // A task whose frames must not be published does not get them embedded either,
+  // whatever --images asked for: the log would carry what the export refused.
+  if (b.provenance?.task?.screenshots === "private") images = false;
   const m = b.metrics;
   const model = `${b.provenance?.provider ?? "unknown"}/${b.model}`;
   const p = m.passAt1, n = m.n;

@@ -4,42 +4,229 @@
   "title": "passk task",
   "description": "A task passk can bench: how to set the desktop up, what to ask the agent, and how to verify the outcome inside the VM.",
   "type": "object",
-  "required": ["id", "name", "prompt", "checks"],
+  "required": [
+    "id",
+    "name",
+    "prompt",
+    "checks"
+  ],
   "additionalProperties": false,
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$", "description": "Short slug; names the snapshot and the run folders." },
-    "name": { "type": "string", "description": "Human title, shown on reports." },
-    "template": { "type": "string", "default": "default", "description": "Solari desktop template: default | office | code | a custom template id." },
-    "resolution": { "type": "string", "pattern": "^\\d+x\\d+$", "default": "1280x720" },
-    "max_steps": { "type": "integer", "minimum": 1, "default": 40, "description": "Hard cap on agent actions per run. A run that hits it is graded on its checks, with the cap recorded as its stop reason." },
-    "prompt": { "type": "string", "description": "Exactly what a user would type. Ambiguity is allowed; the probe will find it." },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Short slug; names the snapshot and the run folders."
+    },
+    "name": {
+      "type": "string",
+      "description": "Human title, shown on reports."
+    },
+    "template": {
+      "type": "string",
+      "default": "default",
+      "description": "Solari desktop template: default | office | code | a custom template id."
+    },
+    "resolution": {
+      "type": "string",
+      "pattern": "^\\d+x\\d+$",
+      "default": "1280x720"
+    },
+    "max_steps": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 40,
+      "description": "Hard cap on agent actions per run. A run that hits it is graded on its checks, with the cap recorded as its stop reason."
+    },
+    "prompt": {
+      "type": "string",
+      "description": "Exactly what a user would type. Ambiguity is allowed; the probe will find it."
+    },
     "setup": {
       "type": "array",
       "description": "Runs once before the snapshot, so forks pay none of it.",
       "items": {
         "oneOf": [
-          { "type": "object", "required": ["exec"], "additionalProperties": false, "properties": { "exec": { "type": "string", "description": "Program to run (argv, not a shell; use sh -c for shell syntax)." }, "args": { "type": "array", "items": { "type": "string" } } } },
-          { "type": "object", "required": ["open"], "additionalProperties": false, "properties": { "open": { "type": "string", "description": "GUI app to launch by name, e.g. mousepad, thunar, libreoffice." }, "args": { "type": "array", "items": { "type": "string" } } } },
-          { "type": "object", "required": ["write", "content"], "additionalProperties": false, "properties": { "write": { "type": "string", "description": "Guest path to write." }, "content": { "type": "string" } } },
-          { "type": "object", "required": ["upload", "to"], "additionalProperties": false, "properties": { "upload": { "type": "string", "description": "Local file, relative to the working directory." }, "to": { "type": "string", "description": "Guest path. Files the agent must attach in Chrome belong under /home/desktop, not /root." } } },
-          { "type": "object", "required": ["click"], "additionalProperties": false, "properties": { "click": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 } } },
-          { "type": "object", "required": ["press"], "additionalProperties": false, "properties": { "press": { "type": "string", "description": "A key or +-joined chord: Return, ctrl+l, alt+F4." } } },
-          { "type": "object", "required": ["type"], "additionalProperties": false, "properties": { "type": { "type": "string", "description": "Literal text to type into whatever has focus." } } },
-          { "type": "object", "required": ["wait"], "additionalProperties": false, "properties": { "wait": { "type": "number", "description": "Seconds." } } }
+          {
+            "type": "object",
+            "required": [
+              "exec"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "exec": {
+                "type": "string",
+                "description": "Program to run (argv, not a shell; use sh -c for shell syntax)."
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "open"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "open": {
+                "type": "string",
+                "description": "GUI app to launch by name, e.g. mousepad, thunar, libreoffice."
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "write",
+              "content"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "write": {
+                "type": "string",
+                "description": "Guest path to write."
+              },
+              "content": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "upload",
+              "to"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "upload": {
+                "type": "string",
+                "description": "Local file, relative to the working directory."
+              },
+              "to": {
+                "type": "string",
+                "description": "Guest path. Files the agent must attach in Chrome belong under /home/desktop, not /root."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "click"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "click": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "press"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "press": {
+                "type": "string",
+                "description": "A key or +-joined chord: Return, ctrl+l, alt+F4."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Literal text to type into whatever has focus."
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "wait"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "wait": {
+                "type": "number",
+                "description": "Seconds."
+              }
+            }
+          }
         ]
       }
     },
     "setup_from": {
       "description": "Setup steps included from another YAML file (a list of steps, or a document with a `setup:` list), inserted before this task's own `setup`. Paths resolve against the task file. The object form supplies values for the include's ${name} placeholders, e.g. the URL a shared Chrome launch line opens.",
       "oneOf": [
-        { "type": "string" },
-        { "type": "object", "required": ["file"], "additionalProperties": false, "properties": { "file": { "type": "string" }, "with": { "type": "object", "additionalProperties": { "type": "string" } } } },
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "required": [
+            "file"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "file": {
+              "type": "string"
+            },
+            "with": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        },
         {
           "type": "array",
           "items": {
             "oneOf": [
-              { "type": "string" },
-              { "type": "object", "required": ["file"], "additionalProperties": false, "properties": { "file": { "type": "string" }, "with": { "type": "object", "additionalProperties": { "type": "string" } } } }
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string"
+                  },
+                  "with": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
             ]
           }
         }
@@ -47,13 +234,21 @@
     },
     "evidence": {
       "type": "array",
-      "description": "Guest paths copied out of every fork after grading, into `<run dir>/evidence/`. The file that explains a verdict — an app's state, a log — instead of it dying with the VM. Files over 2 MB are recorded as skipped.",
-      "items": { "type": "string" }
+      "description": "Guest paths copied out of every fork after grading, into `<run dir>/evidence/`. The file that explains a verdict \u2014 an app's state, a log \u2014 instead of it dying with the VM. Files over 2 MB are recorded as skipped.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "screenshots": {
+      "const": "private",
+      "description": "Set to `private` to keep every screenshot inside runs/: `passk export` copies none of them and the exported report shows none. For a task whose screens carry real content that must not be published. The checks and the task-declared evidence files are still exported."
     },
     "golden": {
       "type": "array",
       "description": "Steps that produce the correct end state without an agent. `passk validate` proves the checks fail before them and pass after them.",
-      "items": { "$ref": "#/properties/setup/items" }
+      "items": {
+        "$ref": "#/properties/setup/items"
+      }
     },
     "checks": {
       "type": "array",
@@ -61,11 +256,148 @@
       "description": "Evaluated inside the desktop after the agent stops. A run passes only if every check passes. Nothing the agent says counts.",
       "items": {
         "oneOf": [
-          { "type": "object", "required": ["type", "path"], "additionalProperties": false, "properties": { "invariant": { "type": "boolean", "description": "A guard that must hold before and after the agent acts, not a goal." }, "name": { "type": "string", "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash." }, "type": { "const": "file_exists" }, "path": { "type": "string" } } },
-          { "type": "object", "required": ["type", "path", "text"], "additionalProperties": false, "properties": { "invariant": { "type": "boolean", "description": "A guard that must hold before and after the agent acts, not a goal." }, "name": { "type": "string", "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash." }, "type": { "const": "file_contains" }, "path": { "type": "string" }, "text": { "type": "string" } } },
-          { "type": "object", "required": ["type", "path", "text"], "additionalProperties": false, "properties": { "invariant": { "type": "boolean", "description": "A guard that must hold before and after the agent acts, not a goal." }, "name": { "type": "string", "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash." }, "type": { "const": "file_equals" }, "path": { "type": "string" }, "text": { "type": "string" } } },
-          { "type": "object", "required": ["type", "cmd"], "additionalProperties": false, "properties": { "invariant": { "type": "boolean", "description": "A guard that must hold before and after the agent acts, not a goal." }, "name": { "type": "string", "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash." }, "type": { "const": "exec" }, "cmd": { "type": "string" }, "args": { "type": "array", "items": { "type": "string" } }, "stdout_contains": { "type": "string", "description": "With this set and no exit_code, only the output is judged." }, "exit_code": { "type": "integer" } } },
-          { "type": "object", "required": ["type", "rubric"], "additionalProperties": false, "properties": { "invariant": { "type": "boolean", "description": "A guard that must hold before and after the agent acts, not a goal." }, "name": { "type": "string", "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash." }, "type": { "const": "screenshot_judge" }, "rubric": { "type": "string", "description": "The model grades the final screen against this. Weakest check; prefer state." } } }
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "path"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "invariant": {
+                "type": "boolean",
+                "description": "A guard that must hold before and after the agent acts, not a goal."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash."
+              },
+              "type": {
+                "const": "file_exists"
+              },
+              "path": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "path",
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "invariant": {
+                "type": "boolean",
+                "description": "A guard that must hold before and after the agent acts, not a goal."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash."
+              },
+              "type": {
+                "const": "file_contains"
+              },
+              "path": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "path",
+              "text"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "invariant": {
+                "type": "boolean",
+                "description": "A guard that must hold before and after the agent acts, not a goal."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash."
+              },
+              "type": {
+                "const": "file_equals"
+              },
+              "path": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "cmd"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "invariant": {
+                "type": "boolean",
+                "description": "A guard that must hold before and after the agent acts, not a goal."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash."
+              },
+              "type": {
+                "const": "exec"
+              },
+              "cmd": {
+                "type": "string"
+              },
+              "args": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "stdout_contains": {
+                "type": "string",
+                "description": "With this set and no exit_code, only the output is judged."
+              },
+              "exit_code": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "type",
+              "rubric"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "invariant": {
+                "type": "boolean",
+                "description": "A guard that must hold before and after the agent acts, not a goal."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human label shown in reports instead of the raw path or command. Does not affect grading or the task hash."
+              },
+              "type": {
+                "const": "screenshot_judge"
+              },
+              "rubric": {
+                "type": "string",
+                "description": "The model grades the final screen against this. Weakest check; prefer state."
+              }
+            }
+          }
         ]
       }
     }

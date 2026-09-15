@@ -142,5 +142,9 @@ max_steps: 80
 # The whole decisions map, kept per run: which post got Keep, which got
 # Remove, and in what order. A failed check says one target survived; this
 # says what the agent actually decided, and it dies with the VM otherwise.
+# The screens are a real library of saved posts, including the queue's removal
+# targets, so no frame leaves runs/. state.json — the decisions themselves —
+# carries the diagnosis instead.
+screenshots: private
 evidence:
   - /root/app/state.json

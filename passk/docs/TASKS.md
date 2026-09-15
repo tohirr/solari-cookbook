@@ -153,6 +153,14 @@ a file is missing or over 2 MB. Declaring one cannot change an outcome, so it
 is left out of the task hash: a bench that starts keeping a state file is still
 comparable with the one before it.
 
+**Frames a run may not publish.** A task that drives a screen carrying real
+content — someone's library, a record with a real name on it — declares
+`screenshots: private`. The frames are still captured, so the local report and
+the divergence diff work as ever; they simply never leave `runs/`. Export
+copies none and references none, and `export-inspect --images` embeds none.
+Grade such a task from an `evidence` file instead, the way `bookmarx-triage`
+is graded from its decisions map. This too is out of the task hash.
+
 Check types: `file_exists`, `file_contains`, `file_equals`, `exec` (exit code +
 stdout), `screenshot_judge` (the model grades the final screen against a rubric).
 Prefer several checks that each grade one fact over one script that grades
@@ -272,6 +280,14 @@ the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. The comparison folder holds the paired result.
 `passk export runs/<dir> evidence/<name>` copies a bench with only the
 screenshots that carry proof, plus every evidence file the task declared.
+
+A task whose screens carry real content adds `screenshots: private`, and then
+no frame leaves `runs/`: none is copied, the exported report shows none, and
+`export-inspect --images` embeds none. The numbers, the checks as run and the
+declared evidence files are exported as usual, so the bench is still auditable
+— the `bookmarx-triage` pair is graded from `state.json`, the decisions
+themselves, rather than from pictures of someone's library. Like `evidence`,
+the declaration cannot change an outcome, so it is not in the task hash.
 (In `bench.json`, spend per run is `usage.costUsd` and spend for the bench is
 `metrics.totalCostUsd`; there is no `metrics.costUsd`.) `passk export-inspect runs/<dir> [out dir]`
 writes the bench as an [Inspect AI](https://inspect.aisi.org.uk/) eval log:

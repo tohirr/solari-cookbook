@@ -123,8 +123,9 @@ async function main() {
     case "export": {
       const out = process.argv[4];
       if (!out) { console.error("export needs a source bench dir and a destination dir"); process.exit(1); }
-      const { bench, files, evidence, bytes } = exportBench(must(target), out);
-      console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${files} screenshots${evidence ? `, ${evidence} evidence files` : ""}, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
+      const { bench, files, evidence, bytes, privateShots } = exportBench(must(target), out);
+      const shots = privateShots ? "no screenshots: the task declares them private" : `${files} screenshots`;
+      console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${shots}${evidence ? `, ${evidence} evidence files` : ""}, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
       return;
     }
     case "export-inspect": {

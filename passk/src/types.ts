@@ -63,6 +63,15 @@ export interface Task {
    * still present". Without it that state dies with the VM.
    */
   evidence?: string[];
+  /**
+   * `private` keeps every screenshot inside `runs/`: `export` copies none of
+   * them and the exported report shows none. For a task whose screens carry
+   * real content — a library of someone's saved posts, a record with a real
+   * name on it — the frames are the one artefact that cannot be published,
+   * while the checks and the task-declared evidence files still can. Like
+   * `evidence`, it cannot change an outcome, so it is not in the task hash.
+   */
+  screenshots?: "private";
 }
 
 /** One file copied out of a fork after grading. `file` and `bytes` are absent when the copy failed. */
