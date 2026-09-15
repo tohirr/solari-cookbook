@@ -5,7 +5,7 @@
 # every screenshot) is uploaded as an artifact, and the numbers go to the
 # job summary and the step outputs.
 #
-#   - uses: tohirr/solari-cookbook/passk@main
+#   - uses: tohirr/solari-cookbook/passk@v0.1
 #     with:
 #       task: tasks/ticket-queue.yaml
 #       k: 10

@@ -145,7 +145,7 @@ runs your agent on every fork, grades each run <strong>inside the VM</strong> af
 agent stops, and fails the build unless the pass rate clears the bar. Nothing
 the agent says about its own success counts.</p>
 <h2 id="in-your-agent39s-ci">In your agent&#39;s CI</h2>
-<pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@main
+<pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@v0.1
   with:
     task: tasks/ticket-queue.yaml
     k: 10

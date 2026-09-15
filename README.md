@@ -7,7 +7,7 @@ fails the build unless the pass rate clears the bar. Nothing the agent says
 about its own success counts.
 
 ```yaml
-- uses: tohirr/solari-cookbook/passk@main
+- uses: tohirr/solari-cookbook/passk@v0.1
   with:
     task: tasks/ticket-queue.yaml
     k: 10

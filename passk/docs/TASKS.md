@@ -47,7 +47,7 @@ The GitHub Action runs `passk run` on a runner with no display; the desktops
 are Solari's. Secrets arrive as `env`, never as inputs.
 
 ```yaml
-- uses: tohirr/solari-cookbook/passk@main
+- uses: tohirr/solari-cookbook/passk@v0.1
   with:
     task: tasks/ticket-queue.yaml     # path in your repo
     k: 10
