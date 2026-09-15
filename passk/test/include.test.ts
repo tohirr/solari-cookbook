@@ -67,7 +67,8 @@ test("the shipped bookmarx tasks all expand to the one Chrome line, each at its 
   };
   const lines = new Set<string>();
   for (const [id, url] of Object.entries(urls)) {
-    const task = loadTask(`tasks/${id}.yaml`);
+    // The boxed tasks upload an export this checkout may not have; this test reads their steps and boots nothing.
+    const task = loadTask(`tasks/${id}.yaml`, { uploads: "skip" });
     const chrome = (task.setup ?? []).find((s) => "exec" in s && (s.args ?? []).some((a) => a.includes("remote-debugging-port")));
     assert.ok(chrome, `${id} should include the Chrome step`);
     const line = ("args" in chrome! ? chrome!.args ?? [] : [])[1] ?? "";

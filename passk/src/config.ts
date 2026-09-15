@@ -157,7 +157,12 @@ function missingUploads(task: Task): string[] {
  * the task hash, the bench's own record of what it ran — sees one flat list
  * of steps and never has to know a file was shared.
  */
-export function loadTask(file: string): Task {
+/**
+ * `uploads: "skip"` loads a task without the pre-flight on its upload sources,
+ * for tooling and tests that read a task and boot nothing. Every command that
+ * boots keeps the default.
+ */
+export function loadTask(file: string, opts: { uploads?: "check" | "skip" } = {}): Task {
   const raw = parse(fs.readFileSync(file, "utf8")) as Task & { setup_from?: Include | Include[] };
   if (!validateTaskFile(raw)) {
     throw new Error(`${file} is not a valid passk task:\n${schemaProblems(validateTaskFile.errors ?? [], raw).join("\n")}`);
@@ -171,7 +176,7 @@ export function loadTask(file: string): Task {
   });
   const setup = shared.length ? [...shared, ...(task.setup ?? [])] : task.setup;
   const built: Task = { template: "default", resolution: "1280x720", max_steps: 40, ...task, ...(setup ? { setup } : {}) };
-  const missing = missingUploads(built);
+  const missing = opts.uploads === "skip" ? [] : missingUploads(built);
   if (missing.length) {
     // A README beside a missing file is where its build step is written down.
     const lines = missing.map((m) => {
