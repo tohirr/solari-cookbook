@@ -187,18 +187,63 @@ if (fs.existsSync(path.join(EV, "compare-bookmarx-triage-prompt", "compare.json"
   fs.writeFileSync(path.join(OUT, "compare-bookmarx-triage.html"), hero);
 }
 
+// 3c. The card: one image that survives a timeline. Huge dots, one number, two
+//     lines of context. Everything comes from the bench file, so the glyphs and
+//     the count cannot drift from what was published.
+if (fs.existsSync(path.join(EV, "bookmarx-triage", "bench.json"))) {
+  const b = bench("bookmarx-triage");
+  const m = b.metrics;
+  const dots = b.runs.map((r) => {
+    const cls = r.status === "passed" ? "p" : r.status === "failed" ? "f" : "l";
+    return `<i class="${cls}">${r.status === "passed" ? "✓" : r.status === "failed" ? "✗" : "·"}</i>`;
+  }).join("");
+  const card = page("passk · four times in ten", `
+<div class="card-wrap">
+  <div class="dots">${dots}</div>
+  <div class="score"><b>${m.passed}/${m.n}</b></div>
+  <div class="lede">Ten forks of one desktop. Same agent, same prompt, same snapshot.</div>
+  <div class="sub">My library-sweeping agent, benched with <b>passk</b> on Solari · 95% interval ${Math.round(m.passAt1Lower * 100)}–${pct(m.passAt1Upper)}</div>
+</div>
+`, `
+html,body{height:630px;overflow:hidden}
+main{max-width:none;padding:0;display:grid;place-items:center;height:630px}
+.card-wrap{width:1200px;padding:0 90px;text-align:center}
+.dots{display:flex;gap:18px;justify-content:center;margin-bottom:54px}
+.dots i{width:86px;height:86px;border-radius:50%;display:grid;place-items:center;font:700 44px/1 var(--sans);font-style:normal}
+.dots i.p{background:var(--good-dim);color:var(--good-ink)}
+.dots i.f{background:var(--crit);color:#fff}
+.dots i.l{background:transparent;box-shadow:inset 0 0 0 3px var(--line-2);color:var(--ink-3)}
+.score b{font:600 190px/0.9 var(--sans);letter-spacing:-.04em;color:var(--ink);display:block}
+.lede{font:26px/1.35 var(--serif);color:var(--ink);margin-top:38px}
+.sub{font:17px/1.5 var(--sans);color:var(--ink-3);margin-top:16px}
+.sub b{color:var(--ink-2);font-weight:600}
+`);
+  fs.writeFileSync(path.join(OUT, "card-four-in-ten.html"), card);
+}
+
 // 4. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const shots: [string, string][] = [["failure-ticket-routing", "docs/failure-ticket-routing.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"], ...(fs.existsSync(path.join(OUT, "compare-bookmarx-triage.html")) ? [["compare-bookmarx-triage", "docs/compare-bookmarx-triage.jpg"] as [string, string]] : [])];
+// [name, destination, fixed height]. Pages are shot tall and trimmed to what
+// was drawn; a social card is a canvas of its own and keeps every pixel, since
+// 1200×630 is what X, LinkedIn and an OG preview all expect.
+type Shot = [name: string, dest: string, height?: number];
+const shots: Shot[] = [
+  ["failure-ticket-routing", "docs/failure-ticket-routing.jpg"],
+  ["how-it-works", "docs/how-it-works.jpg"],
+  ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"],
+  ...(fs.existsSync(path.join(OUT, "compare-bookmarx-triage.html")) ? [["compare-bookmarx-triage", "docs/compare-bookmarx-triage.jpg"] as Shot] : []),
+  ...(fs.existsSync(path.join(OUT, "card-four-in-ten.html")) ? [["card-four-in-ten", "docs/card-four-in-ten.jpg", 630] as Shot] : []),
+];
 if (fs.existsSync(chrome)) {
-  for (const [name, dest] of shots) {
+  for (const [name, dest, fixed] of shots) {
     const png = path.join(OUT, `${name}.png`);
-    execFileSync(chrome, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--virtual-time-budget=4000", "--window-size=1280,1800", `--screenshot=${png}`, `file://${path.join(OUT, `${name}.html`)}`], { stdio: "ignore" });
+    const width = fixed ? 1200 : 1280;
+    execFileSync(chrome, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--virtual-time-budget=4000", `--window-size=${width},${fixed ?? 1800}`, `--screenshot=${png}`, `file://${path.join(OUT, `${name}.html`)}`], { stdio: "ignore" });
     const tall = fs.readFileSync(png);
-    const height = contentHeight(tall, [0xfb, 0xfa, 0xf7]);
-    fs.writeFileSync(png, cropPng(tall, height));
+    const height = fixed ?? contentHeight(tall, [0xfb, 0xfa, 0xf7]);
+    if (!fixed) fs.writeFileSync(png, cropPng(tall, height));
     execFileSync("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "70", png, "--out", dest], { stdio: "ignore" });
-    console.log(`${dest} 1280×${height} (${(fs.statSync(dest).size / 1024).toFixed(0)} KB)`);
+    console.log(`${dest} ${width}×${height} (${(fs.statSync(dest).size / 1024).toFixed(0)} KB)`);
   }
 } else {
   console.log(`no Chrome at ${chrome}; HTML written to ${OUT}`);
