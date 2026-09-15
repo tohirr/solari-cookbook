@@ -197,7 +197,11 @@ with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. Comparison folders hold the paired results.
 `passk export runs/<dir> evidence/<name>` copies a bench with only the
-screenshots that carry proof; `sh scripts/curate-evidence.sh` rebuilds the
+screenshots that carry proof. `passk export-inspect runs/<dir> [out dir]`
+writes the bench as an [Inspect AI](https://inspect.aisi.org.uk/) eval log:
+one task, one sample, each run an epoch, the checks as the scorer, lost runs
+unscored, every step a tool call, so `inspect view` opens it beside whatever
+else a team evaluates there (`--images` embeds the screenshots as data URLs); `sh scripts/curate-evidence.sh` rebuilds the
 whole directory from `runs/`. `npm run assets` redraws the two still images
 in `docs/` (failure evidence, how it works) from the same bench files.
 `docs/demo.tape` records the no-key demo as a GIF with

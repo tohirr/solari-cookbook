@@ -18,6 +18,7 @@
  *   passk report   runs/<dir>                 re-render report.html from bench.json
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
  *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof
+ *   passk export-inspect runs/<dir> [out dir]  the bench as an Inspect AI eval log, for `inspect view`
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
  *   passk studio                              the results board on localhost, with a Run button
  *
@@ -29,6 +30,7 @@ import { classifyFailures } from "./classify.js";
 import { compareBenches, formatComparison, loadBench } from "./compare.js";
 import { doctor } from "./doctor.js";
 import { exportBench } from "./export.js";
+import { exportInspect } from "./inspect.js";
 import { recommendDir } from "./recommend.js";
 import { validateTask } from "./validate.js";
 import { renderCompare } from "./report/compare.js";
@@ -147,6 +149,13 @@ async function main() {
       console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${files} screenshots, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
       return;
     }
+    case "export-inspect": {
+      // --images embeds every screenshot as a data URL; the default keeps paths, which the viewer shows as text.
+      const out = process.argv[4] && !process.argv[4].startsWith("--") ? process.argv[4] : undefined;
+      const r = exportInspect(must(target), out, has("images"));
+      console.log(`${r.samples} runs → ${r.file} (${(r.bytes / 1e6).toFixed(1)} MB)\nopen it with: inspect view --log-dir ${path.dirname(r.file)}${/\d{4}-\d\d-\d\dT.*_.*\.json$/.test(path.basename(r.file)) ? "" : "   (the viewer lists only Inspect-named files; pass a directory to get one)"}`);
+      return;
+    }
     case "classify": {
       // Classification is a separate, retryable step: it needs the model, and a
       // network blip during it should not cost a 50-run bench its hypotheses.
@@ -202,6 +211,7 @@ async function main() {
   pieces of run, on their own:
   passk prepare <task.yaml>      passk validate <task.yaml> [--snapshot snap_…]      passk report <runs/dir>
   passk classify <runs/dir>      passk export <runs/dir> <evidence/dir>              passk sweep
+  passk export-inspect <runs/dir> [out dir] [--images]    the bench as an Inspect AI eval log
   passk studio [--port 8787] [--no-open]`);
       process.exit(cmd ? 1 : 0);
   }

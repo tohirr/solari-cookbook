@@ -114,6 +114,7 @@ npm run passk compare runs/A runs/B        # what changed, what moved, and wheth
 npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
 npm run passk probe tasks/x.yaml           # what would the agent ask a human before acting?
 npm run passk recommend runs/dir           # what to change next, and what to keep fixed
+npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, next to it, for `inspect view`
 npm run studio                             # the results board on localhost, with a Run button
 ```
 
