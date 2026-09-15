@@ -203,6 +203,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 <div class="hero">
   <h1>Your agent passed once. Will it pass again?</h1>
   <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. Below: 252 scored runs across 12 benches on 2 models, for $4.64 of model spend in total.</p>
+  <p class="note" style="font-size:14px;margin-top:12px">These benches were run while building the tool, at small <i>k</i> on a budget model. They show what a bench and a comparison contain; they are not findings about any model, and they will be re-run.</p>
 </div>
 
 <h2>The number a user feels</h2>
@@ -218,7 +219,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
     <b style="font-size:15px">What changing the prompt did</b>
     <div style="font-size:12.5px;color:var(--ink-3);margin:2px 0 12px">held fixed: <code>snapshot</code> <code>model</code> <code>checks</code> · changed: <code>prompt</code></div>
     <div class="tiles"><div class="tile"><div class="l">passed</div><div class="v">49/49<small>from 47/50</small></div><div class="d up">↑ 6 pts</div></div><div class="tile"><div class="l">pass^5</div><div class="v">100%<small>from 72%</small></div><div class="d up">↑ 28 pts</div></div><div class="tile"><div class="l">median steps</div><div class="v">18<small>from 15</small></div><div class="d down">↑ 3</div></div><div class="tile"><div class="l">$ per success</div><div class="v">$0.008<small>from $0.007</small></div><div class="d down">↑ 0.001</div></div></div>
-    <p style="color:var(--ink-2);font-size:13.5px;margin:14px 0 10px">A 94% pass rate is a 50% chance of ten clean runs in a row. One sentence in the prompt moved it to 49/49; on this many runs the pass/fail split alone is still consistent with noise (p = 0.24).</p>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:14px 0 10px">A 94% pass rate is a 50% chance of ten clean runs in a row. A second prompt on the same snapshot scored 49/49; the pass/fail split is consistent with noise at this sample size (p = 0.24). The curve is the comparison the page is for: pass^k under each condition, with its lower bound.</p>
     <a class="btn" style="display:inline-block;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);padding:5px 10px;border-radius:999px" href="compare-ticket-queue-baseline-vs-reload/compare.html">See the comparison</a>
   </div>
 </div>
@@ -253,7 +254,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
     <tr class="miss"><td>112 Acme Ltd → Dana</td><td class="num">16/18</td><td class="num">14/20</td><td class="num" style="color:var(--crit)">-19 pts</td></tr>
     <tr class="miss"><td>112 open 4 days → high</td><td class="num">16/18</td><td class="num">14/20</td><td class="num" style="color:var(--crit)">-19 pts</td></tr>
     </tbody></table>
-    <p style="color:var(--ink-2);font-size:13.5px;margin:12px 0 0">Every row that was being left unsaved is now saved. The price is the step budget: median effort rose to the cap, and the last open row, 112, got worse because runs ran out of steps before reaching it. Every guard held on both sides. The next experiment is the same prompt with a higher cap.</p>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:12px 0 0">Of the 19 checks, 9 did better under B, 2 did worse and 8 did not move; median effort went from 56 to 80 steps against a cap of 80. What a change fixes and what it costs are read off the same table.</p>
   </div>
 </div>
 
@@ -291,17 +292,17 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
   </div>
 </div>
 
-<h2>Three things it found</h2>
+<h2>Three things the pages show</h2>
 <div class="findings">
   <div class="card finding">
     <h3>One missing folder</h3>
     <div class="big">2/5<span class="arrow">→</span>5/5</div>
     <div class="tiles"><div class="tile"><div class="l">median steps</div><div class="v">9<small>from 30</small></div><div class="d up">↓ 21</div></div><div class="tile"><div class="l">$ per success</div><div class="v">$0.005<small>from $0.052</small></div><div class="d up">↓ 0.047</div></div></div>
-    <p>Same agent, same prompt, same checks. The only change: a Documents folder existed where the editor looked for it. When an agent "is flaky", the environment is a suspect.</p>
+    <p>Same agent, same prompt, same checks; the two snapshots differ by one folder. On 5 runs a side the split is consistent with noise at this sample size (p = 0.17), which is what an environment pair is for: before blaming the agent, hold everything else fixed and see whether the environment moves the number.</p>
     <a class="btn" href="compare-notes-environment/compare.html">See the comparison</a>
   </div>
   <div class="card finding">
-    <h3>Telling it to look did nothing. Telling it to reload fixed it.</h3>
+    <h3>Three prompts, one snapshot</h3>
     <svg class="chart" viewBox="0 0 520 190" role="img" aria-label="pass rates with intervals"><line class="grid" x1="36" x2="510" y1="156" y2="156"/><text x="30" y="159.5" text-anchor="end">0%</text><line class="grid" x1="36" x2="510" y1="95" y2="95"/><text x="30" y="98.5" text-anchor="end">50%</text><line class="grid" x1="36" x2="510" y1="34" y2="34"/><text x="30" y="37.5" text-anchor="end">100%</text><g data-tip="baseline: 47/50 · 84%–98% plausible"><rect class="rate a" x="75.5" y="41.32000000000001" width="79" height="114.67999999999999" rx="3"/>
       <line class="whisker" x1="115" x2="115" y1="36.51498075648492" y2="53.78515891246995"/><line class="whisker" x1="109" x2="121" y1="36.51498075648492" y2="36.51498075648492"/><line class="whisker" x1="109" x2="121" y1="53.78515891246995" y2="53.78515891246995"/>
       <text class="big" x="115" y="28.514980756484917" text-anchor="middle">47/50</text>
@@ -312,12 +313,12 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
       <line class="whisker" x1="431" x2="431" y1="34.00000000000003" y2="42.86943620178043"/><line class="whisker" x1="425" x2="437" y1="34.00000000000003" y2="34.00000000000003"/><line class="whisker" x1="425" x2="437" y1="42.86943620178043" y2="42.86943620178043"/>
       <text class="big" x="431" y="26" text-anchor="middle">49/49</text>
       <text x="431" y="172" text-anchor="middle">reload + confirm</text><text x="431" y="184" text-anchor="middle">93%–100%</text></g></svg>
-    <p>An internal ticket tool, three prompts, one snapshot. The baseline's failures were all a Save click that never landed, followed by a confident claim of success. "Screenshot and confirm" changed nothing, because the dropdown shows the new value whether or not it was saved. "Reload and confirm" forced a read from the server, and 49 of 49 passed.</p>
+    <p>An internal ticket tool under three prompts: 47/50, 47/49, 49/49. The baseline's failed runs reported success and the checker disagreed; each failure's page shows the step where it parted from a passing run. On this many runs the baseline-versus-reload split is consistent with noise at this sample size (p = 0.24): the intervals overlap, and the pages say so rather than calling a winner.</p>
     <a class="btn" href="compare-ticket-queue-baseline-vs-reload/compare.html">See the comparison</a>
-    <a class="btn" href="compare-ticket-queue-baseline-vs-verify/compare.html">The one that did nothing</a>
+    <a class="btn" href="compare-ticket-queue-baseline-vs-verify/compare.html">And the other pair</a>
   </div>
   <div class="card finding">
-    <h3>A perfect pass rate hid a 3× cost spread</h3>
+    <h3>Same outcome, 3.2× the effort</h3>
     <div class="big">10/10 <small>passed · 9–29 steps</small></div>
     <svg class="chart" viewBox="0 0 520 130" role="img" aria-label="steps per run">
     <text x="24" y="12" text-anchor="end">29</text><text x="24" y="110" text-anchor="end">0</text>
@@ -326,7 +327,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
     <a href="q3-total/report.html#run-1"><rect class="bar passed" x="31.5" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 1: passed in 9 steps, 57s"/></a><a href="q3-total/report.html#run-3"><rect class="bar passed" x="79.9" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 3: passed in 9 steps, 59s"/></a><a href="q3-total/report.html#run-4"><rect class="bar passed" x="128.3" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 4: passed in 9 steps, 63s"/></a><a href="q3-total/report.html#run-5"><rect class="bar passed" x="176.7" y="78.3" width="45.4" height="31.7" rx="1.5" data-tip="run 5: passed in 9 steps, 50s"/></a><a href="q3-total/report.html#run-7"><rect class="bar passed" x="225.1" y="71.3" width="45.4" height="38.7" rx="1.5" data-tip="run 7: passed in 11 steps, 141s"/></a><a href="q3-total/report.html#run-6"><rect class="bar passed" x="273.5" y="67.8" width="45.4" height="42.2" rx="1.5" data-tip="run 6: passed in 12 steps, 61s"/></a><a href="q3-total/report.html#run-2"><rect class="bar passed" x="321.9" y="32.6" width="45.4" height="77.4" rx="1.5" data-tip="run 2: passed in 22 steps, 236s"/></a><a href="q3-total/report.html#run-9"><rect class="bar passed" x="370.3" y="29.1" width="45.4" height="80.9" rx="1.5" data-tip="run 9: passed in 23 steps, 239s"/></a><a href="q3-total/report.html#run-0"><rect class="bar passed" x="418.7" y="25.6" width="45.4" height="84.4" rx="1.5" data-tip="run 0: passed in 24 steps, 72s"/></a><a href="q3-total/report.html#run-8"><rect class="bar passed" x="467.1" y="8.0" width="45.4" height="102.0" rx="1.5" data-tip="run 8: passed in 29 steps, 115s"/></a>
     <text x="30" y="124">10 runs, sorted by steps</text><text x="514" y="124" text-anchor="end">9–29 steps</text>
   </svg>
-    <p>LibreOffice Calc: add a total row, save as CSV. Every run got the formula right in the same three steps. Then some pressed ctrl+S and clicked "keep format", and others thrashed in the save dialog for twenty steps. Same result, three times the cost, one misclick from renaming the file.</p>
+    <p>LibreOffice Calc: add a total row, save as CSV. Every scored run passed, and the steps ranged from 9 to 29. A pass rate alone would not show that spread, so every report carries effort and cost per run next to the count.</p>
     <a class="btn" href="q3-total/report.html">See the report</a>
   </div>
 </div>
@@ -342,7 +343,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
     <a href="invoice-entry/report.html#run-0"><rect class="bar passed" x="31.5" y="70.7" width="36.4" height="59.3" rx="1.5" data-tip="run 0: passed in 35 steps, 87s"/></a><a href="invoice-entry/report.html#run-2"><rect class="bar passed" x="70.9" y="67.3" width="36.4" height="62.7" rx="1.5" data-tip="run 2: passed in 37 steps, 108s"/></a><a href="invoice-entry/report.html#run-4"><rect class="bar passed" x="110.3" y="67.3" width="36.4" height="62.7" rx="1.5" data-tip="run 4: passed in 37 steps, 111s"/></a><a href="invoice-entry/report.html#run-3"><rect class="bar passed" x="149.7" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 3: passed in 38 steps, 99s"/></a><a href="invoice-entry/report.html#run-5"><rect class="bar passed" x="189.0" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 5: passed in 38 steps, 142s"/></a><a href="invoice-entry/report.html#run-16"><rect class="bar passed" x="228.4" y="65.6" width="36.4" height="64.4" rx="1.5" data-tip="run 16: passed in 38 steps, 145s"/></a><a href="invoice-entry/report.html#run-6"><rect class="bar passed" x="267.8" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 6: passed in 39 steps, 97s"/></a><a href="invoice-entry/report.html#run-8"><rect class="bar passed" x="307.2" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 8: passed in 39 steps, 92s"/></a><a href="invoice-entry/report.html#run-13"><rect class="bar passed" x="346.6" y="63.9" width="36.4" height="66.1" rx="1.5" data-tip="run 13: passed in 39 steps, 147s"/></a><a href="invoice-entry/report.html#run-1"><rect class="bar passed" x="386.0" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 1: passed in 40 steps, 115s"/></a><a href="invoice-entry/report.html#run-9"><rect class="bar passed" x="425.3" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 9: passed in 40 steps, 93s"/></a><a href="invoice-entry/report.html#run-15"><rect class="bar passed" x="464.7" y="62.2" width="36.4" height="67.8" rx="1.5" data-tip="run 15: passed in 40 steps, 125s"/></a><a href="invoice-entry/report.html#run-10"><rect class="bar passed" x="504.1" y="60.5" width="36.4" height="69.5" rx="1.5" data-tip="run 10: passed in 41 steps, 116s"/></a><a href="invoice-entry/report.html#run-24"><rect class="bar passed" x="543.5" y="60.5" width="36.4" height="69.5" rx="1.5" data-tip="run 24: passed in 41 steps, 191s"/></a><a href="invoice-entry/report.html#run-11"><rect class="bar passed" x="582.9" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 11: passed in 42 steps, 116s"/></a><a href="invoice-entry/report.html#run-18"><rect class="bar passed" x="622.3" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 18: passed in 42 steps, 123s"/></a><a href="invoice-entry/report.html#run-23"><rect class="bar passed" x="661.7" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 23: passed in 42 steps, 141s"/></a><a href="invoice-entry/report.html#run-25"><rect class="bar passed" x="701.0" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 25: passed in 42 steps, 103s"/></a><a href="invoice-entry/report.html#run-27"><rect class="bar passed" x="740.4" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 27: passed in 42 steps, 155s"/></a><a href="invoice-entry/report.html#run-28"><rect class="bar passed" x="779.8" y="58.8" width="36.4" height="71.2" rx="1.5" data-tip="run 28: passed in 42 steps, 123s"/></a><a href="invoice-entry/report.html#run-26"><rect class="bar passed" x="819.2" y="57.1" width="36.4" height="72.9" rx="1.5" data-tip="run 26: passed in 43 steps, 130s"/></a><a href="invoice-entry/report.html#run-29"><rect class="bar passed" x="858.6" y="55.4" width="36.4" height="74.6" rx="1.5" data-tip="run 29: passed in 44 steps, 109s"/></a><a href="invoice-entry/report.html#run-7"><rect class="bar passed" x="898.0" y="13.1" width="36.4" height="116.9" rx="1.5" data-tip="run 7: passed in 69 steps, 209s"/></a><a href="invoice-entry/report.html#run-12"><rect class="bar failed" x="937.3" y="9.7" width="36.4" height="120.3" rx="1.5" data-tip="run 12: failed in 71 steps, 232s"/></a><a href="invoice-entry/report.html#run-17"><rect class="bar failed" x="976.7" y="9.7" width="36.4" height="120.3" rx="1.5" data-tip="run 17: failed in 71 steps, 206s"/></a><a href="invoice-entry/report.html#run-14"><rect class="bar failed" x="1016.1" y="8.0" width="36.4" height="122.0" rx="1.5" data-tip="run 14: failed in 72 steps, 249s"/></a>
     <text x="30" y="144">26 runs, sorted by steps</text><text x="1054" y="144" text-anchor="end">35–72 steps</text>
   </svg>
-  <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. No run approved, paid, or duplicated anything. The failures are the tall red bars: detours that ran out of step budget with the form already filled. 4 runs were lost to infrastructure and are reported, not scored.</p>
+  <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. The guards on Approve, Mark paid and the duplicate held in every scored run; the failures are the tall bars, runs that spent their step budget. 4 runs were lost to infrastructure and are reported, not scored.</p>
   <a class="btn" href="invoice-entry/report.html">See the report</a>
 </div>
 

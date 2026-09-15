@@ -6,28 +6,39 @@ times, runs the same agent on every fork, grades the outcome **inside the
 VM** after the agent stops, and reports pass@k and pass^k with honest
 intervals. Nothing the agent says about its own success counts.
 
-**One sentence, measured per rule.** On a twelve-ticket routing task with
-nineteen checks, the cheapest model available passed **5 of 18** runs.
-Adding *"when you are done, reload the page and confirm each row"* to the
-prompt took it to **14 of 20** on the same snapshot with the same checks
-(Fisher p = 0.022). The comparison says which checks the sentence fixed
-(every row that was being left unsaved now saves), and what it cost (median
-effort rose from 56 steps to the cap of 80, and the last open row got worse
-because runs ran out of steps before reaching it).
+passk exists for one question: when your agent works, how often does it
+work? A single pass is one draw from a distribution. Solari's snapshot and
+fork make the rest of the draws cheap: every attempt starts from a
+byte-identical desktop, so fifty runs of a task cost about a dollar on a
+budget model, and the spread you measure is the agent's, not the
+environment's.
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="passk comparison: one sentence in the prompt took a twelve-ticket routing task from 5/18 to 14/20 on the same snapshot; the by-check table shows every unsaved row now saves and the last row got worse from the step cap" width="100%"></a></p>
+What a bench reports, and what a comparison adds:
 
-**[The routing comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
+- **pass@1 with a 95% interval, and pass^k**, the chance that *k* attempts in
+  a row all succeed, which is the number a user feels.
+- **A verifier proven before any agent runs.** The checks must fail on the
+  untouched snapshot and pass after the task's golden steps, or no bench.
+- **Per check, how often each rule was met**, so a pass rate becomes a diagnosis.
+- **For each failure**, the first step where it parted from a passing run and
+  a hypothesis for why.
+- **Runs lost to infrastructure**, listed and never scored against the agent.
+- **`compare`**: two conditions on one snapshot, what was held fixed, what
+  changed, the per-check deltas, and Fisher's exact p, so you learn whether a
+  change moved anything or the sample was too small to say.
+
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
+
+**[An example comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
 · [Every bench and screenshot](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
 · [How it works](passk/docs/TASKS.md#what-run-does)
 · [The method](passk/docs/METHOD.md)
 · [Notes for Solari's team](passk/docs/SOLARI-NOTES.md)**
 
-252 verified runs across eleven tasks and three Solari templates, two
-controlled prompt experiments, and a mock accounts-payable workflow with a
-duplicate trap and buttons that must not be pressed (23/26 at 3.5 cents per
-success, failed attempts included), for $4.64 of model spend in total. Every
-number links to the bench file, the checks as run, and the screenshots.
+The benches published so far were run while building the tool, on one budget
+model at small *k*. They are there to show what the pages contain, not as
+findings about any model, and they will be re-run. Every number on them links
+to its bench file, the checks as run, and the screenshots.
 
 The question is from Gonzalez-Pumariega et al., [*On the Reliability of
 Computer Use Agents*](https://arxiv.org/abs/2604.17849) (2026), which

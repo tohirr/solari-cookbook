@@ -112,7 +112,7 @@ fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
   const rows = (routing.checks ?? []).filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n);
   const hero = page("passk · one sentence, measured per rule", `
 <div class="brand"><b>passk</b> controlled comparison · same snapshot, same checks, same model · one sentence added to the prompt</div>
-<h1 style="font-size:26px">One sentence took ${A.metrics.passed}/${A.metrics.n} to ${B.metrics.passed}/${B.metrics.n}. The table says which rows it fixed, and which it cost.</h1>
+<h1 style="font-size:26px">One task under two prompts on one snapshot: ${A.metrics.passed}/${A.metrics.n} against ${B.metrics.passed}/${B.metrics.n}, and per check, which rules moved.</h1>
 <div class="two" style="margin-top:14px">
   <div class="card">
     <b style="font-size:15px">${esc(A.taskName)}</b>
@@ -135,10 +135,10 @@ fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
     <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
     ${rows.map((x) => `<tr class="${x.delta < 0 ? "miss" : ""}"><td>${esc(x.label)}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num" style="color:${x.delta > 0 ? "var(--good)" : x.delta < 0 ? "var(--crit)" : "var(--ink-3)"}">${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)} pts</td></tr>`).join("\n    ")}
     </tbody></table>
-    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">Every row that was being left unsaved now saves. The price is the step budget: median effort rose to the cap, and the last open row, 112, got worse because runs ran out of steps before reaching it. Every guard held on both sides.</div>
+    <div style="color:var(--ink-2);font-size:13px;margin-top:12px">${(routing.checks ?? []).filter((x) => x.delta > 0).length} checks did better under B, ${(routing.checks ?? []).filter((x) => x.delta < 0).length} did worse; median effort went from ${A.metrics.medianSteps} to ${B.metrics.medianSteps} steps against a cap of ${A.provenance.task.max_steps ?? 40}. What a change fixes and what it costs are on the same table.</div>
   </div>
 </div>
-`, `.cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:12px 0 6px} .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} table.checks .bar{display:none} main{max-width:1280px}`);
+`, `.cap{font:12.5px var(--sans);color:var(--ink-3);margin:12px 0 6px} .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} table.checks .bar{display:none} main{max-width:1280px}`);
   fs.writeFileSync(path.join(OUT, "compare-ticket-routing.html"), hero);
 }
 

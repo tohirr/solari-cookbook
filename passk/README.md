@@ -7,28 +7,24 @@ snapshots one Solari desktop, forks it *k* times, runs the same agent on every
 fork, verifies the outcome inside the VM, and reports pass@k and pass^k with
 honest intervals, plus the step where each failure parted ways with a passing run.
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="One sentence in the prompt took a twelve-ticket routing task from 5/18 to 14/20 on the same snapshot; the by-check table shows every unsaved row now saves and the last row got worse from the step cap" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
 
-One sentence, measured per rule. On a twelve-ticket routing task with nineteen
-checks, the cheapest model available passed 5 of 18 runs. Adding "when you are
-done, reload the page and confirm each row" to the prompt took it to 14 of 20
-on the same snapshot with the same checks (Fisher p = 0.022). The comparison
-says which checks the sentence fixed: every row that was being left unsaved
-now saves. It also says what it cost: median effort rose from 56 steps to the
-cap of 80, and the last open row got worse because runs ran out of steps
-before reaching it. Every guard held on both sides.
+The bench is the instrument; the experiment is the point. Fork one snapshot
+under two conditions, a prompt, a folder, a model, and `compare` puts them
+side by side: what was held fixed, what changed, the delta in passes, effort
+and cost per success, the same delta per check, and Fisher's exact p for the
+pass/fail split. It refuses to attribute a difference when more than one
+thing changed, and it says when a sample is too small to say anything.
 
-The simpler ticket queue told the same story at smaller scale: three prompts
-went 47/50, 47/49, 49/49. The failures were a Save click that did not land
-followed by a confident claim of success; asking the agent to verify on screen
-changed nothing, asking it to reload fixed it, and on fifty runs the split
-alone is still consistent with noise (p = 0.24). The mechanism is the
-evidence, and the interval says so.
+The picture above is one such comparison from the benches in `evidence/`,
+which were run while building the tool, on one budget model at small *k*.
+Read them as a demonstration of what the pages contain, not as findings;
+they will be re-run.
 
-**[The routing comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
-· [The ticket-queue comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html)
+**[An example comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
 · [Every bench and screenshot](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
 · [How it works](docs/TASKS.md#what-run-does)
+· [The method](docs/METHOD.md)
 · [Notes for Solari's team](docs/SOLARI-NOTES.md)**
 
 ## One command
@@ -75,12 +71,14 @@ Nothing the agent says about its own success counts. Grading happens inside the 
 
 ## Evidence
 
-Eleven tasks across three Solari templates, 250+ verified runs, two controlled
-prompt experiments, a model comparison, a mock accounts-payable workflow with
-a duplicate trap, all for under $5 of model spend. Every number is in
-[`evidence/`](evidence/) with screenshots and traces, rendered at
-[the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
-and summarized on [the front page](https://tohirr.github.io/solari-cookbook/passk/).
+[`evidence/`](evidence/) holds every bench run so far: eleven tasks across
+three Solari templates, prompt pairs and an environment pair on one snapshot,
+and a mock accounts-payable workflow with a duplicate trap, each with its
+bench file, the checks as run, screenshots and traces, rendered at
+[the showcase](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html).
+They were run while building the tool, on one budget model at small *k*:
+a demonstration of what a bench and a comparison contain, not a result about
+any model. The Claude loop has not been benched yet.
 
 ## Write your own task
 

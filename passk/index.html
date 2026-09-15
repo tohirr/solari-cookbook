@@ -143,26 +143,22 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 snapshots one Solari desktop, forks it <em>k</em> times, runs the same agent on every
 fork, verifies the outcome inside the VM, and reports pass@k and pass^k with
 honest intervals, plus the step where each failure parted ways with a passing run.</p>
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="One sentence in the prompt took a twelve-ticket routing task from 5/18 to 14/20 on the same snapshot; the by-check table shows every unsaved row now saves and the last row got worse from the step cap" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
 
-<p>One sentence, measured per rule. On a twelve-ticket routing task with nineteen
-checks, the cheapest model available passed 5 of 18 runs. Adding &quot;when you are
-done, reload the page and confirm each row&quot; to the prompt took it to 14 of 20
-on the same snapshot with the same checks (Fisher p = 0.022). The comparison
-says which checks the sentence fixed: every row that was being left unsaved
-now saves. It also says what it cost: median effort rose from 56 steps to the
-cap of 80, and the last open row got worse because runs ran out of steps
-before reaching it. Every guard held on both sides.</p>
-<p>The simpler ticket queue told the same story at smaller scale: three prompts
-went 47/50, 47/49, 49/49. The failures were a Save click that did not land
-followed by a confident claim of success; asking the agent to verify on screen
-changed nothing, asking it to reload fixed it, and on fifty runs the split
-alone is still consistent with noise (p = 0.24). The mechanism is the
-evidence, and the interval says so.</p>
-<p><strong><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html">The routing comparison</a>
-· <a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-queue-baseline-vs-reload/compare.html">The ticket-queue comparison</a>
+<p>The bench is the instrument; the experiment is the point. Fork one snapshot
+under two conditions, a prompt, a folder, a model, and <code>compare</code> puts them
+side by side: what was held fixed, what changed, the delta in passes, effort
+and cost per success, the same delta per check, and Fisher&#39;s exact p for the
+pass/fail split. It refuses to attribute a difference when more than one
+thing changed, and it says when a sample is too small to say anything.</p>
+<p>The picture above is one such comparison from the benches in <code>evidence/</code>,
+which were run while building the tool, on one budget model at small <em>k</em>.
+Read them as a demonstration of what the pages contain, not as findings;
+they will be re-run.</p>
+<p><strong><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html">An example comparison</a>
 · <a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html">Every bench and screenshot</a>
 · <a href="docs/tasks.html#what-run-does">How it works</a>
+· <a href="docs/method.html">The method</a>
 · <a href="docs/solari-notes.html">Notes for Solari&#39;s team</a></strong></p>
 <h2 id="one-command">One command</h2>
 <p>No keys, forty seconds, the whole pipeline on in-memory desktops:</p>
@@ -198,12 +194,14 @@ cost about a dollar on a budget model.</p>
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-queue.jpg" alt="Failure evidence: a passing run and a failing run of the ticket queue on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
 
 <h2 id="evidence">Evidence</h2>
-<p>Eleven tasks across three Solari templates, 250+ verified runs, two controlled
-prompt experiments, a model comparison, a mock accounts-payable workflow with
-a duplicate trap, all for under $5 of model spend. Every number is in
-<a href="evidence"><code>evidence/</code></a> with screenshots and traces, rendered at
-<a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html">the showcase</a>
-and summarized on <a href="https://tohirr.github.io/solari-cookbook/passk/">the front page</a>.</p>
+<p><a href="evidence"><code>evidence/</code></a> holds every bench run so far: eleven tasks across
+three Solari templates, prompt pairs and an environment pair on one snapshot,
+and a mock accounts-payable workflow with a duplicate trap, each with its
+bench file, the checks as run, screenshots and traces, rendered at
+<a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html">the showcase</a>.
+They were run while building the tool, on one budget model at small <em>k</em>:
+a demonstration of what a bench and a comparison contain, not a result about
+any model. The Claude loop has not been benched yet.</p>
 <h2 id="write-your-own-task">Write your own task</h2>
 <pre><code class="language-yaml">id: notes
 name: Save a note in Mousepad
@@ -230,7 +228,7 @@ tasks, and what is out of scope are in <a href="docs/tasks.html">the operator&#3
 npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
 npm run passk probe tasks/x.yaml           # what would the agent ask a human before acting?
 npm run passk recommend runs/dir           # what to change next, and what to keep fixed
-npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, for `inspect view`
+npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, next to it, for `inspect view`
 npm run studio                             # the results board on localhost, with a Run button
 </code></pre>
 <h2 id="docs">Docs</h2>

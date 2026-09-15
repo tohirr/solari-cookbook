@@ -34,6 +34,11 @@ const allFailures = all.flatMap(([, b]) => b.failures);
 const allRuns = all.flatMap(([, b]) => b.runs.filter((r) => r.status === "passed" || r.status === "failed").map((r) => ({ steps: r.steps.length, passed: r.status === "passed" })));
 const totalSpend = all.reduce((a, [, b]) => a + b.metrics.totalCostUsd, 0);
 const models = new Set(all.map(([, b]) => b.model));
+/** Per-check movement in a comparison, so the prose counts rather than asserts. */
+const moved = (c: Comparison) => { const rows = c.checks ?? []; return { up: rows.filter((x) => x.delta > 0).length, down: rows.filter((x) => x.delta < 0).length, same: rows.filter((x) => x.delta === 0).length }; };
+const routeMoved = moved(routing);
+const noise = (c: Comparison) => c.fisherP < 0.05 ? `unlikely to be noise (p = ${c.fisherP.toFixed(3)})` : `consistent with noise at this sample size (p = ${c.fisherP.toFixed(2)})`;
+const guardsHeld = (b: BenchResult) => (b.metrics.checks ?? []).filter((c) => c.invariant).every((c) => c.passed === c.n);
 
 const dots = (b: BenchResult, dir: string) => dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped, "", (i) => `${dir}/report.html#run-${i}`);
 const bars = (b: BenchResult, dir: string, h = 120, w = 520) => stepBars(b, w, h, (i) => `${dir}/report.html#run-${i}`);
@@ -71,6 +76,7 @@ ${FONTS}
 <div class="hero">
   <h1>Your agent passed once. Will it pass again?</h1>
   <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. Below: ${allRuns.length} scored runs across ${all.length} benches on ${models.size === 1 ? `one model, <code>${esc([...models][0])}</code>` : `${models.size} models`}, for ${usd(totalSpend, 2)} of model spend in total.</p>
+  <p class="note" style="font-size:14px;margin-top:12px">These benches were run while building the tool, at small <i>k</i> on a budget model. They show what a bench and a comparison contain; they are not findings about any model, and they will be re-run.</p>
 </div>
 
 <h2>The number a user feels</h2>
@@ -91,7 +97,7 @@ ${FONTS}
       { label: "median steps", a: String(R0.medianSteps), b: String(R1.medianSteps), delta: reload.delta.medianSteps, better: "down" },
       { label: "$ per success", a: usd(R0.costPerSuccessUsd), b: usd(R1.costPerSuccessUsd), delta: reload.delta.costPerSuccessUsd ?? 0, better: "down", digits: 3 },
     ])}
-    <p style="color:var(--ink-2);font-size:13.5px;margin:14px 0 10px">A ${pct(R0.passAt1)} pass rate is a ${pct(pow(R0, 10))} chance of ten clean runs in a row. One sentence in the prompt moved it to ${R1.passed}/${R1.n}; on this many runs the pass/fail split alone is ${reload.fisherP < 0.05 ? "unlikely to be noise" : "still consistent with noise"} (p = ${reload.fisherP.toFixed(2)}).</p>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:14px 0 10px">A ${pct(R0.passAt1)} pass rate is a ${pct(pow(R0, 10))} chance of ten clean runs in a row. A second prompt on the same snapshot scored ${R1.passed}/${R1.n}; the pass/fail split is ${noise(reload)}. The curve is the comparison the page is for: pass^k under each condition, with its lower bound.</p>
     <a class="btn" style="display:inline-block;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);padding:5px 10px;border-radius:999px" href="compare-ticket-queue-baseline-vs-reload/compare.html">See the comparison</a>
   </div>
 </div>
@@ -120,7 +126,7 @@ ${FONTS}
     <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
     ${(routing.checks ?? []).filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => `<tr class="${x.delta < 0 ? "miss" : ""}"><td>${esc(x.label)}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num" style="color:${x.delta > 0 ? "var(--good)" : x.delta < 0 ? "var(--crit)" : "var(--ink-3)"}">${x.delta > 0 ? "+" : ""}${Math.round(x.delta * 100)} pts</td></tr>`).join("\n    ")}
     </tbody></table>
-    <p style="color:var(--ink-2);font-size:13.5px;margin:12px 0 0">Every row that was being left unsaved is now saved. The price is the step budget: median effort rose to the cap, and the last open row, 112, got worse because runs ran out of steps before reaching it. Every guard held on both sides. The next experiment is the same prompt with a higher cap.</p>
+    <p style="color:var(--ink-2);font-size:13.5px;margin:12px 0 0">Of the ${(routing.checks ?? []).length} checks, ${routeMoved.up} did better under B, ${routeMoved.down} did worse and ${routeMoved.same} did not move; median effort went from ${routeA.metrics.medianSteps} to ${routeB.metrics.medianSteps} steps against a cap of ${routeA.provenance.task.max_steps ?? 40}. What a change fixes and what it costs are read off the same table.</p>
   </div>
 </div>
 
@@ -144,7 +150,7 @@ ${FONTS}
   </div>
 </div>
 
-<h2>Three things it found</h2>
+<h2>Three things the pages show</h2>
 <div class="findings">
   <div class="card finding">
     <h3>One missing folder</h3>
@@ -153,21 +159,21 @@ ${FONTS}
       { label: "median steps", a: String(A.medianSteps), b: String(B.medianSteps), delta: env.delta.medianSteps, better: "down" },
       { label: "$ per success", a: usd(A.costPerSuccessUsd), b: usd(B.costPerSuccessUsd), delta: env.delta.costPerSuccessUsd ?? 0, better: "down", digits: 3 },
     ])}
-    <p>Same agent, same prompt, same checks. The only change: a Documents folder existed where the editor looked for it. When an agent "is flaky", the environment is a suspect.</p>
+    <p>Same agent, same prompt, same checks; the two snapshots differ by one folder. On ${A.n} runs a side the split is ${noise(env)}, which is what an environment pair is for: before blaming the agent, hold everything else fixed and see whether the environment moves the number.</p>
     <a class="btn" href="compare-notes-environment/compare.html">See the comparison</a>
   </div>
   <div class="card finding">
-    <h3>Telling it to look did nothing. Telling it to reload fixed it.</h3>
+    <h3>Three prompts, one snapshot</h3>
     ${rateBars([{ label: "baseline", passed: R0.passed, n: R0.n, cls: "a" }, { label: "screenshot + confirm", passed: V.passed, n: V.n, cls: "n" }, { label: "reload + confirm", passed: R1.passed, n: R1.n, cls: "b" }], 520, 190)}
-    <p>An internal ticket tool, three prompts, one snapshot. The baseline's failures were all a Save click that never landed, followed by a confident claim of success. "Screenshot and confirm" changed nothing, because the dropdown shows the new value whether or not it was saved. "Reload and confirm" forced a read from the server, and ${R1.passed} of ${R1.n} passed.</p>
+    <p>An internal ticket tool under three prompts: ${R0.passed}/${R0.n}, ${V.passed}/${V.n}, ${R1.passed}/${R1.n}. The baseline's failed runs reported success and the checker disagreed; each failure's page shows the step where it parted from a passing run. On this many runs the baseline-versus-reload split is ${noise(reload)}: the intervals overlap, and the pages say so rather than calling a winner.</p>
     <a class="btn" href="compare-ticket-queue-baseline-vs-reload/compare.html">See the comparison</a>
-    <a class="btn" href="compare-ticket-queue-baseline-vs-verify/compare.html">The one that did nothing</a>
+    <a class="btn" href="compare-ticket-queue-baseline-vs-verify/compare.html">And the other pair</a>
   </div>
   <div class="card finding">
-    <h3>A perfect pass rate hid a 3× cost spread</h3>
+    <h3>Same outcome, ${S.minSteps ? (Math.round((S.maxSteps / S.minSteps) * 10) / 10) : "?"}× the effort</h3>
     <div class="big">${S.passed}/${S.n} <small>passed · ${S.minSteps}–${S.maxSteps} steps</small></div>
     ${bars(sheet, "q3-total", 130)}
-    <p>LibreOffice Calc: add a total row, save as CSV. Every run got the formula right in the same three steps. Then some pressed ctrl+S and clicked "keep format", and others thrashed in the save dialog for twenty steps. Same result, three times the cost, one misclick from renaming the file.</p>
+    <p>LibreOffice Calc: add a total row, save as CSV. Every scored run passed, and the steps ranged from ${S.minSteps} to ${S.maxSteps}. A pass rate alone would not show that spread, so every report carries effort and cost per run next to the count.</p>
     <a class="btn" href="q3-total/report.html">See the report</a>
   </div>
 </div>
@@ -177,7 +183,7 @@ ${FONTS}
   <h3>Accounts payable: PDF → mock ERP, with a duplicate trap and buttons that must not be pressed</h3>
   <div class="big">${I.passed}/${I.n} <small>passed · ${pct(I.passAt1Lower)}–${pct(I.passAt1Upper)} · ${usd(I.costPerSuccessUsd)} per success · ${I.minSteps}–${I.maxSteps} steps</small></div>
   ${bars(inv, "invoice-entry", 150, 1060)}
-  <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. No run approved, paid, or duplicated anything. The failures are the tall red bars: detours that ran out of step budget with the form already filled. ${I.errored ? `${I.errored} runs were lost to infrastructure and are reported, not scored.` : ""}</p>
+  <p>Read the right invoice out of three PDFs, skip the one already entered, fill a form with dropdowns and a date, attach the file through the OS file dialog, save as Pending review, and never touch Approve or Mark paid. ${guardsHeld(inv) ? "The guards on Approve, Mark paid and the duplicate held in every scored run" : "Not every guard held; the Checks table says which"}; the failures are the tall bars, runs that spent their step budget. ${I.errored ? `${I.errored} runs were lost to infrastructure and are reported, not scored.` : ""}</p>
   <a class="btn" href="invoice-entry/report.html">See the report</a>
 </div>
 
