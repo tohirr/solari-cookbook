@@ -210,11 +210,20 @@ Status is **validated** when live runs are published in [`evidence/`](../evidenc
 |---|---|---|---|
 | `ticket-routing` / `-reload` | default | validated, 20 + 20 runs | A support queue served from inside the VM, no login, no proxy, state in a JSON file the checker reads. Twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report's Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check. |
 | `ticket-queue` | default | ready | The same tool, simpler: five tickets, one closed row that must not be touched. The task to start from. |
-| `bookmarx-triage` / `-keep` | default | ready | bookmarx, run *inside* the desktop as static files plus a stdlib server over a 269-post slice of its demo library (`tasks/bookmarx-lite/`). The review queue before a public demo: seventeen posts, nine the rules say to remove and eight guards that look risky and are clean. Nineteen checks, one fact each, named by category and never by post. A prompt pair: the bare rules vs the rules plus "when unsure, keep", for over-deletion against under-deletion per check. |
-| `bookmarx-box-lookup` / `-paraphrase` / `-deep` | default | ready | The three search memories, on the boxed bookmarx: graded from the click the app records inside the VM. |
+| `bookmarx-triage` / `-keep` | default | ready, **needs the export** | bookmarx, run *inside* the desktop as static files plus a stdlib server over a 269-post slice of its demo library (`tasks/bookmarx-lite/`). The review queue before a public demo: seventeen posts, nine the rules say to remove and eight guards that look risky and are clean. Nineteen checks, one fact each, named by category and never by post. A prompt pair: the bare rules vs the rules plus "when unsure, keep", for over-deletion against under-deletion per check. |
+| `bookmarx-box-lookup` / `-paraphrase` / `-deep` | default | ready, **needs the export** | The three search memories, on the boxed bookmarx: graded from the click the app records inside the VM. |
 | `bookmarx-lookup` / `-paraphrase` / `-scroll` | default | ready | The same memories against the live site through Chrome's DevTools port; read-only, so the live database is safe. |
 | `notes` | default | ready | Save a note in Mousepad: the ten-line task in the README, for a first run. |
 | `fake` | none | harness test | Runs on the scripted provider; exercises the pipeline with no VM or model. It is what CI runs. |
+
+**The five boxed bookmarx tasks need a file this repository does not carry.**
+They upload `tasks/bookmarx-lite/bookmarx-box.tar.gz`, the export built by
+`pnpm demo:export` in [bookmarx](https://github.com/tohirr/bookmarx); it stays
+out of git because the review queue's removal targets are real saved posts.
+Without it those tasks are refused at load, naming the file and pointing at
+[`tasks/bookmarx-lite/README.md`](../tasks/bookmarx-lite/README.md), which says
+how to build it — nothing boots and nothing is billed. Every other task in the
+table runs from a clone.
 
 The ticket queue is a mock on purpose. A mock lets the bench
 own the state, plant a trap, and verify exactly. What they keep from the real

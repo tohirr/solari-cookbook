@@ -137,6 +137,19 @@ function substitute<T>(node: T, vars: Record<string, string>, file: string): T {
 }
 
 /**
+ * Every `upload:` source a task names, from its own steps and from anything
+ * `setup_from` pulled in, that is not on this machine. Sources are read
+ * relative to the working directory, the way `prepare` reads them. A task
+ * whose files are built rather than committed — an export, a fixture too
+ * large or too private for git — would otherwise boot a desktop, run setup,
+ * and die on ENOENT with the bill already paid.
+ */
+function missingUploads(task: Task): string[] {
+  const steps = [...(task.setup ?? []), ...(task.golden ?? [])];
+  return steps.flatMap((s) => ("upload" in s && !fs.existsSync(s.upload) ? [s.upload] : []));
+}
+
+/**
  * Parse a task file and refuse it before anything billable if it does not
  * match schema/task.schema.json: the same schema the editor uses, so what
  * completes in VS Code is what runs. `setup_from` includes are resolved here,
@@ -157,7 +170,17 @@ export function loadTask(file: string): Task {
     return substitute(readInclude(p), spec.with ?? {}, p);
   });
   const setup = shared.length ? [...shared, ...(task.setup ?? [])] : task.setup;
-  return { template: "default", resolution: "1280x720", max_steps: 40, ...task, ...(setup ? { setup } : {}) };
+  const built: Task = { template: "default", resolution: "1280x720", max_steps: 40, ...task, ...(setup ? { setup } : {}) };
+  const missing = missingUploads(built);
+  if (missing.length) {
+    // A README beside a missing file is where its build step is written down.
+    const lines = missing.map((m) => {
+      const readme = path.join(path.dirname(m), "README.md");
+      return `  ${m}${fs.existsSync(readme) ? ` — how to build it: ${readme}` : ""}`;
+    });
+    throw new Error(`${file} uploads files that are not on this machine:\n${lines.join("\n")}\nPaths are read relative to the working directory (${process.cwd()}).`);
+  }
+  return built;
 }
 
 /** Snapshot ids are remembered per task so `run` can fork without re-preparing. */
