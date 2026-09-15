@@ -135,7 +135,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 .doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 .doc strong{font-weight:600}
 </style></head><body><main>
-<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html">Tasks</a><a href="method.html" class="on">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a href="../board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html">Tasks</a><a href="method.html" class="on">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
 <article class="doc">
 <h1 id="method">Method</h1>
 <p>How passk turns repeated runs into numbers you can act on, and what it refuses to claim. Companion to the <a href="../index.html">README</a> and the <a href="tasks.html">operator&#39;s manual</a>.</p>
@@ -233,9 +233,7 @@ run passed. Start small, then extend: <code>--resume</code> with a larger <code>
 runs to a finished bench on the same snapshot.</p>
 <p><strong>What to change.</strong> Exactly one thing per experiment, on the same snapshot
 with the same checks: a prompt, an environment detail, a model, a plan. The
-failure evidence from the last bench says which. <code>passk recommend runs/&lt;dir&gt;</code> reads a finished bench and suggests the category of the next
-experiment with what to keep fixed; it is a recommendation, not a diagnosis,
-and it will never rewrite your prompt or switch your model. Roughly:</p>
+failure evidence from the last bench says which. Roughly:</p>
 <table>
 <thead>
 <tr>
@@ -249,7 +247,7 @@ and it will never rewrite your prompt or switch your model. Roughly:</p>
 </tr>
 <tr>
 <td>runs interpreted the task differently</td>
-<td>one clarification at a time (<code>passk probe</code> lists candidates)</td>
+<td>one clarification at a time</td>
 </tr>
 <tr>
 <td>same plan, environment flinched</td>
@@ -324,10 +322,9 @@ Computer Use Agents</em></a> (arXiv:2604.17849,
 once may fail on a repeat of the same task, so what stops it from doing so
 reliably? It supplies the taxonomy the failure classifier sorts into
 (stochasticity during execution, ambiguity in task specification,
-variability in agent behavior) and three recommendations that map onto
-three commands here: evaluate under repeated execution (<code>run</code>), let agents
-resolve ambiguity through interaction (<code>probe</code>), and favor strategies that
-stay stable across runs (<code>compare</code>). The paper measures this on OSWorld;
+variability in agent behavior) and recommendations that map onto
+what passk does: evaluate under repeated execution (<code>run</code>) and favor
+strategies that stay stable across runs (<code>compare</code>). The paper measures this on OSWorld;
 passk measures it on your workflow.</li>
 <li><strong>Khanal, Tao and Zhou, <a href="https://arxiv.org/abs/2603.29231"><em>Beyond pass@1: A Reliability Science Framework
 for Long-Horizon LLM Agents</em></a>

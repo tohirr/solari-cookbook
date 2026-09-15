@@ -67,7 +67,7 @@ cost about a dollar on a budget model.
 
 Nothing the agent says about its own success counts. Grading happens inside the VM after it stops.
 
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-queue.jpg" alt="Failure evidence: a passing run and a failing run of the ticket queue on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-routing.jpg" alt="Failure evidence: a passing run and a failing run of the routing task on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
 
 ## Evidence
 
@@ -110,10 +110,7 @@ tasks, and what is out of scope are in [the operator's manual](docs/TASKS.md).
 ```bash
 npm run passk compare runs/A runs/B        # what changed, what moved, and whether it could be noise
 npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
-npm run passk probe tasks/x.yaml           # what would the agent ask a human before acting?
-npm run passk recommend runs/dir           # what to change next, and what to keep fixed
 npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, next to it, for `inspect view`
-npm run studio                             # the results board on localhost, with a Run button
 ```
 
 ## Docs

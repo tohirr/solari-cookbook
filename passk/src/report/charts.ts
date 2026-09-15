@@ -120,25 +120,6 @@ export function stepBars(b: BenchResult, w = 520, h = 120, href?: (runIndex: num
   </svg>`;
 }
 
-/** Pass rates side by side with their 95% intervals as whiskers. */
-export function rateBars(items: { label: string; passed: number; n: number; cls?: "a" | "b" | "n" }[], w = 520, h = 170): string {
-  const L = 36, R = 10, T = 34, B = 34;
-  const iw = w - L - R, ih = h - T - B;
-  const y = (p: number) => T + (1 - p) * ih;
-  const slot = iw / items.length, bw = Math.min(90, slot * 0.5);
-  const grid = [0, 0.5, 1].map((p) => `<line class="grid" x1="${L}" x2="${w - R}" y1="${y(p)}" y2="${y(p)}"/><text x="${L - 6}" y="${y(p) + 3.5}" text-anchor="end">${pct(p)}</text>`).join("");
-  const bars = items.map((it, i) => {
-    const p = it.n ? it.passed / it.n : 0;
-    const { lower, upper } = wilson(it.passed, it.n);
-    const cx = L + slot * i + slot / 2;
-    const tip = `${it.label}: ${it.passed}/${it.n} · ${pct(lower)}–${pct(upper)} plausible`;
-    return `<g data-tip="${esc(tip)}"><rect class="rate ${it.cls ?? ""}" x="${cx - bw / 2}" y="${y(p)}" width="${bw}" height="${y(0) - y(p)}" rx="3"/>
-      <line class="whisker" x1="${cx}" x2="${cx}" y1="${y(upper)}" y2="${y(lower)}"/><line class="whisker" x1="${cx - 6}" x2="${cx + 6}" y1="${y(upper)}" y2="${y(upper)}"/><line class="whisker" x1="${cx - 6}" x2="${cx + 6}" y1="${y(lower)}" y2="${y(lower)}"/>
-      <text class="big" x="${cx}" y="${Math.min(y(upper), y(p)) - 8}" text-anchor="middle">${it.passed}/${it.n}</text>
-      <text x="${cx}" y="${h - 18}" text-anchor="middle">${esc(it.label)}</text><text x="${cx}" y="${h - 6}" text-anchor="middle">${pct(lower)}–${pct(upper)}</text></g>`;
-  }).join("");
-  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="pass rates with intervals">${grid}${bars}</svg>`;
-}
 
 /** Stat tiles with the delta from A to B. `better` says which direction is good. */
 export function deltaTiles(items: { label: string; a: string; b: string; delta: number; unit?: string; better: "up" | "down"; digits?: number }[]): string {
@@ -150,17 +131,6 @@ export function deltaTiles(items: { label: string; a: string; b: string; delta: 
   }).join("")}</div>`;
 }
 
-/** Failures by cause as one stacked bar with a key. */
-export function causeBar(failures: FailureAnalysis[]): string {
-  const order = ["behavior_variability", "task_ambiguity", "stochastic_execution", "unknown"] as const;
-  const names: Record<string, string> = { behavior_variability: "behaviour variability", task_ambiguity: "task ambiguity", stochastic_execution: "stochastic execution", unknown: "unclassified" };
-  const counts = new Map<string, number>();
-  for (const f of failures) counts.set(f.cause, (counts.get(f.cause) ?? 0) + 1);
-  const total = failures.length || 1;
-  const segs = order.filter((c) => counts.get(c)).map((c) => `<i class="c-${c}" style="width:${((counts.get(c)! / total) * 100).toFixed(1)}%" data-tip="${esc(`${names[c]}: ${counts.get(c)} of ${failures.length}`)}"></i>`).join("");
-  const key = order.filter((c) => counts.get(c)).map((c) => `<span><i class="c-${c}"></i>${names[c]} · ${counts.get(c)}</span>`).join("");
-  return `<div class="causebar">${segs}</div><div class="causekey">${key}</div>`;
-}
 
 const kind = (s: RunResult["steps"][number]) => (["click", "keypress", "type", "wait", "screenshot", "scroll"].includes(s.name) ? s.name : "other");
 const what = (s: RunResult["steps"][number]) => {
@@ -219,38 +189,6 @@ export function traceCompare(b: BenchResult, f: FailureAnalysis, refIndex: numbe
 /** The passing run exported with every screenshot, which is the one the divergence diff used. */
 export function referenceRun(b: BenchResult): RunResult | undefined {
   return b.runs.filter((r) => r.status === "passed").sort((p, q) => q.steps.filter((s) => s.screenshot).length - p.steps.filter((s) => s.screenshot).length)[0];
-}
-
-/**
- * Pass rate by how many steps a run took, across every scored run given: one
- * point per step band with its 95% Wilson interval and the band's run count.
- * It is a description of these benches, not a law: a run that hits its step
- * cap fails by construction and lands in the right-hand bands, and longer
- * tasks are also harder tasks. The figure exists to show that spread rather
- * than to hide it inside a single pass rate.
- */
-export function decayCurve(runs: { steps: number; passed: boolean }[], w = 520, h = 190): string {
-  const edges = [0, 20, 40, 60, 80, Infinity];
-  const bands = edges.slice(0, -1).map((lo, i) => {
-    const hi = edges[i + 1];
-    const rs = runs.filter((r) => r.steps >= lo && r.steps < hi);
-    return { label: hi === Infinity ? `${lo}+` : `${lo}–${hi - 1}`, n: rs.length, passed: rs.filter((r) => r.passed).length };
-  }).filter((b) => b.n > 0);
-  if (bands.length < 2) return "";
-  const L = 40, R = 14, T = 16, B = 40;
-  const iw = w - L - R, ih = h - T - B;
-  const x = (i: number) => L + (iw / bands.length) * (i + 0.5);
-  const y = (p: number) => T + (1 - p) * ih;
-  const grid = [0, 0.5, 1].map((p) => `<line class="grid" x1="${L}" x2="${w - R}" y1="${y(p)}" y2="${y(p)}"/><text x="${L - 8}" y="${y(p) + 3.5}" text-anchor="end">${pct(p)}</text>`).join("");
-  const pts = bands.map((b, i) => {
-    const p = b.passed / b.n;
-    const { lower, upper } = wilson(b.passed, b.n);
-    const tip = `${b.label} steps: ${b.passed}/${b.n} passed · ${pct(lower)}–${pct(upper)} plausible`;
-    return `<g data-tip="${esc(tip)}"><line class="whisker" x1="${x(i)}" x2="${x(i)}" y1="${y(upper)}" y2="${y(lower)}"/><circle class="pt" cx="${x(i)}" cy="${y(p)}" r="5"/>
-      <text x="${x(i)}" y="${h - 22}" text-anchor="middle">${esc(b.label)}</text><text x="${x(i)}" y="${h - 8}" text-anchor="middle">${b.passed}/${b.n}</text></g>`;
-  }).join("");
-  const line = `<path class="ln s-a" d="${bands.map((b, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(b.passed / b.n).toFixed(1)}`).join(" ")}"/>`;
-  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="pass rate by steps taken">${grid}<text x="${L}" y="${h - 22}" text-anchor="end" style="font-size:10px">steps</text>${line}${pts}</svg>`;
 }
 
 /** Dots, but quieter: passes recede, failures stand out. Appended after the theme CSS. */

@@ -57,15 +57,12 @@ runs to a finished bench on the same snapshot.
 
 **What to change.** Exactly one thing per experiment, on the same snapshot
 with the same checks: a prompt, an environment detail, a model, a plan. The
-failure evidence from the last bench says which. `passk recommend
-runs/<dir>` reads a finished bench and suggests the category of the next
-experiment with what to keep fixed; it is a recommendation, not a diagnosis,
-and it will never rewrite your prompt or switch your model. Roughly:
+failure evidence from the last bench says which. Roughly:
 
 | The evidence shows | Try next |
 |---|---|
 | failures reported success anyway | a verification step that reads state back, not a screenshot |
-| runs interpreted the task differently | one clarification at a time (`passk probe` lists candidates) |
+| runs interpreted the task differently | one clarification at a time |
 | same plan, environment flinched | an environment change, not a prompt change |
 | same goal, different routes | a prompt that names the short strategy; compare effort and cost |
 | every failure hit the step cap | a higher cap before blaming the agent |
@@ -132,10 +129,9 @@ passk is a narrow tool assembled from ideas that exist elsewhere.
   once may fail on a repeat of the same task, so what stops it from doing so
   reliably? It supplies the taxonomy the failure classifier sorts into
   (stochasticity during execution, ambiguity in task specification,
-  variability in agent behavior) and three recommendations that map onto
-  three commands here: evaluate under repeated execution (`run`), let agents
-  resolve ambiguity through interaction (`probe`), and favor strategies that
-  stay stable across runs (`compare`). The paper measures this on OSWorld;
+  variability in agent behavior) and recommendations that map onto
+  what passk does: evaluate under repeated execution (`run`) and favor
+  strategies that stay stable across runs (`compare`). The paper measures this on OSWorld;
   passk measures it on your workflow.
 - **Khanal, Tao and Zhou, [*Beyond pass@1: A Reliability Science Framework
   for Long-Horizon LLM Agents*](https://arxiv.org/abs/2603.29231)

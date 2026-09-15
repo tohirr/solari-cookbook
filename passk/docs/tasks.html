@@ -135,7 +135,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 .doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 .doc strong{font-weight:600}
 </style></head><body><main>
-<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html" class="on">Tasks</a><a href="method.html">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a href="../board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<nav class="docnav"><b>passk</b><a href="../index.html">Manual</a><a href="tasks.html" class="on">Tasks</a><a href="method.html">Method</a><a href="solari-notes.html">Solari notes</a><a href="../evidence/index.html">Evidence</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
 <article class="doc">
 <h1 id="writing-and-running-tasks">Writing and running tasks</h1>
 <p>The operator&#39;s manual: setup, the task format, what <code>run</code> does, the shipped tasks, experiments, benching your own agent, and what is in and out of scope. Companion to the <a href="../index.html">README</a> and <a href="method.html">Method</a>.</p>
@@ -224,8 +224,6 @@ example, with nineteen.
 Any check may carry a <code>name</code> (&quot;Invoice was created&quot;); reports show it in
 place of the raw path or command, which stays available for audit. Naming a
 check changes neither grading nor the task hash.</p>
-<p align="center"><a href="../evidence/invoice-entry/report.html"><img src="report-invoice-entry.jpg" alt="Invoice entry report: 23/26 passed, every run a dot in rows of ten, the numbers, effort per run" width="100%"></a></p>
-
 <h2 id="what-run-does">What <code>run</code> does</h2>
 <pre><code>passk run tasks/notes.yaml --k 10
 
@@ -250,8 +248,8 @@ running. Task files carry a <code>yaml-language-server</code> schema hint; with 
 extension in VS Code you get completion and validation from
 <code>schema/task.schema.json</code>.</p>
 <h2 id="tasks-that-ship">Tasks that ship</h2>
-<p>Every task is <strong>validated</strong>: its verifier proved sound and its live runs
-published in <a href="../evidence"><code>evidence/</code></a>.</p>
+<p>Status is <strong>validated</strong> when live runs are published in <a href="../evidence"><code>evidence/</code></a>,
+<strong>ready</strong> when the verifier is proven and no runs are published.</p>
 <table>
 <thead>
 <tr>
@@ -262,49 +260,31 @@ published in <a href="../evidence"><code>evidence/</code></a>.</p>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>notes</code> / <code>notes-nodir</code></td>
-<td>default</td>
-<td>validated, 5 + 5 runs</td>
-<td>Save-dialog handling; an environment pair (folder present vs missing)</td>
-</tr>
-<tr>
-<td><code>rename-invoices</code> / <code>-clarified</code></td>
-<td>default</td>
-<td>validated, 5 + 5 runs</td>
-<td>File manager; a prompt pair (ambiguous vs spelled out)</td>
-</tr>
-<tr>
-<td><code>q3-total</code></td>
-<td>office</td>
-<td>validated, 10 runs</td>
-<td>LibreOffice Calc, formulas, the CSV &quot;keep format&quot; dialog</td>
-</tr>
-<tr>
-<td><code>ticket-queue</code> / <code>-verify</code> / <code>-reload</code></td>
-<td>default</td>
-<td>validated, 50 + 50 + 50 runs</td>
-<td>An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer&#39;s tickets is closed and must not be touched. Three prompt conditions on one snapshot.</td>
-</tr>
-<tr>
 <td><code>ticket-routing</code> / <code>-reload</code></td>
 <td>default</td>
 <td>validated, 20 + 20 runs</td>
-<td>The ticket queue, harder: twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report&#39;s Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check.</td>
+<td>A support queue served from inside the VM, no login, no proxy, state in a JSON file the checker reads. Twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report&#39;s Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check.</td>
 </tr>
 <tr>
-<td><code>invoice-entry</code></td>
-<td>office</td>
-<td>validated, 30 runs</td>
-<td>Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment&#39;s sha256.</td>
+<td><code>ticket-queue</code></td>
+<td>default</td>
+<td>ready</td>
+<td>The same tool, simpler: five tickets, one closed row that must not be touched. The task to start from.</td>
+</tr>
+<tr>
+<td><code>notes</code></td>
+<td>default</td>
+<td>ready</td>
+<td>Save a note in Mousepad: the ten-line task in the README, for a first run.</td>
 </tr>
 <tr>
 <td><code>fake</code></td>
 <td>none</td>
 <td>harness test</td>
-<td>Runs on the scripted provider; exercises the pipeline with no VM or model</td>
+<td>Runs on the scripted provider; exercises the pipeline with no VM or model. It is what CI runs.</td>
 </tr>
 </tbody></table>
-<p>LedgerDesk and the ticket queue are mocks on purpose. A mock lets the bench
+<p>The ticket queue is a mock on purpose. A mock lets the bench
 own the state, plant a trap, and verify exactly. What they keep from the real
 thing is the shape: existing records to search, a duplicate to avoid, required
 fields, dropdowns, a file upload, a business rule (&quot;pending review&quot;), and a
@@ -319,41 +299,22 @@ leaderboard of models. passk asks whether <em>your</em> agent is dependable on
 <h2 id="change-one-thing-measure-again">Change one thing, measure again</h2>
 <p>The bench is the instrument; the experiment is the point. Fork the same
 snapshot under two conditions, then compare:</p>
-<pre><code class="language-bash">passk run tasks/rename-invoices.yaml --k 5                                   # ambiguous prompt
-passk run tasks/rename-invoices-clarified.yaml --k 5 --snapshot snap_…        # clarified prompt, same snapshot
-passk compare runs/rename-invoices-*/ runs/rename-invoices-clarified-*/
+<pre><code class="language-bash">passk run tasks/ticket-routing.yaml --k 20                                   # baseline prompt
+passk run tasks/ticket-routing-reload.yaml --k 20 --snapshot snap_…           # one sentence added, same snapshot
+passk compare runs/ticket-routing-2*/ runs/ticket-routing-reload-*/
 </code></pre>
 <p><code>compare</code> says what was held fixed (snapshot, checks, model), what changed
 (prompt, environment), the observed delta in passes, steps, time and cost per
 success, and Fisher&#39;s exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.</p>
-<p>Before spending k runs on a new prompt, <code>passk probe</code> forks one throwaway
-desktop, lets the agent look around, and has it list every question it would
-ask a human. Tighten the prompt, re-probe, then bench. After a bench, <code>passk recommend</code> reads the failures and suggests the one change to test next.</p>
-<h2 id="studio">Studio</h2>
-<p>The results board, on localhost, with your keys and a working Run button:</p>
-<pre><code class="language-bash">npm run studio          # http://127.0.0.1:8787, opens the browser
-</code></pre>
-<p>Paste your Solari key and a model key into the form; they are written to
-<code>passk/.env</code> on this machine and go only to Solari and the model provider,
-by the runs you start. Pick a shape, a model, k, a budget, and Start. Each
-run is <code>passk run</code> in a child process with exactly the command the board
-shows, so the button and the docs never disagree. Runs execute one at a
-time; a second Start queues behind the first, so two benches never compete
-for your Solari concurrency. The row appears as &quot;local&quot; when it finishes,
-with its report. The board is served only on 127.0.0.1; nothing about a run
-leaves your machine unless you export the bench into <code>evidence/</code> and send it
-as a pull request, which is how the published board gains a row.</p>
-<p>Try it with no keys: choose the model <code>scripted</code> and the row runs the
-harness on in-memory desktops in a few seconds.</p>
 <h2 id="evidence">Evidence</h2>
 <p><a href="../evidence"><code>evidence/</code></a> holds every bench cited in the README: <code>bench.json</code>
 with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
-and of the shortest passing run. Comparison folders hold the paired results.
+and of the shortest passing run. The comparison folder holds the paired result.
 <code>passk export runs/&lt;dir&gt; evidence/&lt;name&gt;</code> copies a bench with only the
-screenshots that carry proof. <code>passk export-inspect runs/&lt;dir&gt; [out.json]</code>
+screenshots that carry proof. <code>passk export-inspect runs/&lt;dir&gt; [out dir]</code>
 writes the bench as an <a href="https://inspect.aisi.org.uk/">Inspect AI</a> eval log:
 one task, one sample, each run an epoch, the checks as the scorer, lost runs
 unscored, every step a tool call, so <code>inspect view</code> opens it beside whatever

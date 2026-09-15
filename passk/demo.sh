@@ -12,7 +12,7 @@ echo "▶ passk run tasks/fake.yaml --k 10 --require 0.9      (scripted provider
 echo
 npx tsx src/cli.ts run tasks/fake.yaml --k 10 --require 0.9 --concurrency 4 || echo "(exit $? : the gate refused a 80% agent, as it should)"
 echo
-echo "▶ now the real evidence: the three-way ticket-queue comparison, and a failed invoice run's screenshots"
+echo "▶ now the real evidence: two prompts on one snapshot, compared per check, and a failed run's screenshots"
 [ -n "$PASSK_DEMO_NO_OPEN" ] && exit 0
-open evidence/compare-ticket-queue-baseline-vs-reload/compare.html 2>/dev/null || true
-open evidence/invoice-entry/report.html 2>/dev/null || true
+open evidence/compare-ticket-routing-prompt/compare.html 2>/dev/null || true
+open evidence/ticket-routing/report.html 2>/dev/null || true

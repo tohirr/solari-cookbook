@@ -8,8 +8,6 @@
  * After a first bench:
  *   passk compare runs/<A> runs/<B>           what changed, what moved, and whether it could be noise
  *   passk gate    runs/<dir> --require 0.9    exit 2 if a saved bench misses a threshold (CI)
- *   passk probe   tasks/notes.yaml            what would the agent ask a human before acting?
- *   passk recommend runs/<dir>                what to change next, and what to keep fixed
  *   passk doctor                              keys, Solari, a desktop boot, the model key, and what a run would use
  *
  * Pieces of `run`, on their own when you need one:
@@ -20,7 +18,6 @@
  *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof
  *   passk export-inspect runs/<dir> [out dir]  the bench as an Inspect AI eval log, for `inspect view`
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
- *   passk studio                              the results board on localhost, with a Run button
  *
  * Exit codes: 0 ok, 1 usage or crash, 2 a --require threshold was not met or the verifier is unsound.
  */
@@ -31,13 +28,11 @@ import { compareBenches, formatComparison, loadBench } from "./compare.js";
 import { doctor } from "./doctor.js";
 import { exportBench } from "./export.js";
 import { exportInspect } from "./inspect.js";
-import { recommendDir } from "./recommend.js";
 import { validateTask } from "./validate.js";
 import { renderCompare } from "./report/compare.js";
 import { config, loadTask, readSnapshots } from "./config.js";
 import { backfillCosts, computeMetrics, regrade, runsForLowerBound, wilson } from "./metrics.js";
 import { prepareTask } from "./prepare.js";
-import { probeTask } from "./probe.js";
 import { renderReport } from "./report/html.js";
 import { findLatest, findResumable, runBench } from "./runner.js";
 import type { BenchResult, Task, ValidationSummary } from "./types.js";
@@ -55,13 +50,6 @@ async function main() {
   switch (cmd) {
     case "prepare": {
       await prepareTask(loadTask(must(target)));
-      return;
-    }
-    case "probe": {
-      const task = loadTask(must(target));
-      const p = await probeTask(task);
-      console.log(`\ninterpretation: ${p.interpretation}\nrisk: ${p.risk}\n`);
-      for (const a of p.ambiguities) console.log(`? ${a.question}\n    why: ${a.why_it_matters}\n    default: ${a.default_assumption}\n`);
       return;
     }
     case "run": {
@@ -111,10 +99,6 @@ async function main() {
       console.log(`\nreport: ${path.join(outDir, "compare.html")}`);
       return;
     }
-    case "recommend": {
-      console.log(recommendDir(must(target)));
-      return;
-    }
     case "validate": {
       const task = loadTask(must(target));
       if (!readSnapshots()[task.id] && !flag("snapshot")) await prepareTask(task);
@@ -124,13 +108,6 @@ async function main() {
     }
     case "doctor": {
       process.exitCode = (await doctor()) ? 0 : 1;
-      return;
-    }
-    case "studio": {
-      const { startStudio } = await import("./studio.js");
-      const { url } = await startStudio({ port: flag("port") ? Number(flag("port")) : undefined, open: !has("no-open") });
-      console.log(`passk studio: ${url}\nkeys live in ${path.resolve(".env")}; runs land in runs/. Ctrl+C to stop.`);
-      await new Promise(() => {});
       return;
     }
     case "sweep": {
@@ -205,14 +182,12 @@ async function main() {
 
   after a first bench:
   passk compare <runs/A> <runs/B> [--out dir]      passk gate <runs/dir> [--require P] [--require-lower P]
-  passk probe <task.yaml>                          passk recommend <runs/dir>
   passk doctor
 
   pieces of run, on their own:
   passk prepare <task.yaml>      passk validate <task.yaml> [--snapshot snap_…]      passk report <runs/dir>
   passk classify <runs/dir>      passk export <runs/dir> <evidence/dir>              passk sweep
-  passk export-inspect <runs/dir> [out dir] [--images]    the bench as an Inspect AI eval log
-  passk studio [--port 8787] [--no-open]`);
+  passk export-inspect <runs/dir> [out dir] [--images]    the bench as an Inspect AI eval log`);
       process.exit(cmd ? 1 : 0);
   }
 }

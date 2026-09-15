@@ -28,7 +28,7 @@ main{padding:40px 40px 32px}
 
 // 1. Failure evidence: a passing run and a failing sibling on one time axis,
 //    the first divergent step, the agent's claim, and what the checker found.
-const base = bench("ticket-queue-baseline");
+const base = bench("ticket-routing");
 const featured = base.failures.find((f) => f.divergenceStep !== null) ?? base.failures[0];
 const ref = referenceRun(base)!;
 const m = base.metrics;
@@ -36,9 +36,9 @@ const failure = page("passk · where a failure diverges", `
 <div class="brand"><b>passk</b> failure evidence · ${esc(base.taskName)} · ${m.passed}/${m.n} passed</div>
 <h1 style="font-size:26px">Same snapshot, same prompt, same model. Run ${ref.runIndex} passed; run ${featured.runIndex} said it did.</h1>
 <p style="margin:0 0 18px;color:var(--ink-2);font-size:14px;max-width:900px">Every run forks the same desktop. The lanes are the two runs' actions on one time axis; the outlined step is where they first part ways. Under the final screens: what the agent reported, and what the checker read from the app's own state file inside the VM.</p>
-<div class="card">${traceCompare(base, featured, ref.runIndex, `file://${path.join(EV, "ticket-queue-baseline")}`)}</div>
+<div class="card">${traceCompare(base, featured, ref.runIndex, `file://${path.join(EV, "ticket-routing")}`)}</div>
 `, `.said img{max-height:300px;object-fit:cover;object-position:top}`);
-fs.writeFileSync(path.join(OUT, "failure-ticket-queue.html"), failure);
+fs.writeFileSync(path.join(OUT, "failure-ticket-routing.html"), failure);
 
 // 2. How it works: the pipeline, with the verifier proven before the forks.
 //    Boxes are positioned; the lines are one SVG underneath, so every connector lands.
@@ -144,7 +144,7 @@ fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
 
 // 4. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const shots: [string, string][] = [["failure-ticket-queue", "docs/failure-ticket-queue.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"]];
+const shots: [string, string][] = [["failure-ticket-routing", "docs/failure-ticket-routing.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"]];
 if (fs.existsSync(chrome)) {
   for (const [name, dest] of shots) {
     const png = path.join(OUT, `${name}.png`);

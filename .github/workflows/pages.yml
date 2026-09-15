@@ -1,4 +1,4 @@
-# Publish the repo to GitHub Pages so the passk showcase, studio and evidence
+# Publish the repo to GitHub Pages so the passk manual and evidence
 # reports resolve at https://tohirr.github.io/solari-cookbook/passk/…
 # The site is the checkout as-is: every page in passk/ is static and committed.
 name: pages

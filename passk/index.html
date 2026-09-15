@@ -135,7 +135,7 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 .doc hr{border:0;border-top:1px solid var(--line);margin:36px 0}
 .doc strong{font-weight:600}
 </style></head><body><main>
-<nav class="docnav"><b>passk</b><a href="index.html" class="on">Manual</a><a href="docs/tasks.html">Tasks</a><a href="docs/method.html">Method</a><a href="docs/solari-notes.html">Solari notes</a><a href="evidence/index.html">Evidence</a><a href="board.html">Results board</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
+<nav class="docnav"><b>passk</b><a href="index.html" class="on">Manual</a><a href="docs/tasks.html">Tasks</a><a href="docs/method.html">Method</a><a href="docs/solari-notes.html">Solari notes</a><a href="evidence/index.html">Evidence</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
 <article class="doc">
 <h1 id="passk">passk</h1>
 <p><strong>Does your computer-use agent pass twice?</strong></p>
@@ -191,7 +191,7 @@ cost about a dollar on a budget model.</p>
 <li><strong>Every screenshot, every action, the checks as run</strong>, and a hash of the task, so the number is auditable.</li>
 </ul>
 <p>Nothing the agent says about its own success counts. Grading happens inside the VM after it stops.</p>
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-queue.jpg" alt="Failure evidence: a passing run and a failing run of the ticket queue on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-routing.jpg" alt="Failure evidence: a passing run and a failing run of the routing task on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
 
 <h2 id="evidence">Evidence</h2>
 <p><a href="evidence"><code>evidence/</code></a> holds every bench run so far: eleven tasks across
@@ -226,10 +226,7 @@ tasks, and what is out of scope are in <a href="docs/tasks.html">the operator&#3
 <h2 id="after-the-first-bench">After the first bench</h2>
 <pre><code class="language-bash">npm run passk compare runs/A runs/B        # what changed, what moved, and whether it could be noise
 npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
-npm run passk probe tasks/x.yaml           # what would the agent ask a human before acting?
-npm run passk recommend runs/dir           # what to change next, and what to keep fixed
 npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, next to it, for `inspect view`
-npm run studio                             # the results board on localhost, with a Run button
 </code></pre>
 <h2 id="docs">Docs</h2>
 <ul>

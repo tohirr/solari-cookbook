@@ -85,8 +85,6 @@ Any check may carry a `name` ("Invoice was created"); reports show it in
 place of the raw path or command, which stays available for audit. Naming a
 check changes neither grading nor the task hash.
 
-<p align="center"><a href="../evidence/invoice-entry/report.html"><img src="report-invoice-entry.jpg" alt="Invoice entry report: 23/26 passed, every run a dot in rows of ten, the numbers, effort per run" width="100%"></a></p>
-
 ## What `run` does
 
 ```
@@ -118,20 +116,17 @@ extension in VS Code you get completion and validation from
 
 ## Tasks that ship
 
-Every task is **validated**: its verifier proved sound and its live runs
-published in [`evidence/`](../evidence/).
+Status is **validated** when live runs are published in [`evidence/`](../evidence/),
+**ready** when the verifier is proven and no runs are published.
 
 | Task | Template | Status | What it exercises |
 |---|---|---|---|
-| `notes` / `notes-nodir` | default | validated, 5 + 5 runs | Save-dialog handling; an environment pair (folder present vs missing) |
-| `rename-invoices` / `-clarified` | default | validated, 5 + 5 runs | File manager; a prompt pair (ambiguous vs spelled out) |
-| `q3-total` | office | validated, 10 runs | LibreOffice Calc, formulas, the CSV "keep format" dialog |
-| `ticket-queue` / `-verify` / `-reload` | default | validated, 50 + 50 + 50 runs | An internal web tool served from inside the VM: no login, no proxy, state in a JSON file the checker reads. One of the customer's tickets is closed and must not be touched. Three prompt conditions on one snapshot. |
-| `ticket-routing` / `-reload` | default | validated, 20 + 20 runs | The ticket queue, harder: twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report's Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check. |
-| `invoice-entry` | office | validated, 30 runs | Accounts payable: read a PDF from Incoming, enter it into LedgerDesk (a mock AP tool served from inside the VM), attach the file, save as Pending review. A duplicate trap, a wrong-vendor decoy, and Approve/Pay buttons that must stay untouched. Verified against the ledger, including the attachment's sha256. |
-| `fake` | none | harness test | Runs on the scripted provider; exercises the pipeline with no VM or model |
+| `ticket-routing` / `-reload` | default | validated, 20 + 20 runs | A support queue served from inside the VM, no login, no proxy, state in a JSON file the checker reads. Twelve tickets, a Team page with the routing table, an SLA rule on ticket age, and traps: two customers named Acme, a row already correct, three closed rows. Nineteen checks grade one fact each, so the report's Checks table says which rule fails. A prompt pair: baseline vs reload-and-confirm, compared per check. |
+| `ticket-queue` | default | ready | The same tool, simpler: five tickets, one closed row that must not be touched. The task to start from. |
+| `notes` | default | ready | Save a note in Mousepad: the ten-line task in the README, for a first run. |
+| `fake` | none | harness test | Runs on the scripted provider; exercises the pipeline with no VM or model. It is what CI runs. |
 
-LedgerDesk and the ticket queue are mocks on purpose. A mock lets the bench
+The ticket queue is a mock on purpose. A mock lets the bench
 own the state, plant a trap, and verify exactly. What they keep from the real
 thing is the shape: existing records to search, a duplicate to avoid, required
 fields, dropdowns, a file upload, a business rule ("pending review"), and a
@@ -152,9 +147,9 @@ The bench is the instrument; the experiment is the point. Fork the same
 snapshot under two conditions, then compare:
 
 ```bash
-passk run tasks/rename-invoices.yaml --k 5                                   # ambiguous prompt
-passk run tasks/rename-invoices-clarified.yaml --k 5 --snapshot snap_…        # clarified prompt, same snapshot
-passk compare runs/rename-invoices-*/ runs/rename-invoices-clarified-*/
+passk run tasks/ticket-routing.yaml --k 20                                   # baseline prompt
+passk run tasks/ticket-routing-reload.yaml --k 20 --snapshot snap_…           # one sentence added, same snapshot
+passk compare runs/ticket-routing-2*/ runs/ticket-routing-reload-*/
 ```
 
 `compare` says what was held fixed (snapshot, checks, model), what changed
@@ -163,39 +158,12 @@ success, and Fisher's exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
 
-Before spending k runs on a new prompt, `passk probe` forks one throwaway
-desktop, lets the agent look around, and has it list every question it would
-ask a human. Tighten the prompt, re-probe, then bench. After a bench, `passk
-recommend` reads the failures and suggests the one change to test next.
-
-## Studio
-
-The results board, on localhost, with your keys and a working Run button:
-
-```bash
-npm run studio          # http://127.0.0.1:8787, opens the browser
-```
-
-Paste your Solari key and a model key into the form; they are written to
-`passk/.env` on this machine and go only to Solari and the model provider,
-by the runs you start. Pick a shape, a model, k, a budget, and Start. Each
-run is `passk run` in a child process with exactly the command the board
-shows, so the button and the docs never disagree. Runs execute one at a
-time; a second Start queues behind the first, so two benches never compete
-for your Solari concurrency. The row appears as "local" when it finishes,
-with its report. The board is served only on 127.0.0.1; nothing about a run
-leaves your machine unless you export the bench into `evidence/` and send it
-as a pull request, which is how the published board gains a row.
-
-Try it with no keys: choose the model `scripted` and the row runs the
-harness on in-memory desktops in a few seconds.
-
 ## Evidence
 
 [`evidence/`](../evidence/) holds every bench cited in the README: `bench.json`
 with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
-and of the shortest passing run. Comparison folders hold the paired results.
+and of the shortest passing run. The comparison folder holds the paired result.
 `passk export runs/<dir> evidence/<name>` copies a bench with only the
 screenshots that carry proof. `passk export-inspect runs/<dir> [out dir]`
 writes the bench as an [Inspect AI](https://inspect.aisi.org.uk/) eval log:

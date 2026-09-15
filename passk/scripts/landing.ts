@@ -3,8 +3,7 @@
  * already the documentation: passk/index.html from README.md and docs/*.html
  * from docs/*.md, typeset in the report theme, with markdown links rewritten
  * to the generated pages. One source of truth: the manual on GitHub and the
- * manual on the site are the same file. `board.html` is the results board in
- * static mode, the same page `passk studio` serves on localhost.
+ * manual on the site are the same file.
  *
  *   npx tsx scripts/landing.ts        # from passk/
  */
@@ -12,7 +11,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { marked, Renderer } from "marked";
 import { CSS, FONTS, esc } from "../src/report/theme.js";
-import { buildShapes, loadBenches, renderBoard, totalsOf } from "../src/report/board.js";
 
 const ROOT = path.resolve(".");
 const PAGES = [
@@ -21,7 +19,7 @@ const PAGES = [
   { src: "docs/METHOD.md", out: "docs/method.html", title: "passk · method", nav: "Method" },
   { src: "docs/SOLARI-NOTES.md", out: "docs/solari-notes.html", title: "passk · notes from building on Solari", nav: "Solari notes" },
 ];
-const EXTRA_NAV = [{ out: "evidence/index.html", nav: "Evidence" }, { out: "board.html", nav: "Results board" }];
+const EXTRA_NAV = [{ out: "evidence/index.html", nav: "Evidence" }];
 const GITHUB = "https://github.com/tohirr/solari-cookbook/tree/main/passk";
 
 /** GitHub's heading ids, so every `#fragment` link in the markdown keeps working on the site. */
@@ -92,9 +90,3 @@ for (const p of PAGES) {
   fs.writeFileSync(path.join(ROOT, p.out), html);
   console.log(`${p.out} (${(html.length / 1024).toFixed(0)} KB) from ${p.src}`);
 }
-
-const benches = loadBenches(path.resolve("evidence"), "evidence", "evidence/");
-const shapes = buildShapes(benches);
-const board = renderBoard({ mode: "static", shapes, totals: totalsOf(benches) });
-fs.writeFileSync(path.resolve("board.html"), board);
-console.log(`board.html (${(board.length / 1024).toFixed(0)} KB), ${shapes.length} shapes, ${shapes.reduce((a, s) => a + s.rows.length, 0)} rows`);

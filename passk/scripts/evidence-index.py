@@ -18,6 +18,4 @@ print("\n## Comparisons\n")
 for d in sorted(glob.glob("evidence/compare-*/compare.json")):
     c = json.load(open(d)); name = os.path.basename(os.path.dirname(d)); a, b = c["a"]["metrics"], c["b"]["metrics"]
     print(f"- [{name}]({name}/compare.html): changed **{', '.join(c['changed'])}**; passes {a['passed']}/{a['n']} → {b['passed']}/{b['n']}, median steps {a['medianSteps']} → {b['medianSteps']}, Fisher p = {c['fisherP']:.2f}")
-print("\n## How to read the three ticket-queue benches\n")
-print("Same snapshot, same model, same checks; only the last sentence of the prompt differs. The baseline's three failures were all one thing: a Save click that did not land, followed by a confident claim of success. Asking the agent to screenshot and confirm changed nothing, because the dropdown shows the new value whether or not it was saved. Asking it to reload forced a read from the server, and no run failed.\n")
 print("Regenerate this folder with `sh scripts/curate-evidence.sh`.")
