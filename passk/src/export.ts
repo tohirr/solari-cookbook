@@ -22,9 +22,12 @@ import type { BenchResult } from "./types.js";
 
 const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 
-export function exportBench(srcDir: string, outDir: string): { bench: BenchResult; files: number; evidence: number; bytes: number; privateShots: boolean } {
+export function exportBench(srcDir: string, outDir: string, forcePrivate = false): { bench: BenchResult; files: number; evidence: number; bytes: number; privateShots: boolean } {
   const bench = loadBench(srcDir);
-  const privateShots = bench.provenance?.task?.screenshots === "private";
+  // The task's declaration is the default nobody can forget; `--no-screenshots`
+  // is the same decision taken at publish time, for a bench recorded before the
+  // task declared it. Neither edits what the run wrote down.
+  const privateShots = forcePrivate || bench.provenance?.task?.screenshots === "private";
   fs.mkdirSync(outDir, { recursive: true });
   const shortestPass = bench.runs.filter((r) => r.status === "passed").sort((a, b) => a.steps.length - b.steps.length)[0];
   let files = 0, evidence = 0, bytes = 0;

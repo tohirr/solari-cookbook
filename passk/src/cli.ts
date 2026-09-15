@@ -15,7 +15,7 @@
  *   passk validate tasks/notes.yaml           prove the checks fail before and pass after the task's golden steps
  *   passk report   runs/<dir>                 re-render report.html from bench.json
  *   passk classify runs/<dir>                 (re)run failure classification on a saved bench
- *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof
+ *   passk export   runs/<dir> evidence/<name> copy a bench with only the screenshots that carry proof (--no-screenshots: none)
  *   passk export-inspect runs/<dir> [out dir]  the bench as an Inspect AI eval log, for `inspect view`
  *   passk sweep                               kill every desktop tagged passk (after an interrupted bench)
  *
@@ -123,8 +123,8 @@ async function main() {
     case "export": {
       const out = process.argv[4];
       if (!out) { console.error("export needs a source bench dir and a destination dir"); process.exit(1); }
-      const { bench, files, evidence, bytes, privateShots } = exportBench(must(target), out);
-      const shots = privateShots ? "no screenshots: the task declares them private" : `${files} screenshots`;
+      const { bench, files, evidence, bytes, privateShots } = exportBench(must(target), out, has("no-screenshots"));
+      const shots = privateShots ? `no screenshots: ${has("no-screenshots") ? "--no-screenshots" : "the task declares them private"}` : `${files} screenshots`;
       console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${shots}${evidence ? `, ${evidence} evidence files` : ""}, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
       return;
     }
