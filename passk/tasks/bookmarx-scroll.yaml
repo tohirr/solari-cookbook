@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../schema/task.schema.json
+# bookmarx (bookmarx.space) is a search over ~2,600 saved posts, built to answer
+# a fuzzy memory with the post you meant. Its golden set pairs such memories
+# with the post's id. This memory ranks the post eighth, below the fold: finding it means reading past the first screen.
+# The template's Chrome is relaunched with a DevTools port so the check can
+# read the open tabs from inside the VM (and its "Can't update Chrome" bubble,
+# which Chrome shows for an old build, is clicked shut before the snapshot); a card click opens the post on X in
+# a new tab, whose URL carries the id. The demo needs no sign-in.
+id: bookmarx-scroll
+name: Find a saved post that ranks eighth
+template: default
+resolution: 1280x720
+setup:
+  - exec: sh
+    args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'https://www.bookmarx.space/api/demo' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
+  - wait: 3
+prompt: >
+  bookmarx is open in the browser: a search over my saved posts. Find the post
+  I mean: "some guy sharing his model he built for image classification where clicking one image brings up similar images". Search for it, pick the result that matches, and open the
+  post itself on X (clicking a card opens it in a new tab). Leave that tab
+  open when you are done.
+golden:
+  - exec: sh
+    args: ["-c", "curl -s -X PUT 'http://127.0.0.1:9222/json/new?https://x.com/i/status/1847432580095701360' >/dev/null; sleep 5"]
+checks:
+  - name: the post 1847432580095701360 is open in a tab
+    type: exec
+    cmd: sh
+    args: ["-c", "curl -s http://127.0.0.1:9222/json"]
+    stdout_contains: "1847432580095701360"
+max_steps: 40
