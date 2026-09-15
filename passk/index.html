@@ -138,41 +138,65 @@ td.num,th.num{text-align:right;font-family:var(--mono);font-size:13px}
 <nav class="docnav"><b>passk</b><a href="index.html" class="on">Manual</a><a href="docs/tasks.html">Tasks</a><a href="docs/method.html">Method</a><a href="docs/solari-notes.html">Solari notes</a><a href="evidence/index.html">Evidence</a><a class="gh" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a></nav>
 <article class="doc">
 <h1 id="passk">passk</h1>
-<p><strong>Reliability CI for computer-use agents.</strong> Your agent passed the demo.
-Will it pass the tenth time?</p>
-<p>passk forks one <a href="https://getsolari.com">Solari</a> desktop snapshot <em>k</em> times,
-runs your agent on every fork, grades each run <strong>inside the VM</strong> after the
-agent stops, and fails the build unless the pass rate clears the bar. Nothing
-the agent says about its own success counts.</p>
+<p><strong>Does your computer-use agent pass twice?</strong></p>
+<p>I have a small app, <a href="https://bookmarx.space">bookmarx</a>, that searches my saved
+posts. Before the library went public I wanted the awkward things out of it, so
+there is an agent that walks a review queue and presses Remove or Keep on each
+post: nine to remove under a rubric, eight guards that only look risky. It
+works. I have watched it work.</p>
+<p>Ten forks of one desktop say it works <strong>four times in ten</strong>.</p>
+<p>Fifteen of its nineteen rules hold on every run. The one that doesn&#39;t is the
+hateful post — removed in half the runs, kept in the other half, in two
+independent samples of ten. Watching it once told me none of that. A single run
+passes 40% of the time, and when it passes it looks reliable.</p>
+<p>That gap — between an agent that works while you watch and an agent that works
+— is what passk measures. It snapshots one <a href="https://getsolari.com">Solari</a>
+desktop, forks it <em>k</em> times, runs the same agent on every fork, and grades each
+run by reading state <strong>inside the VM</strong> after the agent stops. Nothing the agent
+says about its own success counts.</p>
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-bookmarx-triage-prompt/compare.html"><img src="docs/compare-bookmarx-triage.jpg" alt="A passk comparison page for a real app: bookmarx's sweeping agent reviewing a queue of seventeen saved posts under two prompts, 4/10 against 2/10, with the by-check table showing fifteen of nineteen rules holding every run and the hateful post removed in half" width="100%"></a></p>
+
+<h2 id="the-loop">The loop</h2>
+<pre><code class="language-bash">passk run tasks/my-task.yaml --k 10        # fork ×10, run, grade inside the VM, report
+passk compare runs/A runs/B                # change one thing; did reliability move, or is it noise?
+passk gate  runs/dir --require-lower 0.7   # exit 2 when a saved bench misses the bar
+</code></pre>
+<p>Every attempt starts byte-identical, which is the whole reason the numbers mean
+anything: repeated runs measure the agent, not the environment drifting under
+it. It is also why ten runs cost cents — a fork boots from the snapshot in about
+a second.</p>
 <h2 id="in-your-agent39s-ci">In your agent&#39;s CI</h2>
 <pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@v0.2
   with:
-    task: tasks/ticket-queue.yaml
+    task: tasks/triage.yaml
+    agent: agents/triage.ts   # your agent; omit to use passk&#39;s reference loops
     k: 10
-    require-lower: 0.7       # fail unless the 95% lower bound on the pass rate clears 70%
+    require-lower: 0.7        # fail unless the 95% lower bound on the pass rate clears 70%
   env:
     SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}    # or ANTHROPIC_API_KEY
 </code></pre>
-<p>The runner needs no display. The desktops are Solari&#39;s, booted from one
-snapshot in about a second each, so every attempt starts byte-identical and
-ten runs cost cents on a budget model. The job summary gets the verdict,
-every run as a glyph, the interval, the checks that missed and the failed
-runs; the artifact gets the report with every screenshot. Every input and
-output is in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/action.yml"><code>action.yml</code></a>; the repo&#39;s own
-<a href="https://github.com/tohirr/solari-cookbook/blob/main/.github/workflows/passk.yml">workflow</a> runs the action on every push.
-Add <code>agent: src/my-agent.ts</code> to bench your own agent instead of passk&#39;s
-reference loops: any module that takes a desktop handle and a prompt and
-returns what it did (<a href="docs/tasks.html#benching-your-own-agent">the manual</a>).</p>
-<h2 id="or-on-your-machine">Or on your machine</h2>
-<p>No keys, forty seconds, the whole pipeline on in-memory desktops:</p>
+<p>The runner needs no display; the desktops are Solari&#39;s. A push that edits a
+prompt, a triage page or a card component re-benches the agent and fails the
+build when reliability drops. The job summary carries the verdict, every run as
+a glyph, the interval, the checks that missed and the failed runs; the artifact
+carries the full report. Every input and output is in
+<a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/action.yml"><code>action.yml</code></a>, and <a href="https://github.com/tohirr/solari-cookbook/blob/main/.github/workflows/passk.yml">this repo&#39;s own workflow</a>
+runs the action on every push, so it is proven here before you use it.</p>
+<p><code>agent:</code> points at any module that takes a live desktop handle and a prompt and
+returns what it did — the contract is in
+<a href="docs/tasks.html#benching-your-own-agent">the manual</a>. Two rules are not
+negotiable: the agent never sees the task&#39;s checks, and its own claim of
+success is recorded but never graded.</p>
+<h2 id="try-it-with-no-keys">Try it with no keys</h2>
+<p>Forty seconds, the whole pipeline on in-memory desktops:</p>
 <pre><code class="language-bash">git clone https://github.com/tohirr/solari-cookbook.git &amp;&amp; cd solari-cookbook/passk &amp;&amp; npm install
 PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 </code></pre>
 <p align="center"><img src="docs/demo.gif" alt="Terminal recording: passk snapshots the task, proves the verifier, forks ten desktops, grades each run, prints pass@1 with its interval and pass^k, and the gate refuses an 80% agent" width="100%"></p>
 
-<p>The real thing, with a <a href="https://console.getsolari.com">Solari key</a> and an
-OpenAI or Anthropic key in <code>.env</code> (copy <code>.env.example</code>; <code>doctor</code> checks both):</p>
+<p>The real thing needs a <a href="https://console.getsolari.com">Solari key</a> and an OpenAI
+or Anthropic key in <code>.env</code> (copy <code>.env.example</code>; <code>doctor</code> checks both):</p>
 <pre><code class="language-bash">npm run passk doctor
 npm run passk run tasks/ticket-queue.yaml -- --k 10
 open runs/ticket-queue-*/report.html
@@ -194,23 +218,29 @@ checks:                     # graded inside the desktop after the agent stops
     text: hello
 </code></pre>
 <p>Anything whose state lives inside the desktop works: desktop applications,
-files and PDFs, a web tool served from inside the VM. Setup can exec,
-upload, open apps, click and type; checks read files, run commands, or as a
-last resort have the model judge the final screen. Before any agent runs,
-the checks must fail on the untouched snapshot and pass after the golden
-steps, or the bench refuses to start. The format, the shipped tasks and
-what is out of scope are in <a href="docs/tasks.html">the manual</a>.</p>
+files and PDFs, a web tool served from inside the VM. Setup can exec, upload,
+open apps, click and type; checks read files, run commands, or as a last
+resort have the model judge the final screen. Before any agent runs, the
+checks must fail on the untouched snapshot and pass after the golden steps, or
+the bench refuses to start — an unsound verifier makes every number after it
+meaningless. The format, the shipped tasks and what is out of scope are in
+<a href="docs/tasks.html">the manual</a>.</p>
 <h2 id="what-you-get-back">What you get back</h2>
 <ul>
 <li><strong>Observed passes with a 95% interval.</strong> 10/10 is a lower bound of 72%, not proof of 100%.</li>
 <li><strong>pass^k</strong>, the chance all <em>k</em> attempts in a row succeed. 80% pass@1 is 33% pass^5. This is the number a user feels.</li>
-<li><strong>Per check, how often each rule was met</strong>, so a pass rate becomes a diagnosis.</li>
+<li><strong>Per check, how often each rule was met</strong>, so a pass rate becomes a diagnosis rather than a verdict.</li>
 <li><strong>For each failure</strong>, the first step where it diverged from a passing run, and a cause hypothesis.</li>
 <li><strong>Steps, seconds and model spend</strong> per run, and cost per success with the failed attempts counted.</li>
 <li><strong>Runs lost to infrastructure</strong>, listed and never scored against the agent.</li>
 <li><strong>Runs that stopped early</strong>, marked when a run stops by itself far under the bench&#39;s typical effort: not the same failure as working to the step cap and getting it wrong.</li>
 <li><strong>Every screenshot, every action, the checks as run</strong>, and a hash of the task, so the number is auditable — plus any file the task names as <code>evidence</code>, copied out of each fork before it is killed.</li>
 </ul>
+<p>A task whose screens carry real content declares <code>screenshots: private</code>, and one
+whose evidence names real things declares <code>labels</code>; then no frame and no
+identifier leaves the run, and the export refuses if one slips through. That is
+how the bookmarx bench above is published: the numbers and the decisions, with
+every post id replaced by <code>target 6 (hateful)</code>, <code>guard 5</code>, <code>library post 212</code>.</p>
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-routing.jpg" alt="Failure evidence: a passing run and a failing run of the routing task on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
 
 <h2 id="change-one-thing-compare">Change one thing, compare</h2>
@@ -219,50 +249,40 @@ npm run passk run tasks/bookmarx-triage-keep.yaml -- --k 10 --snapshot snap_… 
 npm run passk compare runs/bookmarx-triage-2*/ runs/bookmarx-triage-keep-*/
 </code></pre>
 <p><code>compare</code> puts two conditions from one snapshot side by side: what was held
-fixed, what changed, the delta in passes, effort and cost per success, the
-same delta per check, and Fisher&#39;s exact p for the pass/fail split. It
-refuses to attribute a difference when more than one thing changed, and it
-says when the sample is too small to say anything.</p>
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-bookmarx-triage-prompt/compare.html"><img src="docs/compare-bookmarx-triage.jpg" alt="A passk comparison page for a real app: bookmarx's sweeping agent reviewing a queue of seventeen saved posts under two prompts, 4/10 against 2/10, with the by-check table showing fifteen of nineteen rules holding every run and the hateful post removed in half" width="100%"></a></p>
-
-<p>The picture is a real app. <a href="https://bookmarx.space">bookmarx</a>, a search
-over saved posts, runs <em>inside</em> the desktop as static pages and a stdlib
-server (<a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/tasks/bookmarx-lite/"><code>tasks/bookmarx-lite/</code></a>), and its own
-sweeping agent reviews a queue of seventeen posts before a public demo:
-remove nine, keep eight guards that only look risky. Ten runs each under
-two prompts, the bare rules and the rules plus &quot;when unsure, keep it&quot;: 4/10
-and 2/10, a split consistent with noise (p = 0.63). What the per-check
-table does show is that fifteen of nineteen rules hold in every run and one
-judgment, the hateful post, holds in half — reproduced in a second sample of
-ten. A single demo run has a 40% chance of passing, and if it passes you
-ship believing it works. Published without frames or post ids
-(<code>screenshots: private</code>, <code>labels</code>), graded from the decisions map itself.</p>
-<p>The first version of this comparison read 4/10 against 0/10 and looked like
-one sentence breaking the agent. Two of those ten runs were network
-failures the agent had reported as its own faults; passk scored them
-against it. With the classification fixed and a fresh sample the effect is
-gone. The instrument caught its own artifact, which is the point of having
-one.</p>
-<p>The other example is a mock: an internal ticket queue served from inside
-the VM, twelve tickets and nineteen checks, one sentence added to the
-prompt. <a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html">The comparison</a>
-went 5/18 to 14/20 and the table says which rows the sentence fixed and
-which it cost; it was run while building the tool, on one budget model, and
-is a demonstration of the pages rather than a finding.</p>
-<h2 id="ten-things-learned-about-solari">Ten things learned about Solari</h2>
-<p>Everything in <a href="docs/solari-notes.html"><code>docs/SOLARI-NOTES.md</code></a> was found on a
-live VM while building this, and cost an afternoon each. Among them: key
-chords must be one string or you get a literal &quot;s&quot;; Chrome will not upload a
-file from <code>/root</code>; a snapshot id can come back before the snapshot exists.
-Solari&#39;s team may find the first four worth a changelog entry.</p>
+fixed, what changed, the delta in passes, effort and cost per success, the same
+delta per check, and Fisher&#39;s exact p for the pass/fail split. It refuses to
+attribute a difference when more than one thing changed, and it says when the
+sample is too small to say anything.</p>
+<p>Adding <em>&quot;when you are unsure about a post, keep it&quot;</em> to the sweeping agent&#39;s
+prompt gave 2/10 against the baseline&#39;s 4/10 — a split <strong>consistent with noise</strong>
+(p = 0.63). Worth knowing, and worth not shipping a claim about.</p>
+<p>The first version of that comparison read 4/10 against 0/10 and looked like one
+sentence breaking the agent. Two of those ten runs were network failures the
+agent had reported as its own faults, and passk scored them against it. With the
+classification fixed and a fresh sample, the effect was gone. The instrument
+caught its own artifact, which is the point of having one.</p>
+<p>The second example is a mock rather than a real app: an internal ticket queue
+served from inside the VM, twelve tickets and nineteen checks, one sentence
+added to the prompt.
+<a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html">That comparison</a>
+went 5/18 to 14/20 and the table says which rows the sentence fixed and which it
+cost. It was run while building the tool, on one budget model, and is a
+demonstration of what the pages hold rather than a finding.</p>
+<h2 id="twelve-things-learned-about-solari">Twelve things learned about Solari</h2>
+<p>Everything in <a href="docs/solari-notes.html"><code>docs/SOLARI-NOTES.md</code></a> was found on a live
+VM while building this, and cost an afternoon each. Among them: <code>snapshot()</code> can
+return an id before the snapshot exists, so a fork from it boots and then hangs
+on its first <code>exec</code>; <code>keyboard.press([&quot;ctrl&quot;,&quot;s&quot;])</code> types a literal &quot;s&quot; instead
+of sending the chord; Chrome will not upload a file from under <code>/root</code>. Solari&#39;s
+team may find the first four worth a changelog entry.</p>
 <h2 id="how-this-differs-from-other-agent-tests">How this differs from other agent tests</h2>
 <p><a href="https://github.com/hidai25/eval-view">EvalView</a> snapshots a chat agent&#39;s
 tool-call trajectory and diffs it; the Azure and Bedrock evaluation actions
-score a chat agent&#39;s answers with an LLM judge. passk is for agents that
-drive a screen, it verifies the world rather than the transcript, and its
-runs start from the same bytes, which is what makes <em>k</em> attempts comparable
-and pass^k meaningful. The method, the intervals and the paper the question
-comes from are in <a href="docs/method.html">Method</a>.</p>
+score a chat agent&#39;s answers with an LLM judge. passk is for agents that drive a
+screen, it verifies the world rather than the transcript, and every run starts
+from the same bytes, which is what makes <em>k</em> attempts comparable and pass^k
+meaningful. The method, the intervals and the paper the question comes from are
+in <a href="docs/method.html">Method</a>.</p>
 <h2 id="after-the-first-bench">After the first bench</h2>
 <pre><code class="language-bash">npm run passk compare runs/A runs/B        # what changed, what moved, and whether it could be noise
 npm run passk gate runs/dir -- --require-lower 0.7   # exit 2 in CI if a saved bench misses the bar
@@ -273,7 +293,7 @@ npm run passk export-inspect runs/dir      # the bench as an Inspect AI log, nex
 <li><a href="docs/tasks.html">Manual</a>: setup, the task format, what <code>run</code> does, the shipped tasks, experiments, benching your own agent, scope.</li>
 <li><a href="docs/method.html">Method</a>: intervals, who gets blamed for what, how many runs, resume, testing the harness, safety.</li>
 <li><a href="docs/solari-notes.html">Notes from building on Solari</a>.</li>
-<li><a href="evidence/index.html">Evidence</a>: the worked example, with every screenshot that carries proof.</li>
+<li><a href="evidence/index.html">Evidence</a>: both worked examples, with every file that carries proof.</li>
 </ul>
 
 </article>

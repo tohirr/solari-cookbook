@@ -1,28 +1,39 @@
-# passk — reliability CI for computer-use agents
+# passk — does your computer-use agent pass twice?
 
-Your agent passed the demo. Will it pass the tenth time? passk forks one
-[Solari](https://getsolari.com) desktop snapshot *k* times, runs your agent
-on every fork, grades each run **inside the VM** after the agent stops, and
-fails the build unless the pass rate clears the bar. Nothing the agent says
-about its own success counts.
+I have a small app, [bookmarx](https://bookmarx.space), that searches my saved
+posts. Before the library went public I wanted the awkward things out of it, so
+there is an agent that walks a review queue and presses Remove or Keep on each
+post. It works. I have watched it work.
+
+Ten forks of one desktop say it works **four times in ten** — and the rule it
+cannot hold is the one that matters most: the hateful post, removed in half the
+runs, kept in the other half, in two independent samples.
+
+That gap — between an agent that works while you watch and an agent that works —
+is what passk measures. It snapshots one [Solari](https://getsolari.com)
+desktop, forks it *k* times, runs your agent on every fork, and grades each run
+by reading state **inside the VM** after the agent stops. Nothing the agent says
+about its own success counts. It ships as a GitHub Action, so a push that edits
+a prompt fails the build when reliability drops.
 
 ```yaml
 - uses: tohirr/solari-cookbook/passk@v0.2
   with:
-    task: tasks/ticket-queue.yaml
+    task: tasks/triage.yaml
+    agent: agents/triage.ts   # your agent; omit to use passk's reference loops
     k: 10
-    require-lower: 0.7       # fail unless the 95% lower bound on the pass rate clears 70%
+    require-lower: 0.7        # fail unless the 95% lower bound on the pass rate clears 70%
   env:
     SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}    # or ANTHROPIC_API_KEY
 ```
 
-The runner needs no display: the desktops are Solari's, booted from one
-snapshot in about a second each, so every attempt starts byte-identical and
-ten runs cost cents on a budget model. What comes back: pass@1 with a 95%
-interval, pass^k (the chance *k* attempts in a row all succeed), how often
-each check was met, the step where each failure parted from a passing run,
-and every screenshot, in the job summary and the artifact.
+The runner needs no display: the desktops are Solari's, booted from one snapshot
+in about a second each, so every attempt starts byte-identical and ten runs cost
+cents. What comes back: pass@1 with a 95% interval, pass^k (the chance *k*
+attempts in a row all succeed), how often each check was met, the step where
+each failure parted from a passing run, and every screenshot — in the job
+summary and the artifact.
 
 No keys, forty seconds, the whole pipeline on in-memory desktops:
 
@@ -34,19 +45,17 @@ PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-bookmarx-triage-prompt/compare.html"><img src="passk/docs/compare-bookmarx-triage.jpg" alt="A passk comparison page for a real app: bookmarx's sweeping agent reviewing a queue of seventeen saved posts under two prompts, 4/10 against 2/10, with the by-check table showing fifteen of nineteen rules holding every run and the hateful post removed in half" width="100%"></a></p>
 
 **[passk/README.md](passk/README.md)
-· [Ten things learned about Solari](passk/docs/SOLARI-NOTES.md)
+· [Twelve things learned about Solari](passk/docs/SOLARI-NOTES.md)
 · [Two worked examples](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
 · [The manual](passk/docs/TASKS.md)
 · [The method](passk/docs/METHOD.md)**
 
-The bench is the instrument and `compare` is the point: two conditions on
-one snapshot, what was held fixed, what changed, the delta per check, and
-Fisher's exact p. The picture is a real app: [bookmarx](https://bookmarx.space),
-a search over saved posts, running inside the desktop, and its own sweeping
-agent reviewing seventeen saved posts before a public demo under two
-prompts. 4/10 and 2/10, a split consistent with noise; fifteen of nineteen
-rules hold every run and one judgment, the hateful post, holds in half —
-twice. Published without frames or post ids. The question is from Gonzalez-Pumariega et al.,
+The bench is the instrument and `compare` is the point: two conditions on one
+snapshot, what was held fixed, what changed, the delta per check, and Fisher's
+exact p. Adding "when you are unsure, keep it" to the sweeping agent's prompt
+gave 2/10 against 4/10 — consistent with noise, and worth not shipping a claim
+about. The evidence is published without a single frame or post id. The question
+is from Gonzalez-Pumariega et al.,
 [*On the Reliability of Computer Use Agents*](https://arxiv.org/abs/2604.17849)
 (2026), which measures it on OSWorld; passk measures it on your workflow.
 
