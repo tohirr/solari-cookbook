@@ -28,6 +28,9 @@ every run as a glyph, the interval, the checks that missed and the failed
 runs; the artifact gets the report with every screenshot. Every input and
 output is in [`action.yml`](action.yml); the repo's own
 [workflow](../.github/workflows/passk.yml) runs the action on every push.
+Add `agent: src/my-agent.ts` to bench your own agent instead of passk's
+reference loops: any module that takes a desktop handle and a prompt and
+returns what it did ([the manual](docs/TASKS.md#benching-your-own-agent)).
 
 ## Or on your machine
 

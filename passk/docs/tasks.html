@@ -200,6 +200,7 @@ are Solari&#39;s. Secrets arrive as <code>env</code>, never as inputs.</p>
     budget: 1                         # stop launching runs at $1 of model spend
     snapshot: snap_…                  # optional: fork this snapshot instead of preparing one
     classify: &quot;false&quot;                 # a cause hypothesis per failed run costs model calls
+    # agent: src/my-agent.ts          # bench your own agent instead of passk&#39;s loops (see below)
   env:
     SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -352,13 +353,30 @@ in <code>docs/</code> (failure evidence, how it works) from the same bench files
 <a href="https://github.com/charmbracelet/vhs">vhs</a>: <code>vhs docs/demo.tape</code>.</p>
 <h2 id="benching-your-own-agent">Benching your own agent</h2>
 <p>The bundled loops are one Claude loop and one OpenAI loop, chosen by
-<code>PASSK_PROVIDER</code>. A team with its own agent writes a third file in
-<code>src/agent/</code> implementing the same interface (<code>AgentRunOptions → AgentRunOutput</code> in <code>src/agent/index.ts</code>): it receives a live desktop handle,
-the prompt, a step budget and an output directory, and returns the trace of
-actions it took, its token usage, and how it stopped. Two rules make the
-bench honest and are not negotiable: the agent never sees the task&#39;s checks,
-and the agent&#39;s own claim of success is recorded but never graded. The
-scripted agent in <code>src/agent/scripted.ts</code> is the smallest example.</p>
+<code>PASSK_PROVIDER</code>. To bench your own agent, point <code>PASSK_AGENT</code> at a module
+in your repo (or pass <code>agent:</code> to the action):</p>
+<pre><code class="language-bash">PASSK_AGENT=src/my-agent.ts npm run passk run tasks/ticket-queue.yaml -- --k 10
+</code></pre>
+<p>The module exports <code>runAgent</code>, or a default export, with the signature in
+<code>src/agent/index.ts</code>:</p>
+<pre><code class="language-ts">import type { AgentRunOptions, AgentRunOutput } from &quot;passk/src/agent/index.js&quot;;
+
+export async function runAgent(opts: AgentRunOptions): Promise&lt;AgentRunOutput&gt; {
+  // opts.desktop  a live Solari Desktop handle: screenshot(), mouse, keyboard, fs, exec
+  // opts.prompt   the task&#39;s prompt, exactly as a user would type it
+  // opts.maxSteps the step budget; opts.outDir where to write step screenshots
+  // return { steps, finalMessage, usage: { inputTokens, outputTokens }, stoppedBy }
+}
+</code></pre>
+<p>It resolves against the working directory and imports from your repo&#39;s
+<code>node_modules</code>, so install your repo before the bench. Any model or none:
+the bench&#39;s <code>model</code> is <code>PASSK_MODEL</code> if set, else <code>custom</code>, and cost is
+estimated only when a price is known for it. Two rules make the bench
+honest and are not negotiable: the agent never sees the task&#39;s checks (they
+are stripped before the call), and the agent&#39;s own claim of success is
+recorded but never graded. <code>test/fixtures/custom-agent.ts</code> is the smallest
+example, and the repo&#39;s workflow runs it through the action on in-memory
+desktops (<code>PASSK_FAKE=1</code>).</p>
 <h2 id="what-passk-can-and-cannot-do-today">What passk can and cannot do today</h2>
 <p><strong>Supported.</strong> Anything whose meaningful state lives inside the desktop, because
 that is what a Solari snapshot isolates and a fork resets: LibreOffice and

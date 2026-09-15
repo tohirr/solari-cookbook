@@ -78,3 +78,20 @@ jobs:
           test "${{ steps.miss.outcome }}" = "failure"
           test "${{ steps.miss.outputs.exit-code }}" = "2"
           test "${{ steps.miss.outputs.passed }}" = "8"
+      - name: a custom agent from the workspace runs through the action
+        id: custom
+        uses: ./passk
+        env:
+          PASSK_FAKE: "1"
+        with:
+          task: passk/tasks/fake.yaml
+          agent: passk/test/fixtures/custom-agent.ts
+          k: 5
+          concurrency: 5
+          require: 1
+          artifact-name: passk-action-custom
+      - name: the custom agent was the agent
+        run: |
+          test "${{ steps.custom.outputs.passed }}" = "5"
+          test "${{ steps.custom.outputs.exit-code }}" = "0"
+          grep -q '"agent": "custom: ' "${{ steps.custom.outputs.bench-dir }}/bench.json"

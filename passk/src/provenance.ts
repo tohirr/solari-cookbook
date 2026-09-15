@@ -51,7 +51,7 @@ export function collectProvenance(task: Task, concurrency: number, budgetUsd: nu
     gitCommit: gitCommit(),
     gitDirty: gitDirty(),
     provider: config.provider,
-    agent: `src/agent/${config.provider}.ts`,
+    agent: config.provider === "custom" ? `custom: ${process.env.PASSK_AGENT}` : `src/agent/${config.provider}.ts`,
     systemPromptHash: systemPromptHash(DEFAULT_SYSTEM),
     safety: config.safety,
     model: config.model,

@@ -160,7 +160,10 @@ ten runs cost cents on a budget model. The job summary gets the verdict,
 every run as a glyph, the interval, the checks that missed and the failed
 runs; the artifact gets the report with every screenshot. Every input and
 output is in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/action.yml"><code>action.yml</code></a>; the repo&#39;s own
-<a href="https://github.com/tohirr/solari-cookbook/blob/main/.github/workflows/passk.yml">workflow</a> runs the action on every push.</p>
+<a href="https://github.com/tohirr/solari-cookbook/blob/main/.github/workflows/passk.yml">workflow</a> runs the action on every push.
+Add <code>agent: src/my-agent.ts</code> to bench your own agent instead of passk&#39;s
+reference loops: any module that takes a desktop handle and a prompt and
+returns what it did (<a href="docs/tasks.html#benching-your-own-agent">the manual</a>).</p>
 <h2 id="or-on-your-machine">Or on your machine</h2>
 <p>No keys, forty seconds, the whole pipeline on in-memory desktops:</p>
 <pre><code class="language-bash">git clone https://github.com/tohirr/solari-cookbook.git &amp;&amp; cd solari-cookbook/passk &amp;&amp; npm install

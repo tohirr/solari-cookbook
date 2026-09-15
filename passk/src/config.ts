@@ -25,7 +25,9 @@ function need(name: string): string {
   return process.env[name]!;
 }
 
-function detectProvider(): "anthropic" | "openai" | "scripted" {
+function detectProvider(): "anthropic" | "openai" | "scripted" | "custom" {
+  // Your own agent module (PASSK_AGENT=path) is the agent, whatever keys are around; it may use any model or none.
+  if (process.env.PASSK_AGENT) return "custom";
   const explicit = process.env.PASSK_PROVIDER;
   if (explicit === "anthropic" || explicit === "openai" || explicit === "scripted") return explicit;
   if (isSet("ANTHROPIC_API_KEY")) return "anthropic";
@@ -33,7 +35,7 @@ function detectProvider(): "anthropic" | "openai" | "scripted" {
   throw new Error("Set ANTHROPIC_API_KEY or OPENAI_API_KEY in .env (or PASSK_PROVIDER to pick one).");
 }
 
-const DEFAULT_MODEL = { anthropic: "claude-opus-5", openai: "gpt-5.6", scripted: "scripted" } as const;
+const DEFAULT_MODEL = { anthropic: "claude-opus-5", openai: "gpt-5.6", scripted: "scripted", custom: "custom" } as const;
 
 export const config = {
   version: "0.1.1",

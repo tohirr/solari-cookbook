@@ -57,6 +57,7 @@ are Solari's. Secrets arrive as `env`, never as inputs.
     budget: 1                         # stop launching runs at $1 of model spend
     snapshot: snap_…                  # optional: fork this snapshot instead of preparing one
     classify: "false"                 # a cause hypothesis per failed run costs model calls
+    # agent: src/my-agent.ts          # bench your own agent instead of passk's loops (see below)
   env:
     SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
     OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -210,14 +211,36 @@ in `docs/` (failure evidence, how it works) from the same bench files.
 ## Benching your own agent
 
 The bundled loops are one Claude loop and one OpenAI loop, chosen by
-`PASSK_PROVIDER`. A team with its own agent writes a third file in
-`src/agent/` implementing the same interface (`AgentRunOptions →
-AgentRunOutput` in `src/agent/index.ts`): it receives a live desktop handle,
-the prompt, a step budget and an output directory, and returns the trace of
-actions it took, its token usage, and how it stopped. Two rules make the
-bench honest and are not negotiable: the agent never sees the task's checks,
-and the agent's own claim of success is recorded but never graded. The
-scripted agent in `src/agent/scripted.ts` is the smallest example.
+`PASSK_PROVIDER`. To bench your own agent, point `PASSK_AGENT` at a module
+in your repo (or pass `agent:` to the action):
+
+```bash
+PASSK_AGENT=src/my-agent.ts npm run passk run tasks/ticket-queue.yaml -- --k 10
+```
+
+The module exports `runAgent`, or a default export, with the signature in
+`src/agent/index.ts`:
+
+```ts
+import type { AgentRunOptions, AgentRunOutput } from "passk/src/agent/index.js";
+
+export async function runAgent(opts: AgentRunOptions): Promise<AgentRunOutput> {
+  // opts.desktop  a live Solari Desktop handle: screenshot(), mouse, keyboard, fs, exec
+  // opts.prompt   the task's prompt, exactly as a user would type it
+  // opts.maxSteps the step budget; opts.outDir where to write step screenshots
+  // return { steps, finalMessage, usage: { inputTokens, outputTokens }, stoppedBy }
+}
+```
+
+It resolves against the working directory and imports from your repo's
+`node_modules`, so install your repo before the bench. Any model or none:
+the bench's `model` is `PASSK_MODEL` if set, else `custom`, and cost is
+estimated only when a price is known for it. Two rules make the bench
+honest and are not negotiable: the agent never sees the task's checks (they
+are stripped before the call), and the agent's own claim of success is
+recorded but never graded. `test/fixtures/custom-agent.ts` is the smallest
+example, and the repo's workflow runs it through the action on in-memory
+desktops (`PASSK_FAKE=1`).
 
 ## What passk can and cannot do today
 

@@ -1,8 +1,8 @@
 /**
- * The agent under test. One interface, two loops:
+ * The agent under test. One interface, two loops, and yours:
  *   anthropic.ts  Claude + computer_toolset_20260801 (Messages API)
  *   openai.ts     GPT-5.x + the `computer` tool (Responses API)
- * Add a file here to bench a third.
+ *   custom.ts     any module on disk with the same signature (PASSK_AGENT=path)
  */
 import type { Desktop } from "@solarisdk/sdk";
 import { config } from "../config.js";
@@ -39,6 +39,10 @@ When the task is complete, stop and reply with one short sentence describing the
 Never ask the user questions — make a reasonable choice and continue.`;
 
 export async function runAgent(opts: AgentRunOptions): Promise<AgentRunOutput> {
+  if (config.provider === "custom") {
+    const { runCustomAgent } = await import("./custom.js");
+    return runCustomAgent(opts);
+  }
   if (config.provider === "scripted") {
     const { runScriptedAgent } = await import("./scripted.js");
     return runScriptedAgent(opts);

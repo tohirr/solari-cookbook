@@ -13,6 +13,8 @@
 #     env:
 #       SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
 #       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}   # or ANTHROPIC_API_KEY
+#
+# Add `agent: src/my-agent.ts` to bench your own agent instead of passk's loops.
 name: passk
 description: Reliability CI for computer-use agents. Fork one Solari desktop snapshot k times, run the agent on every fork, grade inside the VM, gate on the pass rate.
 author: tohirr
@@ -31,6 +33,9 @@ inputs:
     required: false
   require-lower:
     description: Fail unless the 95% lower bound on the pass rate is at least this (0–1). The stricter gate.
+    required: false
+  agent:
+    description: Path in your repo to a module exporting runAgent(opts), to bench your own agent instead of passk's reference loops. The module resolves against the workspace and imports from your node_modules, so install your repo first. See the manual, "Benching your own agent".
     required: false
   provider:
     description: anthropic, openai, or scripted. Default picks from the keys present; scripted needs no keys and no Solari, and exercises the pipeline on in-memory desktops.
@@ -115,10 +120,12 @@ runs:
         IN_CONCURRENCY: ${{ inputs.concurrency }}
         IN_BUDGET: ${{ inputs.budget }}
         IN_SNAPSHOT: ${{ inputs.snapshot }}
+        IN_AGENT: ${{ inputs.agent }}
       run: |
         set -u
         [ -n "$PASSK_PROVIDER" ] || unset PASSK_PROVIDER
         [ -n "$PASSK_MODEL" ] || unset PASSK_MODEL
+        if [ -n "$IN_AGENT" ]; then case "$IN_AGENT" in /*) export PASSK_AGENT="$IN_AGENT" ;; *) export PASSK_AGENT="$GITHUB_WORKSPACE/$IN_AGENT" ;; esac; fi
         TSX="$GITHUB_ACTION_PATH/node_modules/.bin/tsx"
         case "$IN_TASK" in /*) TASK="$IN_TASK" ;; *) TASK="$GITHUB_WORKSPACE/$IN_TASK" ;; esac
         args=(run "$TASK" --k "$IN_K" --concurrency "$IN_CONCURRENCY")
