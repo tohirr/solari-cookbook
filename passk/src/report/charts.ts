@@ -10,59 +10,59 @@ import { wilson } from "../metrics.js";
 import type { BenchResult, FailureAnalysis, RunResult } from "../types.js";
 
 export const CHART_CSS = `
-.chart{display:block;width:100%;height:auto;font-family:var(--mono);font-size:10.5px}
+.chart{display:block;width:100%;height:auto;font:11px var(--sans)}
 .chart text{fill:var(--ink-3)}
 .chart .axis{stroke:var(--line-2);stroke-width:1}
 .chart .grid{stroke:var(--line);stroke-width:1}
-.chart .ln{fill:none;stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round}
+.chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
 .chart .ln.lower{stroke-width:1.25;stroke-dasharray:3 4;opacity:.8}
-.chart .s-a{stroke:var(--a)}.chart .s-b{stroke:var(--b)}.chart .s-g{stroke:var(--good)}
-.chart .lbl{font-size:11px;font-weight:600}
-.chart .lbl.a{fill:var(--a)}.chart .lbl.b{fill:var(--b)}.chart .lbl.g{fill:var(--good)}
-.chart .bar.passed{fill:var(--good);opacity:.45}.chart .bar.failed{fill:var(--crit)}.chart .bar.errored{fill:var(--ink-3);opacity:.5}
+.chart .s-a{stroke:var(--a)}.chart .s-b{stroke:var(--b)}.chart .s-g{stroke:var(--a)}
+.chart .lbl{font-size:11.5px;font-weight:600;fill:var(--ink)}
+.chart .bar.passed{fill:var(--ink);opacity:.2}.chart .bar.failed{fill:var(--crit)}.chart .bar.errored{fill:var(--ink-3);opacity:.35}
 .chart .bar:hover{opacity:1}
-.chart .med{stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3;opacity:.7}
+.chart .med{stroke:var(--ink-2);stroke-width:1}
 .chart .whisker{stroke:var(--ink-2);stroke-width:1.5}
-.chart .rate{fill:var(--good);opacity:.4}.chart .rate.a{fill:var(--a);opacity:.85}.chart .rate.b{fill:var(--b);opacity:.85}.chart .rate.n{fill:var(--ink-2);opacity:.55}
-.chart .big{font-size:13px;font-weight:600;fill:var(--ink);font-family:var(--sans)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
-.tile{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
-.tile .l{font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
-.tile .v{font-size:22px;font-weight:600;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.05}
-.tile .v small{font-size:12px;color:var(--ink-3);font-weight:500;letter-spacing:0;margin-left:6px}
-.tile .d{font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
-.tile .d.up{color:var(--good)}.tile .d.down{color:var(--crit)}.tile .d.flat{color:var(--ink-3)}
-.causebar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--surface-2);margin:8px 0 10px}
-.causebar i{display:block;height:100%}
-.causekey{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
-.causekey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.c-behavior_variability{background:var(--b)}.c-task_ambiguity{background:var(--a)}.c-stochastic_execution{background:var(--warn)}.c-unknown{background:var(--ink-3)}
+.chart .rate{fill:var(--a);opacity:.35}.chart .rate.a{fill:var(--a);opacity:.85}.chart .rate.b{fill:var(--b);opacity:.85}.chart .rate.n{fill:var(--ink-3);opacity:.45}
+.chart .pt{fill:var(--a);stroke:var(--bg);stroke-width:2}
+.chart .big{font-size:13px;font-weight:600;fill:var(--ink)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px 24px}
+.tile{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0 0;min-width:0}
+.tile .l{font:12.5px var(--sans);color:var(--ink-3);margin-bottom:6px}
+.tile .v{font:600 24px/1.05 var(--sans);letter-spacing:-.01em;color:var(--ink)}
+.tile .v small{font:12.5px var(--sans);color:var(--ink-3);margin-left:6px}
+.tile .d{font:12.5px var(--sans);margin-top:6px;font-variant-numeric:tabular-nums}
+.tile .d.up{color:var(--good-ink)}.tile .d.down{color:var(--crit-ink)}.tile .d.flat{color:var(--ink-3)}
+.causebar{display:flex;gap:2px;height:12px;margin:10px 0 10px}
+.causebar i{display:block;height:100%;border-radius:2px}
+.causekey{display:flex;gap:16px;flex-wrap:wrap;font:12.5px var(--sans);color:var(--ink-2)}
+.causekey i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.c-behavior_variability{background:var(--b)}.c-task_ambiguity{background:var(--a)}.c-stochastic_execution{background:#eda100}.c-unknown{background:var(--ink-3)}
 .trace{display:grid;gap:14px}
 .trace .lane{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center}
 @media(max-width:640px){.trace .lane{grid-template-columns:1fr;gap:6px}}
-.trace .who{font-size:13px;color:var(--ink-2)}.trace .who b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+.trace .who{font:13px var(--sans);color:var(--ink-2)}.trace .who b{display:block;color:var(--ink);font-weight:600;font-size:14px}
 .trace .who .pill{margin-top:4px}
-.trace .tl{position:relative;height:34px;background:var(--surface-2);border-radius:8px;overflow:hidden}
-.trace .tl i{position:absolute;top:6px;bottom:6px;border-radius:3px;min-width:3px;opacity:.85}
+.trace .tl{position:relative;height:32px;background:var(--surface-2);border-radius:var(--radius);overflow:hidden}
+.trace .tl i{position:absolute;top:6px;bottom:6px;border-radius:2px;min-width:3px;opacity:.9}
 .trace .tl i:hover{opacity:1;outline:1px solid var(--ink)}
-.trace .tl i.click{background:var(--a)}.trace .tl i.keypress{background:#8b5cf6}.trace .tl i.type{background:#14b8a6}.trace .tl i.wait{background:var(--ink-3)}.trace .tl i.screenshot{background:var(--line-2)}.trace .tl i.scroll{background:#0ea5e9}.trace .tl i.other{background:var(--warn)}
+.trace .tl i.click{background:var(--a)}.trace .tl i.keypress{background:#4a3aa7}.trace .tl i.type{background:#1baf7a}.trace .tl i.wait{background:var(--ink-3)}.trace .tl i.screenshot{background:var(--line-2)}.trace .tl i.scroll{background:#eda100}.trace .tl i.other{background:#e87ba4}
 .trace .tl i.div{outline:2px solid var(--crit);outline-offset:-1px;z-index:1}
-.trace .tl em{position:absolute;right:8px;top:9px;font:10.5px var(--mono);font-style:normal;color:var(--ink-3)}
+.trace .tl em{position:absolute;right:8px;top:8px;font:10.5px var(--mono);font-style:normal;color:var(--ink-3)}
 .trace .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.trace .chips span{font:11px var(--mono);color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:2px 6px}
-.trace .chips span.div{border-color:var(--crit);color:var(--crit)}
+.trace .chips span{font:11px var(--mono);color:var(--ink-2);background:var(--surface-2);border-radius:3px;padding:2px 6px}
+.trace .chips span.div{box-shadow:inset 0 0 0 1px var(--crit);color:var(--crit-ink)}
 .trace .chips span.same{opacity:.55}
-.tracekey{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-3);margin-top:4px}
-.tracekey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.said{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.tracekey{display:flex;gap:14px;flex-wrap:wrap;font:12px var(--sans);color:var(--ink-3);margin-top:4px}
+.tracekey i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.said{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;margin-top:16px}
 @media(max-width:760px){.said{grid-template-columns:1fr}}
 .said>div{min-width:0}
-.said .cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
-.said img{width:100%;border-radius:8px;border:1px solid var(--line);display:block;background:#000;aspect-ratio:16/9;object-fit:cover}
-.said blockquote{margin:8px 0 0;padding:10px 12px;border-radius:8px;font-size:13px;line-height:1.45}
-.said .agent{background:var(--surface-2);color:var(--ink-2)}
-.said .vm{background:var(--crit-dim);color:var(--crit);font-family:var(--mono);font-size:12px}
-.said .vm.ok{background:var(--good-dim);color:var(--good)}
+.said .cap{font:12.5px var(--sans);color:var(--ink-3);margin-bottom:6px}
+.said img{width:100%;border-radius:var(--radius-s);border:1px solid var(--line);display:block;background:#000;aspect-ratio:16/9;object-fit:cover}
+.said blockquote{margin:8px 0 0;padding:8px 12px;border-radius:var(--radius);font-size:14px;line-height:1.45}
+.said .agent{background:var(--surface-2);color:var(--ink-2);font-style:italic}
+.said .vm{background:var(--crit-dim);color:var(--crit-ink);font:12.5px var(--mono)}
+.said .vm.ok{background:var(--good-dim);color:var(--good-ink)}
 `;
 
 const fmt = (x: number) => (Math.round(x * 10) / 10).toString();
@@ -207,7 +207,7 @@ export function traceCompare(b: BenchResult, f: FailureAnalysis, refIndex: numbe
   return `<div class="trace">
     ${lane(ref, fail, false)}
     ${lane(fail, ref, true)}
-    <div class="tracekey"><span><i style="background:var(--a)"></i>click</span><span><i style="background:#8b5cf6"></i>key</span><span><i style="background:#14b8a6"></i>type</span><span><i style="background:var(--ink-3)"></i>wait</span><span><i style="background:var(--line-2)"></i>look</span><span><i style="outline:2px solid var(--crit);outline-offset:-1px"></i>first divergent step${f.divergenceStep !== null ? ` (${f.divergenceStep})` : ""}</span></div>
+    <div class="tracekey"><span><i style="background:var(--a)"></i>click</span><span><i style="background:#4a3aa7"></i>key</span><span><i style="background:#1baf7a"></i>type</span><span><i style="background:var(--ink-3)"></i>wait</span><span><i style="background:var(--line-2)"></i>look</span><span><i style="outline:2px solid var(--crit);outline-offset:-1px"></i>first divergent step${f.divergenceStep !== null ? ` (${f.divergenceStep})` : ""}</span></div>
   </div>
   <div class="said">
     <div><div class="cap">Run ${ref.runIndex} · final screen · the VM found</div><a href="${esc(runDir(ref))}/final.jpg" target="_blank"><img loading="lazy" src="${esc(runDir(ref))}/final.jpg" alt="final screenshot of run ${ref.runIndex}"></a><blockquote class="vm ok">${esc(okCheck?.detail ?? "all checks passed")}</blockquote></div>
@@ -221,10 +221,42 @@ export function referenceRun(b: BenchResult): RunResult | undefined {
   return b.runs.filter((r) => r.status === "passed").sort((p, q) => q.steps.filter((s) => s.screenshot).length - p.steps.filter((s) => s.screenshot).length)[0];
 }
 
+/**
+ * Pass rate by how many steps a run took, across every scored run given: one
+ * point per step band with its 95% Wilson interval and the band's run count.
+ * It is a description of these benches, not a law: a run that hits its step
+ * cap fails by construction and lands in the right-hand bands, and longer
+ * tasks are also harder tasks. The figure exists to show that spread rather
+ * than to hide it inside a single pass rate.
+ */
+export function decayCurve(runs: { steps: number; passed: boolean }[], w = 520, h = 190): string {
+  const edges = [0, 20, 40, 60, 80, Infinity];
+  const bands = edges.slice(0, -1).map((lo, i) => {
+    const hi = edges[i + 1];
+    const rs = runs.filter((r) => r.steps >= lo && r.steps < hi);
+    return { label: hi === Infinity ? `${lo}+` : `${lo}–${hi - 1}`, n: rs.length, passed: rs.filter((r) => r.passed).length };
+  }).filter((b) => b.n > 0);
+  if (bands.length < 2) return "";
+  const L = 40, R = 14, T = 16, B = 40;
+  const iw = w - L - R, ih = h - T - B;
+  const x = (i: number) => L + (iw / bands.length) * (i + 0.5);
+  const y = (p: number) => T + (1 - p) * ih;
+  const grid = [0, 0.5, 1].map((p) => `<line class="grid" x1="${L}" x2="${w - R}" y1="${y(p)}" y2="${y(p)}"/><text x="${L - 8}" y="${y(p) + 3.5}" text-anchor="end">${pct(p)}</text>`).join("");
+  const pts = bands.map((b, i) => {
+    const p = b.passed / b.n;
+    const { lower, upper } = wilson(b.passed, b.n);
+    const tip = `${b.label} steps: ${b.passed}/${b.n} passed · ${pct(lower)}–${pct(upper)} plausible`;
+    return `<g data-tip="${esc(tip)}"><line class="whisker" x1="${x(i)}" x2="${x(i)}" y1="${y(upper)}" y2="${y(lower)}"/><circle class="pt" cx="${x(i)}" cy="${y(p)}" r="5"/>
+      <text x="${x(i)}" y="${h - 22}" text-anchor="middle">${esc(b.label)}</text><text x="${x(i)}" y="${h - 8}" text-anchor="middle">${b.passed}/${b.n}</text></g>`;
+  }).join("");
+  const line = `<path class="ln s-a" d="${bands.map((b, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(b.passed / b.n).toFixed(1)}`).join(" ")}"/>`;
+  return `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="pass rate by steps taken">${grid}<text x="${L}" y="${h - 22}" text-anchor="end" style="font-size:10px">steps</text>${line}${pts}</svg>`;
+}
+
 /** Dots, but quieter: passes recede, failures stand out. Appended after the theme CSS. */
 export const QUIET_DOTS_CSS = `
-.dot{width:15px;height:15px;font-size:8px;border-width:1.5px}
+.dot{width:15px;height:15px;font-size:8px}
 .dotrow{gap:5px}.dots{gap:5px}.dotrow em{width:20px;font-size:9px}
-.dot.passed{background:rgba(34,197,94,.28);color:var(--good);border-color:rgba(34,197,94,.35)}
+.dot.passed{background:var(--good-dim);color:var(--good-ink)}
 .dot.failed{background:var(--crit);color:#fff}
 `;

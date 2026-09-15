@@ -8,8 +8,8 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { CSS, TIP_JS, dotsHtml, esc, pct, usd } from "../src/report/theme.js";
-import { CHART_CSS, QUIET_DOTS_CSS, causeBar, deltaTiles, powKCurve, rateBars, referenceRun, stepBars, traceCompare } from "../src/report/charts.js";
+import { CSS, FONTS, TIP_JS, dotsHtml, esc, pct, usd } from "../src/report/theme.js";
+import { CHART_CSS, QUIET_DOTS_CSS, causeBar, decayCurve, deltaTiles, powKCurve, rateBars, referenceRun, stepBars, traceCompare } from "../src/report/charts.js";
 import type { BenchResult } from "../src/types.js";
 import type { Comparison } from "../src/compare.js";
 
@@ -30,6 +30,10 @@ const inv = bench("invoice-entry");
 const all = fs.readdirSync(EV).filter((d) => fs.existsSync(path.join(EV, d, "bench.json"))).map((d) => [d, bench(d)] as const)
   .sort((a, b) => b[1].metrics.n - a[1].metrics.n);
 const allFailures = all.flatMap(([, b]) => b.failures);
+/** Every scored run in the evidence, for the figures that read across benches. */
+const allRuns = all.flatMap(([, b]) => b.runs.filter((r) => r.status === "passed" || r.status === "failed").map((r) => ({ steps: r.steps.length, passed: r.status === "passed" })));
+const totalSpend = all.reduce((a, [, b]) => a + b.metrics.totalCostUsd, 0);
+const models = new Set(all.map(([, b]) => b.model));
 
 const dots = (b: BenchResult, dir: string) => dotsHtml(b.runs.map((r) => ({ status: r.status, runIndex: r.runIndex, steps: r.steps.length, errorKind: r.errorKind, stoppedBy: r.stoppedBy })), b.metrics.skipped, "", (i) => `${dir}/report.html#run-${i}`);
 const bars = (b: BenchResult, dir: string, h = 120, w = 520) => stepBars(b, w, h, (i) => `${dir}/report.html#run-${i}`);
@@ -42,6 +46,7 @@ const html = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>passk · reliability regression testing for computer-use agents</title>
 <meta name="description" content="A reliability bench for computer-use agents on Solari desktops: fork one snapshot k times, verify every outcome inside the VM, and find out why runs diverge.">
+${FONTS}
 <style>${CSS}${CHART_CSS}${QUIET_DOTS_CSS}
 .hero{margin:10px 0 34px}.hero h1{font-size:40px;line-height:1.1;max-width:760px}
 .hero p{font-size:17px;color:var(--ink-2);max-width:720px;margin:14px 0 0}
@@ -54,7 +59,7 @@ const html = `<!doctype html>
 .finding a.btn{display:inline-block;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);padding:5px 10px;border-radius:999px}
 .arrow{color:var(--ink-3);margin:0 8px}
 .two>*{min-width:0}
-.cap{font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin:14px 0 6px}
+.cap{font:12.5px var(--sans);color:var(--ink-3);margin:14px 0 6px}
 .key{display:flex;gap:14px;font-size:11.5px;color:var(--ink-3);margin-top:2px;flex-wrap:wrap}
 .key i{display:inline-block;width:14px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;counter-reset:s}
@@ -65,7 +70,7 @@ const html = `<!doctype html>
 <div class="brand"><b>passk</b> reliability regression testing for computer-use agents · built on Solari · outcomes verified inside the VM</div>
 <div class="hero">
   <h1>Your agent passed once. Will it pass again?</h1>
-  <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. Everything below was run on the cheapest model available, for under $4.</p>
+  <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. Below: ${allRuns.length} scored runs across ${all.length} benches on ${models.size === 1 ? `one model, <code>${esc([...models][0])}</code>` : `${models.size} models`}, for ${usd(totalSpend, 2)} of model spend in total.</p>
 </div>
 
 <h2>The number a user feels</h2>
@@ -127,6 +132,17 @@ const html = `<!doctype html>
 <div class="card" style="margin-top:14px"><h3 style="margin:0 0 4px;font-size:16px">Every failure, by cause</h3>
   <div style="font-size:13.5px;color:var(--ink-2)">${allFailures.length} failing runs across ${all.length} benches. The label is a hypothesis from a model reading the diff; the divergence step and the screenshots are the evidence.</div>
   ${causeBar(allFailures)}</div>
+
+<h2>Pass rate by effort</h2>
+<div class="two">
+  <div class="card">
+    ${decayCurve(allRuns, 520, 200)}
+    <div class="note" style="margin-top:4px">Every scored run in the evidence, banded by the steps it took. Points are the pass rate in each band, whiskers the 95% Wilson interval, the count under each band. Hover a point.</div>
+  </div>
+  <div class="card">
+    <p style="margin:4px 0 0;font-size:16px">Gonzalez-Pumariega et al. and Khanal et al. both report that reliability falls as tasks get longer. This figure is what that looks like across these benches. It is a description, not a law: a run that hits its step cap fails by construction and lands in the right-hand bands, and the longer tasks here are also the harder ones. What it argues for is reporting the spread of effort next to the pass rate, which every report on this site does.</p>
+  </div>
+</div>
 
 <h2>Three things it found</h2>
 <div class="findings">

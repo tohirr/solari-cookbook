@@ -11,7 +11,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { CSS, esc, pct } from "../src/report/theme.js";
+import { contentHeight, cropPng } from "./png.js";
+import { CSS, FONTS, esc, pct } from "../src/report/theme.js";
 import { CHART_CSS, referenceRun, traceCompare } from "../src/report/charts.js";
 import type { BenchResult } from "../src/types.js";
 
@@ -21,7 +22,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const bench = (name: string) => JSON.parse(fs.readFileSync(path.join(EV, name, "bench.json"), "utf8")) as BenchResult;
 
 const page = (title: string, body: string, extra = "") => `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>${esc(title)}</title><style>${CSS}${CHART_CSS}${extra}
+<html lang="en"><head><meta charset="utf-8"><title>${esc(title)}</title>${FONTS}<style>${CSS}${CHART_CSS}${extra}
 main{padding:40px 40px 32px}
 </style></head><body><main>${body}</main></body></html>`;
 
@@ -141,15 +142,18 @@ fs.writeFileSync(path.join(OUT, "how-it-works.html"), howItWorks);
   fs.writeFileSync(path.join(OUT, "compare-ticket-routing.html"), hero);
 }
 
-// 3. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
+// 4. Shoot them. Chrome and sips are macOS conveniences; the HTML is the artifact if they are missing.
 const chrome = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const shots: [string, string, number][] = [["failure-ticket-queue", "docs/failure-ticket-queue.jpg", 1000], ["how-it-works", "docs/how-it-works.jpg", 560], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg", 690]];
+const shots: [string, string][] = [["failure-ticket-queue", "docs/failure-ticket-queue.jpg"], ["how-it-works", "docs/how-it-works.jpg"], ["compare-ticket-routing", "docs/compare-ticket-routing.jpg"]];
 if (fs.existsSync(chrome)) {
-  for (const [name, dest, height] of shots) {
+  for (const [name, dest] of shots) {
     const png = path.join(OUT, `${name}.png`);
-    execFileSync(chrome, ["--headless=new", "--disable-gpu", "--hide-scrollbars", `--window-size=1280,${height}`, `--screenshot=${png}`, `file://${path.join(OUT, `${name}.html`)}`], { stdio: "ignore" });
+    execFileSync(chrome, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--virtual-time-budget=4000", "--window-size=1280,1800", `--screenshot=${png}`, `file://${path.join(OUT, `${name}.html`)}`], { stdio: "ignore" });
+    const tall = fs.readFileSync(png);
+    const height = contentHeight(tall, [0xfb, 0xfa, 0xf7]);
+    fs.writeFileSync(png, cropPng(tall, height));
     execFileSync("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "70", png, "--out", dest], { stdio: "ignore" });
-    console.log(`${dest} (${(fs.statSync(dest).size / 1024).toFixed(0)} KB)`);
+    console.log(`${dest} 1280×${height} (${(fs.statSync(dest).size / 1024).toFixed(0)} KB)`);
   }
 } else {
   console.log(`no Chrome at ${chrome}; HTML written to ${OUT}`);

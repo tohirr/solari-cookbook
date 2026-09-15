@@ -9,7 +9,7 @@ import path from "node:path";
 import type { Comparison } from "../compare.js";
 import type { BenchResult } from "../types.js";
 import { percentile } from "../metrics.js";
-import { CSS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, tailStat, usd, wordDiffHtml } from "./theme.js";
+import { CSS, FONTS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, tailStat, usd, wordDiffHtml } from "./theme.js";
 
 const runDir = (i: number) => `run-${String(i).padStart(2, "0")}`;
 
@@ -72,12 +72,12 @@ export function renderCompare(c: Comparison, A: BenchResult, B: BenchResult, out
 
   // The prompt once, not twice: as a word diff when it is what changed, so the reader sees the one edit rather than re-reading two paragraphs.
   const promptBlock = c.changed.includes("prompt")
-    ? `<div class="diff"><div style="color:var(--ink-3);font-size:11px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px">prompt · <del>A</del> → <ins>B</ins></div>${wordDiffHtml(A.prompt, B.prompt)}</div>`
+    ? `<div class="diff"><div style="font:12.5px var(--sans);color:var(--ink-3);margin-bottom:6px">prompt · <del>A</del> → <ins>B</ins></div>${wordDiffHtml(A.prompt, B.prompt)}</div>`
     : `<blockquote class="prompt">${esc(A.prompt.trim())}</blockquote>`;
 
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk · ${esc(A.taskName)} vs ${esc(B.taskName)}</title><style>${CSS}</style></head><body><main>
+<title>passk · ${esc(A.taskName)} vs ${esc(B.taskName)}</title>${FONTS}<style>${CSS}</style></head><body><main>
 <div class="brand"><b>passk</b> controlled comparison · outcomes verified inside the VM</div>
 <h1>${esc(changedLabel.charAt(0).toUpperCase() + changedLabel.slice(1))} changed. Did reliability?</h1>
 <div class="meta">held fixed: ${c.heldFixed.map((h) => `<code>${esc(h)}</code>`).join(" ")} · changed: ${c.changed.map((h) => `<code>${esc(h)}</code>`).join(" ") || "nothing"} · <code>${esc(A.model)}</code></div>

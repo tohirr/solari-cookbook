@@ -9,7 +9,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { PRICES, wilson } from "../metrics.js";
-import { esc, usd } from "./theme.js";
+import { CSS, FONTS, esc, usd } from "./theme.js";
 import type { BenchResult } from "../types.js";
 
 /** The shapes on the board: which tasks belong to each, how each condition is named, and the words that map a use case to it. */
@@ -121,106 +121,89 @@ export function renderBoard(page: BoardPage): string {
   const models = [...Object.keys(PRICES), "scripted"];
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>passk${studio ? " studio" : ""} · which model can actually do your computer task, reliably?</title>
+<title>passk${studio ? " studio" : ""} · results board</title>
 <meta name="description" content="Results for computer-use agents by task shape: every row is k forks of one desktop snapshot, graded inside the VM. Pass rate with its interval, pass^5 and cost per success.">
-<meta property="og:title" content="passk · which model can actually do your computer task, reliably?">
-<meta property="og:description" content="${totals.runs} verified runs across ${shapes.length} task shapes. Pick yours, compare models on the chance it works every time.">
+<meta property="og:title" content="passk · results board">
+<meta property="og:description" content="${totals.runs} verified runs across ${shapes.length} task shapes. Every row is k forks of one desktop snapshot, graded inside the VM.">
 <meta property="og:image" content="https://tohirr.github.io/solari-cookbook/passk/docs/compare-ticket-queue.jpg">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2322c55e'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='%230e0f12' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0e0f12;--surface:#15171c;--surface-2:#1b1e25;--line:#262a33;--line-2:#333845;--ink:#eceef2;--ink-2:#a3a9b7;--ink-3:#6b7180;--good:#22c55e;--good-dim:rgba(34,197,94,.22);--crit:#e5484d;--crit-dim:rgba(229,72,77,.22);--warn:#f5a524;--warn-dim:rgba(245,165,36,.18);--a:#3987e5;--a-dim:rgba(57,135,229,.22);--accent:#f5c518;--accent-ink:#141306;
---sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-*{box-sizing:border-box}
-html{background:var(--bg)}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
-a{color:var(--ink-2)}a:hover{color:var(--ink)}
-code{font:12.5px var(--mono);color:var(--ink-2)}
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230ca30c'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='%23fbfaf7' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+${FONTS}
+<style>${CSS}
 .bar{border-bottom:1px solid var(--line)}
-.bar .in{max-width:1120px;margin:0 auto;padding:0 28px;height:58px;display:flex;align-items:center;gap:14px}
-.logo{font-weight:700;font-size:15px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:9px}
-.logo i{width:12px;height:12px;border-radius:50%;background:var(--good);display:inline-block}
-.logo span{color:var(--ink-3);font-weight:500}
+.bar .in{max-width:920px;margin:0 auto;padding:0 32px;height:56px;display:flex;align-items:center;gap:14px;font-family:var(--sans)}
+.logo{font:600 15px var(--sans);color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:9px}
+.logo i{width:10px;height:10px;border-radius:50%;background:var(--good);display:inline-block}
+.logo span{color:var(--ink-3);font-weight:400}
 .bar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line-2);background:transparent;padding:7px 12px;border-radius:10px;cursor:pointer;font-family:var(--sans);line-height:1;white-space:nowrap}
-.btn:hover{background:var(--surface-2);color:var(--ink)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.primary:hover{filter:brightness(1.06);color:var(--accent-ink)}
-.btn.danger{color:var(--crit);border-color:var(--crit-dim)}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 13px var(--sans);color:var(--ink);text-decoration:none;border:1px solid var(--line-2);background:transparent;padding:7px 12px;border-radius:999px;cursor:pointer;line-height:1;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}.btn.primary:hover{background:var(--ink-2)}
+.btn.danger{color:var(--crit-ink);border-color:var(--crit)}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-main{max-width:1120px;margin:0 auto;padding:64px 28px 60px}
-h1{font-size:46px;line-height:1.05;letter-spacing:-.035em;font-weight:600;margin:0 0 14px;max-width:820px}
-@media(max-width:560px){h1{font-size:34px}}
-.sub{font-size:17px;color:var(--ink-2);max-width:640px;margin:0 0 34px}
+main{padding-top:44px}
+h1{font-size:34px;max-width:760px}
+.sub{font-size:18px;color:var(--ink-2);max-width:var(--measure);margin:0 0 30px}
 .sub b{color:var(--ink);font-weight:600}
-.ask{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px 6px 6px 16px;margin-bottom:14px}
+.ask{display:flex;align-items:center;gap:12px;border:1px solid var(--line-2);border-radius:999px;padding:4px 6px 4px 16px;margin-bottom:14px;background:var(--surface)}
 .ask svg{flex:none}
-.ask input{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:15px var(--sans);padding:10px 0;outline:none}
+.ask input{flex:1;min-width:0;background:transparent;border:0;color:var(--ink);font:15px var(--sans);padding:8px 0;outline:none}
 .ask input::placeholder{color:var(--ink-3)}
-.ask .match{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--line-2);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.ask .match{font:12.5px var(--sans);color:var(--ink-2);background:var(--surface-2);border-radius:999px;padding:4px 10px;white-space:nowrap}
 .ask .match b{color:var(--ink);font-weight:600}
-@media(max-width:640px){.ask{flex-wrap:wrap}.ask .match{width:100%;text-align:center}}
+@media(max-width:640px){.ask{flex-wrap:wrap;border-radius:14px}.ask .match{width:100%;text-align:center}}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
-.chip{font-size:13px;font-weight:500;color:var(--ink-2);border:1px solid var(--line-2);background:transparent;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:var(--sans)}
+.chip{font:500 13px var(--sans);color:var(--ink-2);border:1px solid var(--line-2);background:transparent;padding:7px 14px;border-radius:999px;cursor:pointer}
 .chip:hover{color:var(--ink);background:var(--surface-2)}
-.chip.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent);font-weight:600}
+.chip.on{color:var(--bg);background:var(--ink);border-color:var(--ink);font-weight:600}
 .chip.more{color:var(--ink-3);border-style:dashed;text-decoration:none}
 .head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
-.head h2{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0}
-.head .blurb{font-size:13.5px;color:var(--ink-3);max-width:560px}
-.head .k{font-size:13px;color:var(--ink-2);white-space:nowrap}
-.head .k code{color:var(--ink);background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;padding:3px 9px}
-.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:900px}
-th{text-align:left;color:var(--ink-3);font-weight:500;font-size:12px;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
-td{padding:13px 14px;border-top:1px solid var(--line);font-size:13.5px;vertical-align:middle}
-tr:first-child td{border-top:0}
-th.num,td.num{text-align:right;font-family:var(--mono);font-size:12.5px}
+.head h2{margin:0;padding:0;border:0}
+.head .blurb{font:14px var(--sans);color:var(--ink-3);max-width:560px}
+.head .k{font:13px var(--sans);color:var(--ink-2);white-space:nowrap}
+.board{border-top:1px solid var(--line);overflow-x:auto}
+.board table{min-width:900px}
+.board th{white-space:nowrap}
+.board td{vertical-align:middle;font-size:14px}
 td.dim{color:var(--ink-3)}
-.model{min-width:180px}.model b{font-weight:600;display:block;white-space:nowrap}.model span{font-size:12px;color:var(--ink-3)}
+.model{min-width:180px}.model b{font-weight:600;display:block;white-space:nowrap}.model span{font:12.5px var(--sans);color:var(--ink-3)}
 .rate{display:flex;align-items:center;gap:10px;min-width:230px}
 .rate .track{position:relative;flex:1;height:8px;background:var(--surface-2);border-radius:4px}
-.rate .band{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.28);border-radius:4px}
-.rate .pt{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;background:var(--good);transform:translateX(-50%)}
+.rate .band{position:absolute;top:0;bottom:0;background:var(--good);opacity:.22;border-radius:4px}
+.rate .pt{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--good);border:2px solid var(--bg);transform:translateX(-50%)}
 .rate .fill{position:absolute;top:0;bottom:0;left:0;background:var(--a-dim);border-radius:4px}
-.rate .v{font:12.5px var(--mono);color:var(--ink);width:118px;text-align:right;white-space:nowrap}
+.rate .v{font:13px var(--mono);color:var(--ink);width:118px;text-align:right;white-space:nowrap}
 .rate .v span{color:var(--ink-3)}
-.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
-.pill.ok{background:var(--good-dim);color:var(--good)}.pill.no{background:var(--surface-2);color:var(--ink-2)}.pill.local{background:var(--a-dim);color:var(--a)}.pill.live{background:var(--warn-dim);color:var(--warn)}
-.fails{font-size:12.5px;color:var(--ink-2);min-width:150px;max-width:200px}
-.cmd{display:none;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font:12px/1.6 var(--mono);color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px}
+.pill.ok{background:var(--good-dim);color:var(--good-ink)}.pill.no{background:var(--surface-2);color:var(--ink-2)}.pill.local{background:var(--a-dim);color:var(--ink)}.pill.live{background:var(--warn-dim);color:var(--warn)}
+.fails{font:13px var(--sans);color:var(--ink-2);min-width:150px;max-width:200px}
+.cmd{display:none;background:var(--surface-2);border-radius:var(--radius);padding:10px 12px;font:12px/1.6 var(--mono);color:var(--ink-2);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px}
 tr.open .cmd{display:block}
-.note{font-size:12.5px;color:var(--ink-3);margin-top:10px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
-.card h3{margin:0 0 4px;font-size:16px;font-weight:600;letter-spacing:-.01em}
-.card .hint{font-size:13px;color:var(--ink-3);margin:0 0 14px}
+.card h3{margin:0 0 4px}
+.card .hint{font:14px var(--sans);color:var(--ink-3);margin:0 0 14px;max-width:var(--measure)}
 .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end}
-.field label{display:block;font-size:11.5px;color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:5px}
-.field input,.field select{width:100%;background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink);border-radius:8px;padding:8px 10px;font:14px var(--sans)}
+.field label{display:block;font:12.5px var(--sans);color:var(--ink-3);margin-bottom:5px}
+.field input,.field select{width:100%;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:var(--radius);padding:8px 10px;font:14px var(--sans)}
 .field input::placeholder{color:var(--ink-3)}
 .keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;align-items:end}
-.keys .field label span{margin-left:8px;text-transform:none;letter-spacing:0}
+.keys .field label span{margin-left:8px}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
-.row .est{font-size:13px;color:var(--ink-2)}.row .est b{color:var(--ink)}
-.msg{font-size:13px;margin-top:10px;color:var(--ink-2)}.msg.bad{color:var(--crit)}.msg.good{color:var(--good)}
+.row .est{font:13px var(--sans);color:var(--ink-2)}.row .est b{color:var(--ink)}
+.msg{font:13px var(--sans);margin-top:10px;color:var(--ink-2)}.msg.bad{color:var(--crit-ink)}.msg.good{color:var(--good-ink)}
 .jobs{display:grid;gap:10px;margin-top:14px}
-.job{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.job{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border-top:1px solid var(--line);padding:12px 0;font-family:var(--sans)}
 .job b{font-weight:600}.job .sub2{font-size:12.5px;color:var(--ink-2);margin-top:2px}
 .job .log{font:11.5px/1.5 var(--mono);color:var(--ink-3);margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:60px;overflow:hidden}
-.job .bar2{height:6px;background:var(--bg);border-radius:3px;margin-top:8px;overflow:hidden}.job .bar2 i{display:block;height:100%;background:var(--accent)}
-.fine{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
-.fine a{color:var(--ink-2)}
-.check{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--ink-2)}
+.job .bar2{height:6px;background:var(--surface-2);border-radius:3px;margin-top:8px;overflow:hidden}.job .bar2 i{display:block;height:100%;background:var(--a)}
+.fine{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font:13.5px/1.55 var(--sans);color:var(--ink-3);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.check{display:flex;gap:8px;align-items:center;font:13px var(--sans);color:var(--ink-2)}
 .check input{width:auto}
 </style></head><body>
 <div class="bar"><div class="in">
   <a class="logo" href="./"><i></i>passk${studio ? " <span>studio · local</span>" : ""}</a>
-  <div class="right"><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a>${studio ? `<a class="btn" href="https://tohirr.github.io/solari-cookbook/passk/">Published board</a>` : `<a class="btn primary" href="https://github.com/tohirr/solari-cookbook/tree/main/passk#setup">Run your own task</a>`}</div>
+  <div class="right"><a class="btn" href="https://github.com/tohirr/solari-cookbook/tree/main/passk">GitHub</a>${studio ? `<a class="btn" href="https://tohirr.github.io/solari-cookbook/passk/">Published board</a>` : `<a class="btn primary" href="./docs/tasks.html#setup">Run your own task</a>`}</div>
 </div></div>
 <main>
-  <h1>Which model can actually do your computer task, reliably?</h1>
-  <p class="sub">Pick the shape of your task. Every row is <b>k forks of one desktop snapshot</b>, same prompt, and every outcome is graded <b>inside the VM</b>, never by what the agent says.${studio ? " Runs start from this page and use the keys on this machine." : " Browsing is free. Running is one command."}</p>
+  <h1>Every row is one agent, run <i>k</i> times from one snapshot.</h1>
+  <p class="sub">Pick the shape of your task. Each row forks one desktop snapshot <b>k</b> times with the same prompt and grades every fork <b>inside the VM</b>, never by what the agent says. Rows are conditions, not a leaderboard: the question is whether <b>your</b> agent is dependable on <b>your</b> workflow.${studio ? " Runs start from this page and use the keys on this machine." : " Browsing is free. Running is one command."}</p>
 
   <form class="ask" id="ask" onsubmit="return false">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7180" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
@@ -269,7 +252,7 @@ tr.open .cmd{display:block}
 
   <div class="fine">
     <div id="totals">${totals.runs} verified runs · ${shapes.length} task shapes · ${totals.models} model${totals.models === 1 ? "" : "s"} with evidence · ${usd(totals.spend, 2)} of model spend in total. Every number on this page is read from ${studio ? "the bench files in <code>evidence/</code> and <code>runs/</code>" : `<a href="evidence/">the published bench files</a>`}.</div>
-    <div><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/METHOD.md">How it is measured</a> · <a href="evidence/index.html">Evidence and findings</a> · <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/docs/TASKS.md">Write a task</a> · built on <a href="https://getsolari.com">Solari</a></div>
+    <div><a href="./">Manual</a> · <a href="docs/method.html">How it is measured</a> · <a href="evidence/index.html">Evidence and findings</a> · <a href="docs/tasks.html">Write a task</a> · built on <a href="https://getsolari.com">Solari</a></div>
   </div>
 </main>
 <script>
