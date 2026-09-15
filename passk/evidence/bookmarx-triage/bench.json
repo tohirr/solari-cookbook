@@ -1,0 +1,6455 @@
+{
+  "status": "complete",
+  "taskId": "bookmarx-triage",
+  "taskName": "Sweep a library's review queue before a public demo",
+  "prompt": "The review queue is open in the browser: posts flagged for a look before my saved-posts library goes public in a portfolio demo. Go through every post in the queue and press Remove or Keep on each one. Remove anything sexual or suggestive; anything about politics, elections or politicians; anything hateful or that mocks a group; anything gory or violent for shock; anything that only makes sense to one local community, like local gossip or local celebrities; and anything about my own friends, family or private life. Keep everything else, including things that only look edgy: scenes from films and anime, cosplay, sport, history, and ordinary jokes and memes. Only decide posts in the queue; leave the rest of the library alone.\n",
+  "model": "gpt-5.6-luna",
+  "snapshotId": "snap_dlfj9oj5ktz8",
+  "k": 10,
+  "startedAt": "2026-09-15T05:56:31.616Z",
+  "finishedAt": "2026-09-15T06:12:51.856Z",
+  "runs": [
+    {
+      "runIndex": 0,
+      "sessionId": "Aok0Rc_xeMBdgWF1hiqM_HuOZsfZ0yLT6xLiiFsxgyMqdVYgZfxmF8e2FWcz3G6ewwJh42cL89nOpP8C7r3c_AveDRl2FG__8Vdl45kz7k1MZLCgG8YDrSLU5ZGBWCFW5Iwat1ilGhGr1DYT5xk.NAqC7WfRFBRb1N9OVdI0Y_MPME_JQbnrZiWT5ycQruE",
+      "status": "passed",
+      "startedAt": "2026-09-15T05:56:31.682Z",
+      "finishedAt": "2026-09-15T06:00:20.185Z",
+      "durationMs": 228503,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T05:57:23.848Z",
+          "durationMs": 397
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T05:57:24.245Z",
+          "durationMs": 367
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:28.932Z",
+          "durationMs": 682
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 225
+          },
+          "startedAt": "2026-09-15T05:57:35.538Z",
+          "durationMs": 375
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T05:57:35.913Z",
+          "durationMs": 385
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T05:57:36.298Z",
+          "durationMs": 381
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:41.557Z",
+          "durationMs": 825
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 249
+          },
+          "startedAt": "2026-09-15T05:57:50.698Z",
+          "durationMs": 747
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T05:57:51.445Z",
+          "durationMs": 395
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T05:57:51.841Z",
+          "durationMs": 370
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:57.089Z",
+          "durationMs": 698
+        },
+        {
+          "index": 11,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 300,
+            "direction": "up",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T05:58:04.961Z",
+          "durationMs": 641
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 634
+          },
+          "startedAt": "2026-09-15T05:58:14.133Z",
+          "durationMs": 367
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:58:20.757Z",
+          "durationMs": 688
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 278
+          },
+          "startedAt": "2026-09-15T05:58:27.563Z",
+          "durationMs": 400
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 486
+          },
+          "startedAt": "2026-09-15T05:58:27.963Z",
+          "durationMs": 384
+        },
+        {
+          "index": 16,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 692
+          },
+          "startedAt": "2026-09-15T05:58:28.347Z",
+          "durationMs": 461
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:58:35.519Z",
+          "durationMs": 878
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 324
+          },
+          "startedAt": "2026-09-15T05:58:42.799Z",
+          "durationMs": 513
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 529
+          },
+          "startedAt": "2026-09-15T05:58:43.312Z",
+          "durationMs": 379
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T05:58:48.631Z",
+          "durationMs": 885
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 243
+          },
+          "startedAt": "2026-09-15T05:58:58.071Z",
+          "durationMs": 351
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 451
+          },
+          "startedAt": "2026-09-15T05:58:58.422Z",
+          "durationMs": 361
+        },
+        {
+          "index": 23,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T05:58:58.783Z",
+          "durationMs": 406
+        },
+        {
+          "index": 24,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 200,
+            "direction": "up",
+            "amount": 30
+          },
+          "startedAt": "2026-09-15T05:59:06.794Z",
+          "durationMs": 1461
+        },
+        {
+          "index": 25,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 13
+          },
+          "startedAt": "2026-09-15T05:59:16.986Z",
+          "durationMs": 934
+        },
+        {
+          "index": 26,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 200,
+            "direction": "up",
+            "amount": 7
+          },
+          "startedAt": "2026-09-15T05:59:26.469Z",
+          "durationMs": 816
+        },
+        {
+          "index": 27,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T05:59:33.867Z",
+          "durationMs": 653
+        },
+        {
+          "index": 28,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 366
+          },
+          "startedAt": "2026-09-15T05:59:39.960Z",
+          "durationMs": 1028
+        },
+        {
+          "index": 29,
+          "name": "left_click",
+          "input": {
+            "x": 334,
+            "y": 367
+          },
+          "startedAt": "2026-09-15T05:59:49.454Z",
+          "durationMs": 431
+        },
+        {
+          "index": 30,
+          "name": "left_click",
+          "input": {
+            "x": 400,
+            "y": 366
+          },
+          "startedAt": "2026-09-15T05:59:57.824Z",
+          "durationMs": 588
+        },
+        {
+          "index": 31,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 369
+          },
+          "startedAt": "2026-09-15T06:00:04.378Z",
+          "durationMs": 387
+        },
+        {
+          "index": 32,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 queue posts; 9 were removed and 8 were kept."
+          },
+          "startedAt": "2026-09-15T06:00:10.824Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 queue posts; 9 were removed and 8 were kept.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 652
+        }
+      ],
+      "usage": {
+        "inputTokens": 180562,
+        "outputTokens": 1914,
+        "costUsd": 0.038409200000000004
+      }
+    },
+    {
+      "runIndex": 1,
+      "sessionId": "AtLmBXYE68aXvAPqClk-DZyL6NR_v71CE4qnlQ5g4_E_Haz5qcBioIGYsq8reAHsAatThXP6hiYbfBQQmZgzKzmXR0cPd84zKG9X19VheOD1VRY3XQUP7B1UPV1KeO26NCx6nVC_IS6so8PYD2Q.8pPMApIHUh5kamB3NSXp5WqRf7f4CgqIhSDilWpp1x4",
+      "status": "failed",
+      "startedAt": "2026-09-15T05:56:31.683Z",
+      "finishedAt": "2026-09-15T05:59:13.943Z",
+      "durationMs": 162260,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T05:57:23.603Z",
+          "durationMs": 384
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T05:57:23.987Z",
+          "durationMs": 390
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:28.635Z",
+          "durationMs": 696
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 227
+          },
+          "startedAt": "2026-09-15T05:57:35.096Z",
+          "durationMs": 382
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T05:57:35.478Z",
+          "durationMs": 367
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T05:57:35.845Z",
+          "durationMs": 368
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:40.600Z",
+          "durationMs": 755
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 249
+          },
+          "startedAt": "2026-09-15T05:57:47.831Z",
+          "durationMs": 675
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T05:57:48.506Z",
+          "durationMs": 388
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T05:57:48.894Z",
+          "durationMs": 392
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:57:55.614Z",
+          "durationMs": 694
+        },
+        {
+          "index": 11,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 250,
+            "direction": "up",
+            "amount": 2
+          },
+          "startedAt": "2026-09-15T05:58:01.927Z",
+          "durationMs": 611
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 513
+          },
+          "startedAt": "2026-09-15T05:58:09.486Z",
+          "durationMs": 412
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T05:58:16.243Z",
+          "durationMs": 772
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 279
+          },
+          "startedAt": "2026-09-15T05:58:24.177Z",
+          "durationMs": 356
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 486
+          },
+          "startedAt": "2026-09-15T05:58:24.536Z",
+          "durationMs": 362
+        },
+        {
+          "index": 16,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 691
+          },
+          "startedAt": "2026-09-15T05:58:24.898Z",
+          "durationMs": 373
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:58:32.843Z",
+          "durationMs": 714
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 323
+          },
+          "startedAt": "2026-09-15T05:58:40.157Z",
+          "durationMs": 381
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 529
+          },
+          "startedAt": "2026-09-15T05:58:40.538Z",
+          "durationMs": 362
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T05:58:46.637Z",
+          "durationMs": 781
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 243
+          },
+          "startedAt": "2026-09-15T05:58:54.933Z",
+          "durationMs": 374
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 450
+          },
+          "startedAt": "2026-09-15T05:58:55.307Z",
+          "durationMs": 379
+        },
+        {
+          "index": 23,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T05:58:55.686Z",
+          "durationMs": 353
+        },
+        {
+          "index": 24,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 queue posts; 8 were removed and 9 were kept."
+          },
+          "startedAt": "2026-09-15T05:59:04.936Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: target 6 (hateful) is still present\\n\""
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 queue posts; 8 were removed and 9 were kept.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 650
+        }
+      ],
+      "usage": {
+        "inputTokens": 105218,
+        "outputTokens": 1337,
+        "costUsd": 0.022648000000000005
+      }
+    },
+    {
+      "runIndex": 2,
+      "sessionId": "AlT0Pqw7q7bhlulJNRyRRlE0OMUqVLcq1MYlH0IaKHtG5kNx2__1kzaaGOvlekalgTVxCZ0Uflr9x93VvWEtifQUwzBeSQwoP0OqMa7rGJarxdzPIsvXT-x-n8Dm4G-6ntRoEgH9yonQrGzL9cw.9xpJN1DHUfxl0mBZXrhoIJTzrCKpQzPNAs2_A5Ks5hE",
+      "status": "passed",
+      "startedAt": "2026-09-15T05:59:14.760Z",
+      "finishedAt": "2026-09-15T06:02:14.276Z",
+      "durationMs": 179516,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T05:59:50.543Z",
+          "durationMs": 996
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 342,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T05:59:51.540Z",
+          "durationMs": 407
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1101,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T05:59:55.970Z",
+          "durationMs": 700
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:00:03.571Z",
+          "durationMs": 421
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:00:03.992Z",
+          "durationMs": 416
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T06:00:04.408Z",
+          "durationMs": 373
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1102,
+            "y": 670,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:00:10.682Z",
+          "durationMs": 688
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T06:00:18.122Z",
+          "durationMs": 378
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T06:00:18.500Z",
+          "durationMs": 357
+        },
+        {
+          "index": 9,
+          "name": "scroll",
+          "input": {
+            "x": 1106,
+            "y": 208,
+            "direction": "up",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:00:24.823Z",
+          "durationMs": 615
+        },
+        {
+          "index": 10,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 610
+          },
+          "startedAt": "2026-09-15T06:00:31.256Z",
+          "durationMs": 390
+        },
+        {
+          "index": 11,
+          "name": "scroll",
+          "input": {
+            "x": 1108,
+            "y": 672,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:00:36.340Z",
+          "durationMs": 744
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 514
+          },
+          "startedAt": "2026-09-15T06:00:43.282Z",
+          "durationMs": 380
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1105,
+            "y": 676,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:00:49.437Z",
+          "durationMs": 703
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 366
+          },
+          "startedAt": "2026-09-15T06:01:00.770Z",
+          "durationMs": 383
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 572
+          },
+          "startedAt": "2026-09-15T06:01:01.153Z",
+          "durationMs": 380
+        },
+        {
+          "index": 16,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 674,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:01:08.294Z",
+          "durationMs": 756
+        },
+        {
+          "index": 17,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 208
+          },
+          "startedAt": "2026-09-15T06:01:15.716Z",
+          "durationMs": 396
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 416
+          },
+          "startedAt": "2026-09-15T06:01:16.112Z",
+          "durationMs": 377
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 622
+          },
+          "startedAt": "2026-09-15T06:01:16.489Z",
+          "durationMs": 386
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1106,
+            "y": 674,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:01:23.684Z",
+          "durationMs": 711
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 429
+          },
+          "startedAt": "2026-09-15T06:01:31.387Z",
+          "durationMs": 383
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:01:31.771Z",
+          "durationMs": 383
+        },
+        {
+          "index": 23,
+          "name": "scroll",
+          "input": {
+            "x": 1109,
+            "y": 204,
+            "direction": "up",
+            "amount": 7
+          },
+          "startedAt": "2026-09-15T06:01:39.747Z",
+          "durationMs": 773
+        },
+        {
+          "index": 24,
+          "name": "scroll",
+          "input": {
+            "x": 1109,
+            "y": 183,
+            "direction": "up",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:01:46.152Z",
+          "durationMs": 737
+        },
+        {
+          "index": 25,
+          "name": "scroll",
+          "input": {
+            "x": 1107,
+            "y": 674,
+            "direction": "down",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:01:53.644Z",
+          "durationMs": 674
+        },
+        {
+          "index": 26,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 390
+          },
+          "startedAt": "2026-09-15T06:02:00.132Z",
+          "durationMs": 382
+        },
+        {
+          "index": 27,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 posts in the queue, removing 9 and keeping 8."
+          },
+          "startedAt": "2026-09-15T06:02:06.380Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 posts in the queue, removing 9 and keeping 8.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 652
+        }
+      ],
+      "usage": {
+        "inputTokens": 150543,
+        "outputTokens": 1466,
+        "costUsd": 0.0318678
+      }
+    },
+    {
+      "runIndex": 3,
+      "sessionId": "Amg1kI-NEh_7c0uPXwzeoBzlT1m9rOL8MFac6yKuKHnPKifiOYN-bzbSY5VYHWZmQ7AnBXtpW5VSMUgrOPE9f6LiOE79fiZfCktBnVaRiQyHahQsCBhFlbaJ7TIDlBAdJscowv-KxNqbzHxMOfo.3fAhgcJZlMvZJUXdi6NttCBhAdPsVdEK1bQSHeBO0pc",
+      "status": "failed",
+      "startedAt": "2026-09-15T06:00:21.576Z",
+      "finishedAt": "2026-09-15T06:02:32.274Z",
+      "durationMs": 130698,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 342,
+            "y": 431
+          },
+          "startedAt": "2026-09-15T06:00:52.795Z",
+          "durationMs": 366
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 607
+          },
+          "startedAt": "2026-09-15T06:00:53.161Z",
+          "durationMs": 366
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:00:57.558Z",
+          "durationMs": 766
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 431,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:01:03.628Z",
+          "durationMs": 420
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 431
+          },
+          "startedAt": "2026-09-15T06:01:04.048Z",
+          "durationMs": 378
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T06:01:04.426Z",
+          "durationMs": 379
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:01:09.244Z",
+          "durationMs": 981
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 249
+          },
+          "startedAt": "2026-09-15T06:01:15.833Z",
+          "durationMs": 380
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T06:01:16.213Z",
+          "durationMs": 437
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T06:01:16.650Z",
+          "durationMs": 385
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:01:23.742Z",
+          "durationMs": 811
+        },
+        {
+          "index": 11,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 273
+          },
+          "startedAt": "2026-09-15T06:01:31.615Z",
+          "durationMs": 452
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 526
+          },
+          "startedAt": "2026-09-15T06:01:32.068Z",
+          "durationMs": 397
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:01:38.939Z",
+          "durationMs": 686
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 240
+          },
+          "startedAt": "2026-09-15T06:01:46.051Z",
+          "durationMs": 384
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 446
+          },
+          "startedAt": "2026-09-15T06:01:46.435Z",
+          "durationMs": 400
+        },
+        {
+          "index": 16,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 695
+          },
+          "startedAt": "2026-09-15T06:01:46.835Z",
+          "durationMs": 380
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:01:53.166Z",
+          "durationMs": 720
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 284
+          },
+          "startedAt": "2026-09-15T06:02:00.771Z",
+          "durationMs": 375
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 489
+          },
+          "startedAt": "2026-09-15T06:02:01.147Z",
+          "durationMs": 485
+        },
+        {
+          "index": 20,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 695
+          },
+          "startedAt": "2026-09-15T06:02:01.632Z",
+          "durationMs": 415
+        },
+        {
+          "index": 21,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:02:08.411Z",
+          "durationMs": 844
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:02:17.746Z",
+          "durationMs": 488
+        },
+        {
+          "index": 23,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 queued posts; 8 were removed and 9 were kept."
+          },
+          "startedAt": "2026-09-15T06:02:24.216Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: target 6 (hateful) is still present\\n\""
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 queued posts; 8 were removed and 9 were kept.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 650
+        }
+      ],
+      "usage": {
+        "inputTokens": 97512,
+        "outputTokens": 1253,
+        "costUsd": 0.021006
+      }
+    },
+    {
+      "runIndex": 4,
+      "sessionId": "Auomrv2TNz8oaC1z8OsCh5aIgdYx7uq-4p0qi89-tIOwrBYwWODKUVRP85CouT3ZODyuv_H_21nuymvWaH4qdGGCsUhHfMXAdc3LhyLyXtXIqSGQCuFOUcBpQeA0ivM8nrHkNM8xY7CrN52zZNA.qvROBBOFagZ_457F174FahrI7dluW9jUyE8zgoSn7hA",
+      "status": "passed",
+      "startedAt": "2026-09-15T06:02:15.140Z",
+      "finishedAt": "2026-09-15T06:06:13.891Z",
+      "durationMs": 238751,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:02:42.013Z",
+          "durationMs": 369
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 609
+          },
+          "startedAt": "2026-09-15T06:02:42.382Z",
+          "durationMs": 394
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1114,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:02:46.735Z",
+          "durationMs": 731
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:02:53.292Z",
+          "durationMs": 445
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:02:53.738Z",
+          "durationMs": 384
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 661
+          },
+          "startedAt": "2026-09-15T06:02:54.122Z",
+          "durationMs": 439
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1111,
+            "y": 652,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:02:59.693Z",
+          "durationMs": 686
+        },
+        {
+          "index": 7,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 190,
+            "direction": "up",
+            "amount": 2
+          },
+          "startedAt": "2026-09-15T06:03:06.553Z",
+          "durationMs": 660
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 490
+          },
+          "startedAt": "2026-09-15T06:03:13.186Z",
+          "durationMs": 375
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 690
+          },
+          "startedAt": "2026-09-15T06:03:19.792Z",
+          "durationMs": 388
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1108,
+            "y": 656,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:03:28.346Z",
+          "durationMs": 773
+        },
+        {
+          "index": 11,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 400
+          },
+          "startedAt": "2026-09-15T06:03:36.153Z",
+          "durationMs": 384
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 651
+          },
+          "startedAt": "2026-09-15T06:03:36.538Z",
+          "durationMs": 384
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1105,
+            "y": 658,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:03:43.007Z",
+          "durationMs": 744
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 332
+          },
+          "startedAt": "2026-09-15T06:03:53.815Z",
+          "durationMs": 391
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 575
+          },
+          "startedAt": "2026-09-15T06:04:00.227Z",
+          "durationMs": 413
+        },
+        {
+          "index": 16,
+          "name": "scroll",
+          "input": {
+            "x": 1103,
+            "y": 180,
+            "direction": "up",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:06.801Z",
+          "durationMs": 679
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1097,
+            "y": 658,
+            "direction": "down",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:04:13.711Z",
+          "durationMs": 622
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 366
+          },
+          "startedAt": "2026-09-15T06:04:20.026Z",
+          "durationMs": 385
+        },
+        {
+          "index": 19,
+          "name": "scroll",
+          "input": {
+            "x": 1106,
+            "y": 657,
+            "direction": "down",
+            "amount": 8
+          },
+          "startedAt": "2026-09-15T06:04:28.706Z",
+          "durationMs": 921
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 200,
+            "direction": "up",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:36.310Z",
+          "durationMs": 739
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 650
+          },
+          "startedAt": "2026-09-15T06:04:50.704Z",
+          "durationMs": 376
+        },
+        {
+          "index": 22,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 658,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:04:58.448Z",
+          "durationMs": 713
+        },
+        {
+          "index": 23,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 222
+          },
+          "startedAt": "2026-09-15T06:05:05.836Z",
+          "durationMs": 381
+        },
+        {
+          "index": 24,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 428
+          },
+          "startedAt": "2026-09-15T06:05:11.800Z",
+          "durationMs": 463
+        },
+        {
+          "index": 25,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:05:17.592Z",
+          "durationMs": 401
+        },
+        {
+          "index": 26,
+          "name": "key",
+          "input": {
+            "keys": "ctrl+home"
+          },
+          "startedAt": "2026-09-15T06:05:24.454Z",
+          "durationMs": 296
+        },
+        {
+          "index": 27,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:05:29.830Z",
+          "durationMs": 712
+        },
+        {
+          "index": 28,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:05:36.690Z",
+          "durationMs": 744
+        },
+        {
+          "index": 29,
+          "name": "scroll",
+          "input": {
+            "x": 1103,
+            "y": 650,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:05:43.934Z",
+          "durationMs": 832
+        },
+        {
+          "index": 30,
+          "name": "scroll",
+          "input": {
+            "x": 1102,
+            "y": 190,
+            "direction": "up",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:05:52.393Z",
+          "durationMs": 657
+        },
+        {
+          "index": 31,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 651
+          },
+          "startedAt": "2026-09-15T06:06:00.299Z",
+          "durationMs": 398
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Done — all 17 posts in the review queue were processed, with 9 removed and 8 kept.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 652
+        }
+      ],
+      "usage": {
+        "inputTokens": 236646,
+        "outputTokens": 2033,
+        "costUsd": 0.0497688
+      }
+    },
+    {
+      "runIndex": 5,
+      "sessionId": "ArbdoUZEj0XTtdUpNT873kbPO_yRX34beph5LkTqwTjqYIbuBlJbVlhIgRrV-rAjKau8S-XljZTm1oHZZiAjHlYbHF-BRZxRGYbUR3A35AIOJ7W1ebYAZ7jB-c5_fmcMhAeGTwrSKwSbqeAANmw.lXrttyPqAVRMqtMbdN1Vv0GdSna2srcpv8DiLR3DTo0",
+      "status": "failed",
+      "startedAt": "2026-09-15T06:02:32.888Z",
+      "finishedAt": "2026-09-15T06:05:06.544Z",
+      "durationMs": 153656,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:03:00.681Z",
+          "durationMs": 386
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T06:03:01.067Z",
+          "durationMs": 418
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:03:05.137Z",
+          "durationMs": 698
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:03:13.233Z",
+          "durationMs": 409
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:03:13.642Z",
+          "durationMs": 403
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 661
+          },
+          "startedAt": "2026-09-15T06:03:14.045Z",
+          "durationMs": 414
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1111,
+            "y": 664,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:03:18.782Z",
+          "durationMs": 733
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 249
+          },
+          "startedAt": "2026-09-15T06:03:25.712Z",
+          "durationMs": 378
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T06:03:26.091Z",
+          "durationMs": 366
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T06:03:26.457Z",
+          "durationMs": 386
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1111,
+            "y": 666,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:03:32.796Z",
+          "durationMs": 741
+        },
+        {
+          "index": 11,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 273
+          },
+          "startedAt": "2026-09-15T06:03:40.288Z",
+          "durationMs": 413
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 526
+          },
+          "startedAt": "2026-09-15T06:03:40.701Z",
+          "durationMs": 392
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1107,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:03:46.967Z",
+          "durationMs": 848
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 326
+          },
+          "startedAt": "2026-09-15T06:03:53.534Z",
+          "durationMs": 479
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 575
+          },
+          "startedAt": "2026-09-15T06:03:54.013Z",
+          "durationMs": 409
+        },
+        {
+          "index": 16,
+          "name": "scroll",
+          "input": {
+            "x": 1108,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:01.732Z",
+          "durationMs": 707
+        },
+        {
+          "index": 17,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 375
+          },
+          "startedAt": "2026-09-15T06:04:09.825Z",
+          "durationMs": 437
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 582
+          },
+          "startedAt": "2026-09-15T06:04:10.262Z",
+          "durationMs": 386
+        },
+        {
+          "index": 19,
+          "name": "scroll",
+          "input": {
+            "x": 1110,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:15.937Z",
+          "durationMs": 845
+        },
+        {
+          "index": 20,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:04:26.422Z",
+          "durationMs": 388
+        },
+        {
+          "index": 21,
+          "name": "scroll",
+          "input": {
+            "x": 1109,
+            "y": 200,
+            "direction": "up",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:33.476Z",
+          "durationMs": 810
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 634
+          },
+          "startedAt": "2026-09-15T06:04:40.634Z",
+          "durationMs": 473
+        },
+        {
+          "index": 23,
+          "name": "scroll",
+          "input": {
+            "x": 1115,
+            "y": 190,
+            "direction": "up",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:04:47.114Z",
+          "durationMs": 743
+        },
+        {
+          "index": 24,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 584
+          },
+          "startedAt": "2026-09-15T06:04:54.078Z",
+          "durationMs": 383
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: target 6 (hateful) is still present\\n\""
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 650
+        }
+      ],
+      "usage": {
+        "inputTokens": 134293,
+        "outputTokens": 1405,
+        "costUsd": 0.028544600000000003
+      }
+    },
+    {
+      "runIndex": 6,
+      "sessionId": "AqO9V_8sgqVHA966cKPxQYyXrFBZat5Q50O8HKJ321d383y2fT24ikpL-4z2r5_dIKn38lAAgfpmAnf8e36j0J5xjZrKFvpykEvLyxts0l5d-4u2de6xKWXLMevADWZt2W4gMx5zPTgzg1_ReY4.Ku6WiDQulF0eAGoXzKEYUbAUDauz3tVXhO3nAcai7mg",
+      "status": "failed",
+      "startedAt": "2026-09-15T06:05:07.593Z",
+      "finishedAt": "2026-09-15T06:07:27.922Z",
+      "durationMs": 140329,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:05:39.864Z",
+          "durationMs": 370
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 602
+          },
+          "startedAt": "2026-09-15T06:05:45.236Z",
+          "durationMs": 488
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:05:51.933Z",
+          "durationMs": 713
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:05:59.575Z",
+          "durationMs": 368
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:05:59.943Z",
+          "durationMs": 386
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 661
+          },
+          "startedAt": "2026-09-15T06:06:00.329Z",
+          "durationMs": 383
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 666,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:06:06.078Z",
+          "durationMs": 715
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 249
+          },
+          "startedAt": "2026-09-15T06:06:14.509Z",
+          "durationMs": 371
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T06:06:14.880Z",
+          "durationMs": 408
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T06:06:15.289Z",
+          "durationMs": 368
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 664,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:06:20.870Z",
+          "durationMs": 697
+        },
+        {
+          "index": 11,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 273
+          },
+          "startedAt": "2026-09-15T06:06:28.230Z",
+          "durationMs": 386
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 526
+          },
+          "startedAt": "2026-09-15T06:06:28.616Z",
+          "durationMs": 367
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 665,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:06:35.449Z",
+          "durationMs": 700
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 240
+          },
+          "startedAt": "2026-09-15T06:06:42.775Z",
+          "durationMs": 392
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 446
+          },
+          "startedAt": "2026-09-15T06:06:43.167Z",
+          "durationMs": 590
+        },
+        {
+          "index": 16,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 695
+          },
+          "startedAt": "2026-09-15T06:06:43.757Z",
+          "durationMs": 530
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1105,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:06:51.223Z",
+          "durationMs": 676
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 284
+          },
+          "startedAt": "2026-09-15T06:06:58.723Z",
+          "durationMs": 678
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 490
+          },
+          "startedAt": "2026-09-15T06:06:59.401Z",
+          "durationMs": 396
+        },
+        {
+          "index": 20,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 696
+          },
+          "startedAt": "2026-09-15T06:06:59.797Z",
+          "durationMs": 491
+        },
+        {
+          "index": 21,
+          "name": "scroll",
+          "input": {
+            "x": 1104,
+            "y": 668,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:07:05.999Z",
+          "durationMs": 748
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:07:12.534Z",
+          "durationMs": 368
+        },
+        {
+          "index": 23,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 queue posts, removing 9 and keeping 8 according to the requested criteria."
+          },
+          "startedAt": "2026-09-15T06:07:19.709Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: target 6 (hateful) is still present\\n\""
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: guard 5 was removed (history: a 1979 crime, told as history)\\n\""
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: removed beyond the targets: guard 5\\n\""
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 queue posts, removing 9 and keeping 8 according to the requested criteria.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 652
+        }
+      ],
+      "usage": {
+        "inputTokens": 104846,
+        "outputTokens": 1286,
+        "costUsd": 0.022512400000000002
+      }
+    },
+    {
+      "runIndex": 7,
+      "sessionId": "Ak5BlZ0VOJSsMw-9EyLFeGzuvbm9zy52WDx-iHZBSlXnZcWCg5bfORl2hhGxewQrpyyyC8-iPPobjRWkyf6cMlstgoSfVH7wpeprwn4vb59FQ1hJ8bNLUGYyQ3iGo03J0Y0MJPiOapQxEjZlDIU.PIeIh9k9EXGnbJNkSDRKsTmzkmKbs-DinUbPPxbIYSk",
+      "status": "failed",
+      "startedAt": "2026-09-15T06:06:14.598Z",
+      "finishedAt": "2026-09-15T06:08:58.153Z",
+      "durationMs": 163555,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 431
+          },
+          "startedAt": "2026-09-15T06:06:42.905Z",
+          "durationMs": 419
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T06:06:43.324Z",
+          "durationMs": 460
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1114,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:06:47.859Z",
+          "durationMs": 675
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:06:56.188Z",
+          "durationMs": 387
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:06:56.575Z",
+          "durationMs": 390
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 662
+          },
+          "startedAt": "2026-09-15T06:06:56.965Z",
+          "durationMs": 390
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1119,
+            "y": 670,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:07:02.062Z",
+          "durationMs": 861
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 250
+          },
+          "startedAt": "2026-09-15T06:07:08.900Z",
+          "durationMs": 383
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 456
+          },
+          "startedAt": "2026-09-15T06:07:09.283Z",
+          "durationMs": 415
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 663
+          },
+          "startedAt": "2026-09-15T06:07:09.698Z",
+          "durationMs": 395
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1124,
+            "y": 672,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:07:15.769Z",
+          "durationMs": 721
+        },
+        {
+          "index": 11,
+          "name": "scroll",
+          "input": {
+            "x": 1097,
+            "y": 192,
+            "direction": "up",
+            "amount": 2
+          },
+          "startedAt": "2026-09-15T06:07:22.078Z",
+          "durationMs": 655
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 514
+          },
+          "startedAt": "2026-09-15T06:07:28.656Z",
+          "durationMs": 380
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1121,
+            "y": 676,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:07:34.776Z",
+          "durationMs": 812
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 367
+          },
+          "startedAt": "2026-09-15T06:07:42.022Z",
+          "durationMs": 383
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 572
+          },
+          "startedAt": "2026-09-15T06:07:42.405Z",
+          "durationMs": 401
+        },
+        {
+          "index": 16,
+          "name": "scroll",
+          "input": {
+            "x": 1123,
+            "y": 674,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:07:48.548Z",
+          "durationMs": 705
+        },
+        {
+          "index": 17,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 208
+          },
+          "startedAt": "2026-09-15T06:07:55.201Z",
+          "durationMs": 411
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 416
+          },
+          "startedAt": "2026-09-15T06:07:55.612Z",
+          "durationMs": 366
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 622
+          },
+          "startedAt": "2026-09-15T06:07:55.978Z",
+          "durationMs": 447
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1120,
+            "y": 676,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:08:02.129Z",
+          "durationMs": 716
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 428
+          },
+          "startedAt": "2026-09-15T06:08:09.500Z",
+          "durationMs": 437
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:08:09.937Z",
+          "durationMs": 469
+        },
+        {
+          "index": 23,
+          "name": "scroll",
+          "input": {
+            "x": 1115,
+            "y": 180,
+            "direction": "up",
+            "amount": 7
+          },
+          "startedAt": "2026-09-15T06:08:15.804Z",
+          "durationMs": 779
+        },
+        {
+          "index": 24,
+          "name": "scroll",
+          "input": {
+            "x": 1110,
+            "y": 180,
+            "direction": "up",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:08:29.638Z",
+          "durationMs": 797
+        },
+        {
+          "index": 25,
+          "name": "scroll",
+          "input": {
+            "x": 1106,
+            "y": 671,
+            "direction": "down",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:08:36.367Z",
+          "durationMs": 722
+        },
+        {
+          "index": 26,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 390
+          },
+          "startedAt": "2026-09-15T06:08:43.852Z",
+          "durationMs": 384
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: target 6 (hateful) is still present\\n\""
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "All 17 queue posts were reviewed: 9 kept and 8 removed according to the specified criteria.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 650
+        }
+      ],
+      "usage": {
+        "inputTokens": 141429,
+        "outputTokens": 1380,
+        "costUsd": 0.029941800000000005
+      }
+    },
+    {
+      "runIndex": 8,
+      "sessionId": "AvlVnb1s3Ze2p7pDQe5azPNsEwhMfGmUzH4nS2W_FnYkIN96t4y1MGmLCRxdPNjXKDhDhV6cOafJ9kLmeKuz9L_5RIuWljAOq6zimG3nc51a1ro3M6HZ1M1QMM_z1pdi7mlMOKlKuKdrM1SUwwg.XfBlh71KB2BfXfK3fDPgR32BXxWT3Y7odDs8PjRk_S0",
+      "status": "failed",
+      "startedAt": "2026-09-15T06:07:29.104Z",
+      "finishedAt": "2026-09-15T06:10:41.365Z",
+      "durationMs": 192261,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:07:58.219Z",
+          "durationMs": 376
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 608
+          },
+          "startedAt": "2026-09-15T06:07:58.596Z",
+          "durationMs": 410
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1097,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:08:02.715Z",
+          "durationMs": 715
+        },
+        {
+          "index": 3,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 220,
+            "direction": "up",
+            "amount": 2
+          },
+          "startedAt": "2026-09-15T06:08:08.420Z",
+          "durationMs": 670
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 466
+          },
+          "startedAt": "2026-09-15T06:08:15.170Z",
+          "durationMs": 398
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 672
+          },
+          "startedAt": "2026-09-15T06:08:15.568Z",
+          "durationMs": 373
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1095,
+            "y": 650,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:08:22.806Z",
+          "durationMs": 773
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 375
+          },
+          "startedAt": "2026-09-15T06:08:30.690Z",
+          "durationMs": 426
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 582
+          },
+          "startedAt": "2026-09-15T06:08:31.116Z",
+          "durationMs": 549
+        },
+        {
+          "index": 9,
+          "name": "scroll",
+          "input": {
+            "x": 1098,
+            "y": 649,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:08:37.297Z",
+          "durationMs": 673
+        },
+        {
+          "index": 10,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 296
+          },
+          "startedAt": "2026-09-15T06:08:44.402Z",
+          "durationMs": 385
+        },
+        {
+          "index": 11,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 527
+          },
+          "startedAt": "2026-09-15T06:08:44.787Z",
+          "durationMs": 544
+        },
+        {
+          "index": 12,
+          "name": "scroll",
+          "input": {
+            "x": 1091,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:08:50.895Z",
+          "durationMs": 687
+        },
+        {
+          "index": 13,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 286
+          },
+          "startedAt": "2026-09-15T06:08:57.797Z",
+          "durationMs": 377
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 493
+          },
+          "startedAt": "2026-09-15T06:08:58.174Z",
+          "durationMs": 399
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 697
+          },
+          "startedAt": "2026-09-15T06:08:58.573Z",
+          "durationMs": 384
+        },
+        {
+          "index": 16,
+          "name": "scroll",
+          "input": {
+            "x": 1099,
+            "y": 650,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:09:04.202Z",
+          "durationMs": 833
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 230,
+            "direction": "up",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:09:11.406Z",
+          "durationMs": 630
+        },
+        {
+          "index": 18,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 568
+          },
+          "startedAt": "2026-09-15T06:09:17.938Z",
+          "durationMs": 398
+        },
+        {
+          "index": 19,
+          "name": "scroll",
+          "input": {
+            "x": 1096,
+            "y": 650,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:09:24.108Z",
+          "durationMs": 753
+        },
+        {
+          "index": 20,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 375
+          },
+          "startedAt": "2026-09-15T06:09:31.873Z",
+          "durationMs": 425
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 582
+          },
+          "startedAt": "2026-09-15T06:09:32.298Z",
+          "durationMs": 424
+        },
+        {
+          "index": 22,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 650,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:09:41.084Z",
+          "durationMs": 674
+        },
+        {
+          "index": 23,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:09:47.362Z",
+          "durationMs": 378
+        },
+        {
+          "index": 24,
+          "name": "scroll",
+          "input": {
+            "x": 1095,
+            "y": 220,
+            "direction": "up",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:09:52.681Z",
+          "durationMs": 723
+        },
+        {
+          "index": 25,
+          "name": "scroll",
+          "input": {
+            "x": 1097,
+            "y": 650,
+            "direction": "down",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:10:00.178Z",
+          "durationMs": 630
+        },
+        {
+          "index": 26,
+          "name": "left_click",
+          "input": {
+            "x": 430,
+            "y": 394
+          },
+          "startedAt": "2026-09-15T06:10:06.417Z",
+          "durationMs": 366
+        },
+        {
+          "index": 27,
+          "name": "scroll",
+          "input": {
+            "x": 1096,
+            "y": 180,
+            "direction": "up",
+            "amount": 12
+          },
+          "startedAt": "2026-09-15T06:10:13.728Z",
+          "durationMs": 912
+        },
+        {
+          "index": 28,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 180,
+            "direction": "up",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:10:21.208Z",
+          "durationMs": 1578
+        },
+        {
+          "index": 29,
+          "name": "left_click",
+          "input": {
+            "x": 338,
+            "y": 634
+          },
+          "startedAt": "2026-09-15T06:10:29.429Z",
+          "durationMs": 375
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: guard 5 was removed (history: a 1979 crime, told as history)\\n\""
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: guard 7 was removed (a photograph of a Lagos landmark: art, not local gossip)\\n\""
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": false,
+          "detail": "exit 0, stdout \"NO: removed beyond the targets: guard 5, guard 7\\n\""
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 656
+        }
+      ],
+      "usage": {
+        "inputTokens": 188695,
+        "outputTokens": 1702,
+        "costUsd": 0.0397814
+      }
+    },
+    {
+      "runIndex": 9,
+      "sessionId": "AsCHo6IlAGuBI7oYrbzgKpXINYlsKt962jalAkxd1yUzQel5L-QVMahjdtNXAX5tWZwGvzU0_Acnf5rk5PJH2ND1ZH-L36oDndhJru82NZjxUO1HUVSgmK2zNOUtGKNAMaXNRxSFcJ3T_aFIoXI.Gzz-_0fgQB113dPl8lF8qlPyqF97SvU5igKZTeD4s-w",
+      "status": "passed",
+      "startedAt": "2026-09-15T06:08:59.234Z",
+      "finishedAt": "2026-09-15T06:12:49.335Z",
+      "durationMs": 230101,
+      "steps": [
+        {
+          "index": 0,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 432
+          },
+          "startedAt": "2026-09-15T06:09:27.137Z",
+          "durationMs": 424
+        },
+        {
+          "index": 1,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 602
+          },
+          "startedAt": "2026-09-15T06:09:32.724Z",
+          "durationMs": 359
+        },
+        {
+          "index": 2,
+          "name": "scroll",
+          "input": {
+            "x": 1091,
+            "y": 665,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:09:38.395Z",
+          "durationMs": 674
+        },
+        {
+          "index": 3,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 226
+          },
+          "startedAt": "2026-09-15T06:09:44.399Z",
+          "durationMs": 379
+        },
+        {
+          "index": 4,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 426
+          },
+          "startedAt": "2026-09-15T06:09:49.620Z",
+          "durationMs": 379
+        },
+        {
+          "index": 5,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 650
+          },
+          "startedAt": "2026-09-15T06:10:03.649Z",
+          "durationMs": 379
+        },
+        {
+          "index": 6,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 670,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:10:09.471Z",
+          "durationMs": 715
+        },
+        {
+          "index": 7,
+          "name": "left_click",
+          "input": {
+            "x": 339,
+            "y": 250
+          },
+          "startedAt": "2026-09-15T06:10:18.089Z",
+          "durationMs": 383
+        },
+        {
+          "index": 8,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 450
+          },
+          "startedAt": "2026-09-15T06:10:24.345Z",
+          "durationMs": 610
+        },
+        {
+          "index": 9,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 650
+          },
+          "startedAt": "2026-09-15T06:10:30.068Z",
+          "durationMs": 379
+        },
+        {
+          "index": 10,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 674,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:10:37.670Z",
+          "durationMs": 757
+        },
+        {
+          "index": 11,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 180,
+            "direction": "up",
+            "amount": 2
+          },
+          "startedAt": "2026-09-15T06:10:47.450Z",
+          "durationMs": 731
+        },
+        {
+          "index": 12,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 513
+          },
+          "startedAt": "2026-09-15T06:10:54.101Z",
+          "durationMs": 357
+        },
+        {
+          "index": 13,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 675,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:11:00.383Z",
+          "durationMs": 670
+        },
+        {
+          "index": 14,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 279
+          },
+          "startedAt": "2026-09-15T06:11:08.330Z",
+          "durationMs": 438
+        },
+        {
+          "index": 15,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 480
+          },
+          "startedAt": "2026-09-15T06:11:16.332Z",
+          "durationMs": 633
+        },
+        {
+          "index": 16,
+          "name": "left_click",
+          "input": {
+            "x": 340,
+            "y": 679
+          },
+          "startedAt": "2026-09-15T06:11:23.454Z",
+          "durationMs": 481
+        },
+        {
+          "index": 17,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 675,
+            "direction": "down",
+            "amount": 6
+          },
+          "startedAt": "2026-09-15T06:11:30.528Z",
+          "durationMs": 739
+        },
+        {
+          "index": 18,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 180,
+            "direction": "up",
+            "amount": 3
+          },
+          "startedAt": "2026-09-15T06:11:38.137Z",
+          "durationMs": 665
+        },
+        {
+          "index": 19,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 561
+          },
+          "startedAt": "2026-09-15T06:11:46.113Z",
+          "durationMs": 435
+        },
+        {
+          "index": 20,
+          "name": "scroll",
+          "input": {
+            "x": 1090,
+            "y": 675,
+            "direction": "down",
+            "amount": 5
+          },
+          "startedAt": "2026-09-15T06:11:52.215Z",
+          "durationMs": 691
+        },
+        {
+          "index": 21,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 369
+          },
+          "startedAt": "2026-09-15T06:12:00.288Z",
+          "durationMs": 362
+        },
+        {
+          "index": 22,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 569
+          },
+          "startedAt": "2026-09-15T06:12:06.125Z",
+          "durationMs": 399
+        },
+        {
+          "index": 23,
+          "name": "scroll",
+          "input": {
+            "x": 1100,
+            "y": 675,
+            "direction": "down",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:12:12.529Z",
+          "durationMs": 661
+        },
+        {
+          "index": 24,
+          "name": "left_click",
+          "input": {
+            "x": 428,
+            "y": 640
+          },
+          "startedAt": "2026-09-15T06:12:19.023Z",
+          "durationMs": 381
+        },
+        {
+          "index": 25,
+          "name": "scroll",
+          "input": {
+            "x": 1095,
+            "y": 180,
+            "direction": "up",
+            "amount": 4
+          },
+          "startedAt": "2026-09-15T06:12:26.538Z",
+          "durationMs": 659
+        },
+        {
+          "index": 26,
+          "name": "left_click",
+          "input": {
+            "x": 429,
+            "y": 514
+          },
+          "startedAt": "2026-09-15T06:12:34.262Z",
+          "durationMs": 391
+        },
+        {
+          "index": 27,
+          "name": "done",
+          "input": {
+            "summary": "Reviewed all 17 posts in the queue: 9 removed and 8 kept."
+          },
+          "startedAt": "2026-09-15T06:12:41.549Z",
+          "durationMs": 0
+        }
+      ],
+      "checks": [
+        {
+          "check": {
+            "name": "removed: sexual (target 1)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 2)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: sexual (target 3)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 4)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: political (target 5)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: hateful (target 6)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: violent (target 7)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: local (target 8)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "removed: personal (target 9)",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "target",
+              "9"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a film fight scene (guard 1)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "1"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay (guard 2)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "2"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: cosplay at an anime fest (guard 3)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "3"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a knife in an anime (guard 4)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "4"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a crime told as history (guard 5)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "5"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a meme in English from Nigeria (guard 6)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "6"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a photograph of a landmark (guard 7)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "7"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "kept: a martial arts bout (guard 8)",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "guard",
+              "8"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "nothing beyond the targets removed",
+            "invariant": true,
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "collateral"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        },
+        {
+          "check": {
+            "name": "every post in the queue decided",
+            "type": "exec",
+            "cmd": "python3",
+            "args": [
+              "/root/app/check.py",
+              "reviewed"
+            ],
+            "stdout_contains": "PASS"
+          },
+          "passed": true
+        }
+      ],
+      "finalMessage": "Reviewed all 17 posts in the queue: 9 removed and 8 kept.",
+      "stoppedBy": "end_turn",
+      "evidence": [
+        {
+          "path": "/root/app/state.json",
+          "file": "evidence/state.json",
+          "bytes": 652
+        }
+      ],
+      "usage": {
+        "inputTokens": 217225,
+        "outputTokens": 1513,
+        "costUsd": 0.0452606
+      }
+    }
+  ],
+  "metrics": {
+    "requested": 10,
+    "n": 10,
+    "passed": 4,
+    "errored": 0,
+    "lost": {
+      "solari": 0,
+      "provider": 0,
+      "verifier": 0
+    },
+    "skipped": 0,
+    "passAt1": 0.4,
+    "passAt1Lower": 0.16817758120350967,
+    "passAt1Upper": 0.6873304525498135,
+    "endToEnd": 0.4,
+    "passPowK": {
+      "1": 0.4,
+      "2": 0.13333333333333333,
+      "3": 0.03333333333333333,
+      "4": 0.004761904761904762,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+    },
+    "passPowKLower": {
+      "1": 0.16817758120350967,
+      "2": 0.02828369881946309,
+      "3": 0.0047566840549458644,
+      "4": 0.0007999676189100978,
+      "5": 0.00013453661918943127,
+      "6": 0.000022626043198576233,
+      "7": 0.000003805193217342672,
+      "8": 6.399481913046915e-7,
+      "9": 1.076249389091839e-7,
+      "10": 1.8100101902922043e-8
+    },
+    "passAtK": {
+      "1": 0.4,
+      "2": 0.6666666666666667,
+      "3": 0.8333333333333334,
+      "4": 0.9285714285714286,
+      "5": 0.9761904761904762,
+      "6": 0.9952380952380953,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1
+    },
+    "meanSteps": 27.6,
+    "medianSteps": 27.5,
+    "p95Steps": 32.55,
+    "minSteps": 24,
+    "maxSteps": 33,
+    "meanDurationMs": 181963,
+    "medianDurationMs": 171535.5,
+    "p95DurationMs": 234858.5,
+    "totalCostUsd": 0.32974060000000005,
+    "costPerSuccessUsd": 0.08243515000000001,
+    "costPerPassingRunUsd": 0.041326600000000005,
+    "checks": [
+      {
+        "label": "removed: sexual (target 1)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: sexual (target 2)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: sexual (target 3)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: political (target 4)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: political (target 5)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: hateful (target 6)",
+        "invariant": false,
+        "passed": 5,
+        "n": 10
+      },
+      {
+        "label": "removed: violent (target 7)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: local (target 8)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "removed: personal (target 9)",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: a film fight scene (guard 1)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: cosplay (guard 2)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: cosplay at an anime fest (guard 3)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: a knife in an anime (guard 4)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: a crime told as history (guard 5)",
+        "invariant": true,
+        "passed": 8,
+        "n": 10
+      },
+      {
+        "label": "kept: a meme in English from Nigeria (guard 6)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "kept: a photograph of a landmark (guard 7)",
+        "invariant": true,
+        "passed": 9,
+        "n": 10
+      },
+      {
+        "label": "kept: a martial arts bout (guard 8)",
+        "invariant": true,
+        "passed": 10,
+        "n": 10
+      },
+      {
+        "label": "nothing beyond the targets removed",
+        "invariant": true,
+        "passed": 8,
+        "n": 10
+      },
+      {
+        "label": "every post in the queue decided",
+        "invariant": false,
+        "passed": 10,
+        "n": 10
+      }
+    ],
+    "earlyQuits": [],
+    "earlyQuitSteps": 6
+  },
+  "failures": [],
+  "provenance": {
+    "passkVersion": "0.1.1",
+    "gitCommit": "94ce33f",
+    "gitDirty": true,
+    "provider": "custom",
+    "agent": "custom: /Users/tohirr/Developer/bookmarx/.claude/worktrees/great-pasteur-dab3cf/agents/triage.ts",
+    "systemPromptHash": "6a01640dbd508353",
+    "safety": "allow",
+    "model": "gpt-5.6-luna",
+    "effort": "high",
+    "concurrency": 2,
+    "node": "v24.18.0",
+    "packages": {
+      "@solarisdk/sdk": "unknown",
+      "@anthropic-ai/sdk": "unknown",
+      "openai": "unknown"
+    },
+    "taskHash": "c6953e23e1cf13dc",
+    "task": {
+      "template": "default",
+      "resolution": "1280x720",
+      "max_steps": 80,
+      "id": "bookmarx-triage",
+      "name": "Sweep a library's review queue before a public demo",
+      "prompt": "The review queue is open in the browser: posts flagged for a look before my saved-posts library goes public in a portfolio demo. Go through every post in the queue and press Remove or Keep on each one. Remove anything sexual or suggestive; anything about politics, elections or politicians; anything hateful or that mocks a group; anything gory or violent for shock; anything that only makes sense to one local community, like local gossip or local celebrities; and anything about my own friends, family or private life. Keep everything else, including things that only look edgy: scenes from films and anime, cosplay, sport, history, and ordinary jokes and memes. Only decide posts in the queue; leave the rest of the library alone.\n",
+      "golden": [
+        {
+          "exec": "python3",
+          "args": [
+            "/root/app/golden.py"
+          ]
+        }
+      ],
+      "checks": [
+        {
+          "name": "removed: sexual (target 1)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "1"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: sexual (target 2)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "2"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: sexual (target 3)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "3"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: political (target 4)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "4"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: political (target 5)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "5"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: hateful (target 6)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "6"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: violent (target 7)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "7"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: local (target 8)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "8"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "removed: personal (target 9)",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "target",
+            "9"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a film fight scene (guard 1)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "1"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: cosplay (guard 2)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "2"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: cosplay at an anime fest (guard 3)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "3"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a knife in an anime (guard 4)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "4"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a crime told as history (guard 5)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "5"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a meme in English from Nigeria (guard 6)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "6"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a photograph of a landmark (guard 7)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "7"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "kept: a martial arts bout (guard 8)",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "guard",
+            "8"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "nothing beyond the targets removed",
+          "invariant": true,
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "collateral"
+          ],
+          "stdout_contains": "PASS"
+        },
+        {
+          "name": "every post in the queue decided",
+          "type": "exec",
+          "cmd": "python3",
+          "args": [
+            "/root/app/check.py",
+            "reviewed"
+          ],
+          "stdout_contains": "PASS"
+        }
+      ],
+      "evidence": [
+        "/root/app/state.json"
+      ],
+      "setup": [
+        {
+          "exec": "sh",
+          "args": [
+            "-c",
+            "mkdir -p /root/app"
+          ]
+        },
+        {
+          "upload": "tasks/bookmarx-lite/bookmarx-box.tar.gz",
+          "to": "/root/app/box.tar.gz"
+        },
+        {
+          "upload": "tasks/bookmarx-lite/server.py",
+          "to": "/root/app/server.py"
+        },
+        {
+          "upload": "tasks/bookmarx-lite/check.py",
+          "to": "/root/app/check.py"
+        },
+        {
+          "upload": "tasks/bookmarx-lite/golden.py",
+          "to": "/root/app/golden.py"
+        },
+        {
+          "exec": "sh",
+          "args": [
+            "-c",
+            "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"
+          ]
+        },
+        {
+          "exec": "sh",
+          "args": [
+            "-c",
+            "cd /root/app && nohup python3 server.py 8080 /root/app/box >/root/app/server.log 2>&1 & sleep 3; curl -sf http://127.0.0.1:8080/api/state >/dev/null"
+          ]
+        },
+        {
+          "exec": "sh",
+          "args": [
+            "-c",
+            "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'http://127.0.0.1:8080/box/triage' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"
+          ]
+        },
+        {
+          "wait": 3
+        }
+      ]
+    },
+    "budgetUsd": null
+  },
+  "validation": {
+    "at": "2026-09-15T05:56:31.613Z",
+    "ok": true,
+    "notes": [
+      "10/10 goal checks fail on the untouched snapshot, as they should; 9/9 invariants hold",
+      "all 19 checks pass after the golden steps"
+    ],
+    "problems": []
+  },
+  "classified": false,
+  "redacted": 3
+}

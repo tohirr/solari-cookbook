@@ -195,7 +195,7 @@ a.btn{display:inline-block;font:12.5px var(--sans);color:var(--ink);text-decorat
 <div class="brand"><b>passk</b> a worked example · built on Solari · outcomes verified inside the VM</div>
 <div class="hero">
   <h1>Your agent passed once. Will it pass again?</h1>
-  <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. This page is one task under two prompts: 38 scored runs on <code>gpt-5.6-luna</code>, $1.48 of model spend.</p>
+  <p>passk forks one Solari desktop snapshot <i>k</i> times, runs the same agent on every fork, verifies the result inside the VM instead of trusting what the agent says, and reports how reliable it is and why it fails when it does. This page is one task under two prompts: 58 scored runs on <code>gpt-5.6-luna</code>, $2.10 of model spend.</p>
   <p class="note" style="font-size:14px;margin-top:12px">These benches were run while building the tool, at small <i>k</i> on a budget model. They show what a bench and a comparison contain; they are not findings about any model, and they will be re-run.</p>
 </div>
 
@@ -275,6 +275,47 @@ a.btn{display:inline-block;font:12.5px var(--sans);color:var(--ink);text-decorat
   <div class="note">A 28% pass rate is a 0% chance of five clean runs in a row; 70% is 13%. The dashed line is what the sample can promise, not what it observed.</div>
 </div>
 
+<h2>A second example: a real app, inside the VM</h2>
+<p class="note" style="max-width:var(--measure);font-size:15px">Sweep a library's review queue before a public demo: <a href="https://bookmarx.space">bookmarx</a>, a search over saved posts, runs inside the desktop as static pages and a stdlib server over a slice of its library. The review queue holds 17 posts; the rules say to remove nine and the eight guards look risky and are clean. One check per fact, named by category. The frames and the post ids do not leave the run: the bench is published without either, graded from the decisions map itself.</p>
+<div class="two">
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="pill a">A</span><b style="font-size:15px">Sweep a library's review queue before a public demo</b><a href="bookmarx-triage/report.html" style="margin-left:auto;font:12.5px var(--sans);color:var(--ink-3);white-space:nowrap">full report</a></div>
+    <div class="dots"><div class="dotrow"><a class="dot passed " data-tip="run 0: passed in 33 steps" aria-label="run 0: passed in 33 steps" href="bookmarx-triage/report.html#run-0">✓</a><a class="dot failed " data-tip="run 1: failed in 25 steps" aria-label="run 1: failed in 25 steps" href="bookmarx-triage/report.html#run-1">×</a><a class="dot passed " data-tip="run 2: passed in 28 steps" aria-label="run 2: passed in 28 steps" href="bookmarx-triage/report.html#run-2">✓</a><a class="dot failed " data-tip="run 3: failed in 24 steps" aria-label="run 3: failed in 24 steps" href="bookmarx-triage/report.html#run-3">×</a><a class="dot passed " data-tip="run 4: passed in 32 steps" aria-label="run 4: passed in 32 steps" href="bookmarx-triage/report.html#run-4">✓</a><a class="dot failed " data-tip="run 5: failed in 25 steps" aria-label="run 5: failed in 25 steps" href="bookmarx-triage/report.html#run-5">×</a><a class="dot failed " data-tip="run 6: failed in 24 steps" aria-label="run 6: failed in 24 steps" href="bookmarx-triage/report.html#run-6">×</a><a class="dot failed " data-tip="run 7: failed in 27 steps" aria-label="run 7: failed in 27 steps" href="bookmarx-triage/report.html#run-7">×</a><a class="dot failed " data-tip="run 8: failed in 30 steps" aria-label="run 8: failed in 30 steps" href="bookmarx-triage/report.html#run-8">×</a><a class="dot passed " data-tip="run 9: passed in 28 steps" aria-label="run 9: passed in 28 steps" href="bookmarx-triage/report.html#run-9">✓</a></div></div>
+    <div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">
+      <div class="kpi"><b>4/10</b><span>passed · 17%–69%</span></div>
+      <div class="kpi"><b>27.5</b><span>median steps · 24–33</span></div>
+      <div class="kpi"><b>$0.082</b><span>per success</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><span class="pill b">B</span><b style="font-size:15px">Sweep a library's review queue before a public demo, keeping when unsure</b><a href="bookmarx-triage-keep/report.html" style="margin-left:auto;font:12.5px var(--sans);color:var(--ink-3);white-space:nowrap">full report</a></div>
+    <div class="dots"><div class="dotrow"><a class="dot failed " data-tip="run 0: failed in 26 steps" aria-label="run 0: failed in 26 steps" href="bookmarx-triage-keep/report.html#run-0">×</a><a class="dot failed " data-tip="run 1: failed in 25 steps" aria-label="run 1: failed in 25 steps" href="bookmarx-triage-keep/report.html#run-1">×</a><a class="dot failed " data-tip="run 2: failed in 25 steps" aria-label="run 2: failed in 25 steps" href="bookmarx-triage-keep/report.html#run-2">×</a><a class="dot failed " data-tip="run 3: failed in 26 steps" aria-label="run 3: failed in 26 steps" href="bookmarx-triage-keep/report.html#run-3">×</a><a class="dot failed " data-tip="run 4: failed in 24 steps" aria-label="run 4: failed in 24 steps" href="bookmarx-triage-keep/report.html#run-4">×</a><a class="dot passed " data-tip="run 5: passed in 26 steps" aria-label="run 5: passed in 26 steps" href="bookmarx-triage-keep/report.html#run-5">✓</a><a class="dot failed " data-tip="run 6: failed in 25 steps" aria-label="run 6: failed in 25 steps" href="bookmarx-triage-keep/report.html#run-6">×</a><a class="dot failed " data-tip="run 7: failed in 25 steps" aria-label="run 7: failed in 25 steps" href="bookmarx-triage-keep/report.html#run-7">×</a><a class="dot passed " data-tip="run 8: passed in 33 steps" aria-label="run 8: passed in 33 steps" href="bookmarx-triage-keep/report.html#run-8">✓</a><a class="dot failed " data-tip="run 9: failed in 29 steps" aria-label="run 9: failed in 29 steps" href="bookmarx-triage-keep/report.html#run-9">×</a></div></div>
+    <div class="kpis" style="margin-top:14px;grid-template-columns:repeat(3,1fr)">
+      <div class="kpi"><b>2/10</b><span>passed · 6%–51%</span></div>
+      <div class="kpi"><b>25.5</b><span>median steps · 24–33</span></div>
+      <div class="kpi"><b>$0.142</b><span>per success</span></div>
+    </div>
+  </div></div>
+<div class="two" style="margin-top:16px">
+  <div class="card">
+    <div style="font:13px var(--sans);color:var(--ink-3);margin:2px 0 12px">held fixed: <code>snapshot</code> <code>model</code> <code>checks</code> <code>system prompt</code> <code>safety</code> · changed: <code>prompt</code></div>
+    <div class="tiles"><div class="tile"><div class="l">passed</div><div class="v">2/10<small>from 4/10</small></div><div class="d down">↓ 20 pts</div></div><div class="tile"><div class="l">median steps</div><div class="v">25.5<small>from 27.5</small></div><div class="d up">↓ 2</div></div><div class="tile"><div class="l">$ per success</div><div class="v">$0.142<small>from $0.082</small></div><div class="d down">↑ 0.059</div></div></div>
+    <p style="color:var(--ink-2);font-size:14px;margin:14px 0 10px">The pass/fail split is consistent with noise at this sample size (p = 0.63): 2 checks did better under B, 2 did worse. What the table does say is where the baseline's 4/10 comes from — 15 of 19 checks hold in every run, and the one that does not, <b>removed: hateful (target 6)</b>, holds in 5/10.</p>
+    <a class="btn" href="compare-bookmarx-triage-prompt/compare.html">The comparison page</a>
+  </div>
+  <div class="card">
+    <b style="font-size:15px">By check, where either side missed</b>
+    <div style="font:13px var(--sans);color:var(--ink-3);margin:2px 0 10px">A → B, worst on A first · 14 other checks passed every run on both sides</div>
+    <table class="checks"><thead><tr><th>check</th><th>A</th><th>B</th><th>Δ</th></tr></thead><tbody>
+    <tr class="miss"><td>removed: hateful (target 6)</td><td class="num">5/10</td><td class="num">3/10</td><td class="num delta down">-20 pts</td></tr>
+    <tr class=""><td>kept: a crime told as history (guard 5)</td><td class="num">8/10</td><td class="num">10/10</td><td class="num delta up">+20 pts</td></tr>
+    <tr class=""><td>nothing beyond the targets removed</td><td class="num">8/10</td><td class="num">9/10</td><td class="num delta up">+10 pts</td></tr>
+    <tr class=""><td>kept: a photograph of a landmark (guard 7)</td><td class="num">9/10</td><td class="num">9/10</td><td class="num delta flat">0 pts</td></tr>
+    <tr class="miss"><td>removed: local (target 8)</td><td class="num">10/10</td><td class="num">9/10</td><td class="num delta down">-10 pts</td></tr>
+    </tbody></table>
+  </div>
+</div>
+
 <h2>Where a failure diverges</h2>
 <div class="card">
   <p style="margin:0 0 14px;color:var(--ink-2);font-size:14px">Run 4 and run 0 of condition A on one time axis: same snapshot, same prompt, same model. The outlined step is where they first part ways. Under the final screens, what the agent reported beside what the checker read from the app's state file inside the VM.</p>
@@ -302,13 +343,13 @@ a.btn{display:inline-block;font:12.5px var(--sans);color:var(--ink);text-decorat
 <h2>Every comparison</h2>
 <div class="card" style="padding:0;overflow-x:auto"><table>
 <tr><th>Comparison</th><th>Changed</th><th class="num">A</th><th class="num">B</th><th class="num">Median steps</th><th class="num">Fisher p</th></tr>
-<tr><td><a href="compare-ticket-routing-prompt/compare.html">Route tickets to account owners with an SLA rule</a></td><td><code>prompt</code></td><td class="num">5/18</td><td class="num">14/20</td><td class="num">56 → 80</td><td class="num">0.022</td></tr>
+<tr><td><a href="compare-bookmarx-triage-prompt/compare.html">Sweep a library's review queue before a public demo</a></td><td><code>prompt</code></td><td class="num">4/10</td><td class="num">2/10</td><td class="num">27.5 → 25.5</td><td class="num">0.628</td></tr><tr><td><a href="compare-ticket-routing-prompt/compare.html">Route tickets to account owners with an SLA rule</a></td><td><code>prompt</code></td><td class="num">5/18</td><td class="num">14/20</td><td class="num">56 → 80</td><td class="num">0.022</td></tr>
 </table></div>
 
 <h2>Every bench</h2>
 <div class="card" style="padding:0;overflow-x:auto"><table>
 <tr><th>Bench</th><th>Model</th><th class="num">Passed</th><th class="num">Pass rate (95%)</th><th class="num">pass^5</th><th class="num">Median steps</th><th class="num">$/success</th><th class="num">Lost</th></tr>
-<tr><td><a href="ticket-routing-reload/report.html">Route tickets to account owners with an SLA rule (reload-and-confirm prompt)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">14/20</td><td class="num">70% (48%–85%)</td><td class="num">13%</td><td class="num">80</td><td class="num">$0.061</td><td class="num"></td></tr><tr><td><a href="ticket-routing/report.html">Route tickets to account owners with an SLA rule</a></td><td><code>gpt-5.6-luna</code></td><td class="num">5/18</td><td class="num">28% (12%–51%)</td><td class="num">0%</td><td class="num">56</td><td class="num">$0.126</td><td class="num">2</td></tr>
+<tr><td><a href="ticket-routing-reload/report.html">Route tickets to account owners with an SLA rule (reload-and-confirm prompt)</a></td><td><code>gpt-5.6-luna</code></td><td class="num">14/20</td><td class="num">70% (48%–85%)</td><td class="num">13%</td><td class="num">80</td><td class="num">$0.061</td><td class="num"></td></tr><tr><td><a href="ticket-routing/report.html">Route tickets to account owners with an SLA rule</a></td><td><code>gpt-5.6-luna</code></td><td class="num">5/18</td><td class="num">28% (12%–51%)</td><td class="num">0%</td><td class="num">56</td><td class="num">$0.126</td><td class="num">2</td></tr><tr><td><a href="bookmarx-triage/report.html">Sweep a library's review queue before a public demo</a></td><td><code>gpt-5.6-luna</code></td><td class="num">4/10</td><td class="num">40% (17%–69%)</td><td class="num">0%</td><td class="num">27.5</td><td class="num">$0.082</td><td class="num"></td></tr><tr><td><a href="bookmarx-triage-keep/report.html">Sweep a library's review queue before a public demo, keeping when unsure</a></td><td><code>gpt-5.6-luna</code></td><td class="num">2/10</td><td class="num">20% (6%–51%)</td><td class="num">0%</td><td class="num">25.5</td><td class="num">$0.142</td><td class="num"></td></tr>
 </table></div>
 <div class="note">Observed counts with 95% Wilson intervals. Runs lost to infrastructure, the model provider, or a checker crash are listed, not scored. Hover any dot or bar for the run.</div>
 

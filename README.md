@@ -35,7 +35,7 @@ PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 
 **[passk/README.md](passk/README.md)
 · [Ten things learned about Solari](passk/docs/SOLARI-NOTES.md)
-· [A worked example](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
+· [Two worked examples](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
 · [The manual](passk/docs/TASKS.md)
 · [The method](passk/docs/METHOD.md)**
 

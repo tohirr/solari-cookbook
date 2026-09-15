@@ -229,6 +229,16 @@ says when the sample is too small to say anything.</p>
 from <code>evidence/</code>, run while building the tool on one budget model at small
 <em>k</em>. Read it as a demonstration of what the pages contain, not as a finding;
 it will be re-run.</p>
+<p>The second example is a real app. <a href="https://bookmarx.space">bookmarx</a>, a
+search over saved posts, runs <em>inside</em> the desktop as static pages and a
+stdlib server (<a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/tasks/bookmarx-lite/"><code>tasks/bookmarx-lite/</code></a>), and its own
+sweeping agent reviews a queue of seventeen posts before a public demo:
+remove nine, keep eight guards that only look risky. Ten runs each under two
+prompts: 4/10 and 2/10, a split consistent with noise; what the per-check
+table shows is that fifteen of nineteen rules hold every time and one
+judgment, the hateful post, holds in half the runs. Published without frames
+or post ids (<code>screenshots: private</code>, <code>labels</code>), graded from the decisions
+map itself.</p>
 <h2 id="ten-things-learned-about-solari">Ten things learned about Solari</h2>
 <p>Everything in <a href="docs/solari-notes.html"><code>docs/SOLARI-NOTES.md</code></a> was found on a
 live VM while building this, and cost an afternoon each. Among them: key

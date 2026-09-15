@@ -1,0 +1,22 @@
+{
+  "decisions": {
+    "target 3 (sexual)": "remove",
+    "target 1 (sexual)": "remove",
+    "guard 7": "keep",
+    "guard 1": "keep",
+    "target 7 (violent)": "remove",
+    "target 4 (political)": "remove",
+    "guard 2": "keep",
+    "target 6 (hateful)": "remove",
+    "target 8 (local)": "remove",
+    "target 9 (personal)": "remove",
+    "target 2 (sexual)": "remove",
+    "guard 6": "keep",
+    "guard 8": "keep",
+    "guard 4": "keep",
+    "guard 3": "keep",
+    "guard 5": "keep",
+    "target 5 (political)": "remove"
+  },
+  "clicks": []
+}

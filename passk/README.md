@@ -113,6 +113,17 @@ from `evidence/`, run while building the tool on one budget model at small
 *k*. Read it as a demonstration of what the pages contain, not as a finding;
 it will be re-run.
 
+The second example is a real app. [bookmarx](https://bookmarx.space), a
+search over saved posts, runs *inside* the desktop as static pages and a
+stdlib server ([`tasks/bookmarx-lite/`](tasks/bookmarx-lite/)), and its own
+sweeping agent reviews a queue of seventeen posts before a public demo:
+remove nine, keep eight guards that only look risky. Ten runs each under two
+prompts: 4/10 and 2/10, a split consistent with noise; what the per-check
+table shows is that fifteen of nineteen rules hold every time and one
+judgment, the hateful post, holds in half the runs. Published without frames
+or post ids (`screenshots: private`, `labels`), graded from the decisions
+map itself.
+
 ## Ten things learned about Solari
 
 Everything in [`docs/SOLARI-NOTES.md`](docs/SOLARI-NOTES.md) was found on a

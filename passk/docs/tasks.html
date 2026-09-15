@@ -279,6 +279,31 @@ each run in the report, survive <code>passk export</code>, and are skipped with 
 a file is missing or over 2 MB. Declaring one cannot change an outcome, so it
 is left out of the task hash: a bench that starts keeping a state file is still
 comparable with the one before it.</p>
+<p><strong>Frames a run may not publish.</strong> A task that drives a screen carrying real
+content — someone&#39;s library, a record with a real name on it — declares
+<code>screenshots: private</code>. The frames are still captured, so the local report and
+the divergence diff work as ever; they simply never leave <code>runs/</code>. Export
+copies none and references none, and <code>export-inspect --images</code> embeds none.
+Grade such a task from an <code>evidence</code> file instead, the way <code>bookmarx-triage</code>
+is graded from its decisions map. This too is out of the task hash.</p>
+<p><strong>Identifiers a run may not publish.</strong> An evidence file that grades honestly
+often names real things: the decisions map is keyed by post id. <code>labels</code>
+names a guest file of <code>{ identifier: label }</code>:</p>
+<pre><code class="language-yaml">labels: /root/app/labels.json   # { &quot;1844896946642878650&quot;: &quot;target 6 (hateful)&quot;, … }
+</code></pre>
+<p>Every run keeps a copy beside its trace, never exported. <code>passk export</code>
+then rewrites the bench and every evidence file it copies so each identifier
+appears only as its label — in check details, in the agent&#39;s own words, in
+the hypotheses, and as the keys of a decisions map, which stays valid JSON.
+A reader learns which labelled thing got which decision and never which
+real thing that was. Once a map is in play the export is all or nothing: an
+identifier-shaped token the map misses stops it, naming the identifier and
+where it still appears, because a label file that misses one post is the
+case this exists to catch. <code>passk export --labels file.json</code> applies a map
+to a bench recorded before its task declared one; <code>--no-screenshots</code> is the
+same for frames. Neither edits what the run wrote down. The boxed bookmarx
+tasks declare both; <code>tasks/bookmarx-lite/labels.py</code> is the map builder, and
+the exported report says how many identifiers became labels.</p>
 <p>Check types: <code>file_exists</code>, <code>file_contains</code>, <code>file_equals</code>, <code>exec</code> (exit code +
 stdout), <code>screenshot_judge</code> (the model grades the final screen against a rubric).
 Prefer several checks that each grade one fact over one script that grades
@@ -346,13 +371,13 @@ extension in VS Code you get completion and validation from
 <tr>
 <td><code>bookmarx-triage</code> / <code>-keep</code></td>
 <td>default</td>
-<td>ready</td>
-<td>bookmarx, run <em>inside</em> the desktop as static files plus a stdlib server over a 269-post slice of its demo library (<code>tasks/bookmarx-lite/</code>). The review queue before a public demo: seventeen posts, nine the rules say to remove and eight guards that look risky and are clean. Nineteen checks, one fact each, named by category and never by post. A prompt pair: the bare rules vs the rules plus &quot;when unsure, keep&quot;, for over-deletion against under-deletion per check.</td>
+<td>validated, 10 + 10 runs, <strong>needs the export</strong></td>
+<td>bookmarx, run <em>inside</em> the desktop as static files plus a stdlib server over a 269-post slice of its demo library (<code>tasks/bookmarx-lite/</code>). The review queue before a public demo: seventeen posts, nine the rules say to remove and eight guards that look risky and are clean. Nineteen checks, one fact each, named by category and never by post. A prompt pair: the bare rules vs the rules plus &quot;when unsure, keep&quot;, for over-deletion against under-deletion per check. Published without frames or post ids: <code>screenshots: private</code> and <code>labels</code>.</td>
 </tr>
 <tr>
 <td><code>bookmarx-box-lookup</code> / <code>-paraphrase</code> / <code>-deep</code></td>
 <td>default</td>
-<td>ready</td>
+<td>ready, <strong>needs the export</strong></td>
 <td>The three search memories, on the boxed bookmarx: graded from the click the app records inside the VM.</td>
 </tr>
 <tr>
@@ -374,6 +399,14 @@ extension in VS Code you get completion and validation from
 <td>Runs on the scripted provider; exercises the pipeline with no VM or model. It is what CI runs.</td>
 </tr>
 </tbody></table>
+<p><strong>The five boxed bookmarx tasks need a file this repository does not carry.</strong>
+They upload <code>tasks/bookmarx-lite/bookmarx-box.tar.gz</code>, the export built by
+<code>pnpm demo:export</code> in <a href="https://github.com/tohirr/bookmarx">bookmarx</a>; it stays
+out of git because the review queue&#39;s removal targets are real saved posts.
+Without it those tasks are refused at load, naming the file and pointing at
+<a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/tasks/bookmarx-lite/README.md"><code>tasks/bookmarx-lite/README.md</code></a>, which says
+how to build it — nothing boots and nothing is billed. Every other task in the
+table runs from a clone.</p>
 <p>The ticket queue is a mock on purpose. A mock lets the bench
 own the state, plant a trap, and verify exactly. What they keep from the real
 thing is the shape: existing records to search, a duplicate to avoid, required
@@ -411,7 +444,14 @@ with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. The comparison folder holds the paired result.
 <code>passk export runs/&lt;dir&gt; evidence/&lt;name&gt;</code> copies a bench with only the
-screenshots that carry proof, plus every evidence file the task declared.
+screenshots that carry proof, plus every evidence file the task declared.</p>
+<p>A task whose screens carry real content adds <code>screenshots: private</code>, and then
+no frame leaves <code>runs/</code>: none is copied, the exported report shows none, and
+<code>export-inspect --images</code> embeds none. The numbers, the checks as run and the
+declared evidence files are exported as usual, so the bench is still auditable
+— the <code>bookmarx-triage</code> pair is graded from <code>state.json</code>, the decisions
+themselves, rather than from pictures of someone&#39;s library. Like <code>evidence</code>,
+the declaration cannot change an outcome, so it is not in the task hash. <code>labels: &lt;guest file&gt;</code> does the same for identifiers inside the evidence — post ids become <code>target 6 (hateful)</code> on the way out — and the export refuses if one is missed; <code>--labels file.json</code> applies a map at publish time.
 (In <code>bench.json</code>, spend per run is <code>usage.costUsd</code> and spend for the bench is
 <code>metrics.totalCostUsd</code>; there is no <code>metrics.costUsd</code>.) <code>passk export-inspect runs/&lt;dir&gt; [out dir]</code>
 writes the bench as an <a href="https://inspect.aisi.org.uk/">Inspect AI</a> eval log:

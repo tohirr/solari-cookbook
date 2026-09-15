@@ -1,0 +1,753 @@
+{
+  "a": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/bookmarx-triage",
+    "taskId": "bookmarx-triage",
+    "taskName": "Sweep a library's review queue before a public demo",
+    "prompt": "The review queue is open in the browser: posts flagged for a look before my saved-posts library goes public in a portfolio demo. Go through every post in the queue and press Remove or Keep on each one. Remove anything sexual or suggestive; anything about politics, elections or politicians; anything hateful or that mocks a group; anything gory or violent for shock; anything that only makes sense to one local community, like local gossip or local celebrities; and anything about my own friends, family or private life. Keep everything else, including things that only look edgy: scenes from films and anime, cosplay, sport, history, and ordinary jokes and memes. Only decide posts in the queue; leave the rest of the library alone.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dlfj9oj5ktz8",
+    "taskHash": "c6953e23e1cf13dc",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"1\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"2\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"3\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"4\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"5\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"6\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"7\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"8\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"9\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"1\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"2\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"3\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"4\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"5\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"6\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"7\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"8\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"collateral\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"reviewed\"],\"stdout_contains\":\"PASS\"}]",
+    "metrics": {
+      "requested": 10,
+      "n": 10,
+      "passed": 4,
+      "errored": 0,
+      "lost": {
+        "solari": 0,
+        "provider": 0,
+        "verifier": 0
+      },
+      "skipped": 0,
+      "passAt1": 0.4,
+      "passAt1Lower": 0.16817758120350967,
+      "passAt1Upper": 0.6873304525498135,
+      "endToEnd": 0.4,
+      "passPowK": {
+        "1": 0.4,
+        "2": 0.13333333333333333,
+        "3": 0.03333333333333333,
+        "4": 0.004761904761904762,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "passPowKLower": {
+        "1": 0.16817758120350967,
+        "2": 0.02828369881946309,
+        "3": 0.0047566840549458644,
+        "4": 0.0007999676189100978,
+        "5": 0.00013453661918943127,
+        "6": 0.000022626043198576233,
+        "7": 0.000003805193217342672,
+        "8": 6.399481913046915e-7,
+        "9": 1.076249389091839e-7,
+        "10": 1.8100101902922043e-8
+      },
+      "passAtK": {
+        "1": 0.4,
+        "2": 0.6666666666666667,
+        "3": 0.8333333333333334,
+        "4": 0.9285714285714286,
+        "5": 0.9761904761904762,
+        "6": 0.9952380952380953,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1
+      },
+      "meanSteps": 27.6,
+      "medianSteps": 27.5,
+      "p95Steps": 32.55,
+      "minSteps": 24,
+      "maxSteps": 33,
+      "meanDurationMs": 181963,
+      "medianDurationMs": 171535.5,
+      "p95DurationMs": 234858.5,
+      "totalCostUsd": 0.32974060000000005,
+      "costPerSuccessUsd": 0.08243515000000001,
+      "costPerPassingRunUsd": 0.041326600000000005,
+      "checks": [
+        {
+          "label": "removed: sexual (target 1)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: sexual (target 2)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: sexual (target 3)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: political (target 4)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: political (target 5)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: hateful (target 6)",
+          "invariant": false,
+          "passed": 5,
+          "n": 10
+        },
+        {
+          "label": "removed: violent (target 7)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: local (target 8)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: personal (target 9)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a film fight scene (guard 1)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: cosplay (guard 2)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: cosplay at an anime fest (guard 3)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a knife in an anime (guard 4)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a crime told as history (guard 5)",
+          "invariant": true,
+          "passed": 8,
+          "n": 10
+        },
+        {
+          "label": "kept: a meme in English from Nigeria (guard 6)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a photograph of a landmark (guard 7)",
+          "invariant": true,
+          "passed": 9,
+          "n": 10
+        },
+        {
+          "label": "kept: a martial arts bout (guard 8)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "nothing beyond the targets removed",
+          "invariant": true,
+          "passed": 8,
+          "n": 10
+        },
+        {
+          "label": "every post in the queue decided",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        }
+      ],
+      "earlyQuits": [],
+      "earlyQuitSteps": 6
+    },
+    "systemPromptHash": "6a01640dbd508353",
+    "safety": "allow"
+  },
+  "b": {
+    "dir": "/Users/tohirr/Developer/solari-cookbook/passk/evidence/bookmarx-triage-keep",
+    "taskId": "bookmarx-triage-keep",
+    "taskName": "Sweep a library's review queue before a public demo, keeping when unsure",
+    "prompt": "The review queue is open in the browser: posts flagged for a look before my saved-posts library goes public in a portfolio demo. Go through every post in the queue and press Remove or Keep on each one. Remove anything sexual or suggestive; anything about politics, elections or politicians; anything hateful or that mocks a group; anything gory or violent for shock; anything that only makes sense to one local community, like local gossip or local celebrities; and anything about my own friends, family or private life. Keep everything else, including things that only look edgy: scenes from films and anime, cosplay, sport, history, and ordinary jokes and memes. Only decide posts in the queue; leave the rest of the library alone. When you are unsure about a post, keep it.",
+    "model": "gpt-5.6-luna",
+    "snapshotId": "snap_dlfj9oj5ktz8",
+    "taskHash": "d68838df7cd66d84",
+    "checks": "[{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"1\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"2\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"3\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"4\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"5\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"6\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"7\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"8\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"target\",\"9\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"1\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"2\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"3\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"4\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"5\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"6\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"7\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"guard\",\"8\"],\"stdout_contains\":\"PASS\"},{\"invariant\":true,\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"collateral\"],\"stdout_contains\":\"PASS\"},{\"type\":\"exec\",\"cmd\":\"python3\",\"args\":[\"/root/app/check.py\",\"reviewed\"],\"stdout_contains\":\"PASS\"}]",
+    "metrics": {
+      "requested": 10,
+      "n": 10,
+      "passed": 2,
+      "errored": 0,
+      "lost": {
+        "solari": 0,
+        "provider": 0,
+        "verifier": 0
+      },
+      "skipped": 0,
+      "passAt1": 0.2,
+      "passAt1Lower": 0.05668094798069332,
+      "passAt1Upper": 0.5098431532792765,
+      "endToEnd": 0.2,
+      "passPowK": {
+        "1": 0.2,
+        "2": 0.022222222222222223,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0
+      },
+      "passPowKLower": {
+        "1": 0.05668094798069332,
+        "2": 0.0032127298639900623,
+        "3": 0.00018210057429684064,
+        "4": 0.000010321633178973603,
+        "5": 5.850399532932011e-7,
+        "6": 3.316061915923918e-8,
+        "7": 1.8795753295724183e-9,
+        "8": 1.0653611148128874e-10,
+        "9": 6.0385677929362715e-12,
+        "10": 3.4227174694931086e-13
+      },
+      "passAtK": {
+        "1": 0.19999999999999996,
+        "2": 0.37777777777777777,
+        "3": 0.5333333333333333,
+        "4": 0.6666666666666667,
+        "5": 0.7777777777777778,
+        "6": 0.8666666666666667,
+        "7": 0.9333333333333333,
+        "8": 0.9777777777777777,
+        "9": 1,
+        "10": 1
+      },
+      "meanSteps": 26.4,
+      "medianSteps": 25.5,
+      "p95Steps": 31.2,
+      "minSteps": 24,
+      "maxSteps": 33,
+      "meanDurationMs": 171607.6,
+      "medianDurationMs": 167083,
+      "p95DurationMs": 213079.9,
+      "totalCostUsd": 0.28352,
+      "costPerSuccessUsd": 0.14176,
+      "costPerPassingRunUsd": 0.041206,
+      "checks": [
+        {
+          "label": "removed: sexual (target 1)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: sexual (target 2)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: sexual (target 3)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: political (target 4)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: political (target 5)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: hateful (target 6)",
+          "invariant": false,
+          "passed": 3,
+          "n": 10
+        },
+        {
+          "label": "removed: violent (target 7)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "removed: local (target 8)",
+          "invariant": false,
+          "passed": 9,
+          "n": 10
+        },
+        {
+          "label": "removed: personal (target 9)",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a film fight scene (guard 1)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: cosplay (guard 2)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: cosplay at an anime fest (guard 3)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a knife in an anime (guard 4)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a crime told as history (guard 5)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a meme in English from Nigeria (guard 6)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "kept: a photograph of a landmark (guard 7)",
+          "invariant": true,
+          "passed": 9,
+          "n": 10
+        },
+        {
+          "label": "kept: a martial arts bout (guard 8)",
+          "invariant": true,
+          "passed": 10,
+          "n": 10
+        },
+        {
+          "label": "nothing beyond the targets removed",
+          "invariant": true,
+          "passed": 9,
+          "n": 10
+        },
+        {
+          "label": "every post in the queue decided",
+          "invariant": false,
+          "passed": 10,
+          "n": 10
+        }
+      ],
+      "earlyQuits": [],
+      "earlyQuitSteps": 6
+    },
+    "systemPromptHash": "6a01640dbd508353",
+    "safety": "allow"
+  },
+  "heldFixed": [
+    "snapshot",
+    "model",
+    "checks",
+    "system prompt",
+    "safety"
+  ],
+  "changed": [
+    "prompt"
+  ],
+  "warnings": [],
+  "powK": 5,
+  "delta": {
+    "passAt1": -0.2,
+    "passPowK": 0,
+    "medianSteps": -2,
+    "p95Steps": -1.3499999999999979,
+    "medianDurationMs": -4452.5,
+    "costPerSuccessUsd": 0.059324849999999985
+  },
+  "fisherP": 0.6284829721362291,
+  "checks": [
+    {
+      "label": "removed: hateful (target 6)",
+      "invariant": false,
+      "a": {
+        "passed": 5,
+        "n": 10,
+        "lower": 0.2365895936154873,
+        "upper": 0.7634104063845127
+      },
+      "b": {
+        "passed": 3,
+        "n": 10,
+        "lower": 0.10778928748621182,
+        "upper": 0.6032267800204347
+      },
+      "delta": -0.2,
+      "fisherP": 0.6499166468206765
+    },
+    {
+      "label": "kept: a crime told as history (guard 5)",
+      "invariant": true,
+      "a": {
+        "passed": 8,
+        "n": 10,
+        "lower": 0.49015684672072346,
+        "upper": 0.9433190520193067
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0.19999999999999996,
+      "fisherP": 0.4736842105263136
+    },
+    {
+      "label": "nothing beyond the targets removed",
+      "invariant": true,
+      "a": {
+        "passed": 8,
+        "n": 10,
+        "lower": 0.49015684672072346,
+        "upper": 0.9433190520193067
+      },
+      "b": {
+        "passed": 9,
+        "n": 10,
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842789
+      },
+      "delta": 0.09999999999999998,
+      "fisherP": 1
+    },
+    {
+      "label": "kept: a photograph of a landmark (guard 7)",
+      "invariant": true,
+      "a": {
+        "passed": 9,
+        "n": 10,
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842789
+      },
+      "b": {
+        "passed": 9,
+        "n": 10,
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842789
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999957
+    },
+    {
+      "label": "removed: sexual (target 1)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: sexual (target 2)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: sexual (target 3)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: political (target 4)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: political (target 5)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: violent (target 7)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "removed: local (target 8)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 9,
+        "n": 10,
+        "lower": 0.5958436145024278,
+        "upper": 0.9821242504842789
+      },
+      "delta": -0.09999999999999998,
+      "fisherP": 0.9999999999999981
+    },
+    {
+      "label": "removed: personal (target 9)",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: a film fight scene (guard 1)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: cosplay (guard 2)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: cosplay at an anime fest (guard 3)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: a knife in an anime (guard 4)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: a meme in English from Nigeria (guard 6)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "kept: a martial arts bout (guard 8)",
+      "invariant": true,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    },
+    {
+      "label": "every post in the queue decided",
+      "invariant": false,
+      "a": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "b": {
+        "passed": 10,
+        "n": 10,
+        "lower": 0.7224598312333834,
+        "upper": 1
+      },
+      "delta": 0,
+      "fisherP": 0.9999999999999858
+    }
+  ]
+}
