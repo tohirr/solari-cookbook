@@ -184,9 +184,36 @@ marks ✗ before going further. The commands in these docs are written as
 <code>passk …</code>; run them as <code>npm run passk -- …</code> or set <code>alias passk=&quot;npx tsx src/cli.ts&quot;</code>
 inside the <code>passk/</code> folder.</p>
 <p>Results land in <code>runs/&lt;task&gt;-&lt;timestamp&gt;/</code> (ignored by git); the curated,
-committed copies live in <a href="../evidence"><code>evidence/</code></a>.</p>
+committed copies live in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/evidence/"><code>evidence/</code></a>.</p>
 <p>The Claude agent loop is written but was not exercised during development
 for want of a working key; every published result came from the OpenAI loop.</p>
+<h2 id="in-ci">In CI</h2>
+<p>The GitHub Action runs <code>passk run</code> on a runner with no display; the desktops
+are Solari&#39;s. Secrets arrive as <code>env</code>, never as inputs.</p>
+<pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@main
+  with:
+    task: tasks/ticket-queue.yaml     # path in your repo
+    k: 10
+    require-lower: 0.7                # or require: 0.9 for the observed rate
+    provider: openai                  # anthropic | openai | scripted; default picks from the keys present
+    concurrency: 2                    # match your Solari plan
+    budget: 1                         # stop launching runs at $1 of model spend
+    snapshot: snap_…                  # optional: fork this snapshot instead of preparing one
+    classify: &quot;false&quot;                 # a cause hypothesis per failed run costs model calls
+  env:
+    SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+</code></pre>
+<p>The step writes the verdict, every run as a glyph, the interval, pass^5,
+the checks that missed and the failed runs to the job summary, sets
+<code>passed</code>, <code>n</code>, <code>pass-at-1</code>, <code>pass-at-1-lower</code>, <code>pass-pow-5</code>, <code>cost-usd</code>,
+<code>bench-dir</code> and <code>exit-code</code> as outputs, uploads the bench directory as an
+artifact whatever happened, and only then raises the gate: exit 0 met, 2
+missed, 1 crashed. Without a <code>snapshot</code> the action prepares one on every
+run, which costs a desktop boot and the task&#39;s setup; pass the id from a
+first run to skip that and keep every run on one environment. The
+scripted provider needs no keys and no Solari, which is how this repo&#39;s
+own workflow tests the action.</p>
 <h2 id="task-status">Task status</h2>
 <p>Every task carries a <code>golden</code> block, the recipe for a correct outcome with
 no agent involved, so <code>passk validate</code> can prove its checks fail before and
@@ -248,7 +275,7 @@ running. Task files carry a <code>yaml-language-server</code> schema hint; with 
 extension in VS Code you get completion and validation from
 <code>schema/task.schema.json</code>.</p>
 <h2 id="tasks-that-ship">Tasks that ship</h2>
-<p>Status is <strong>validated</strong> when live runs are published in <a href="../evidence"><code>evidence/</code></a>,
+<p>Status is <strong>validated</strong> when live runs are published in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/evidence/"><code>evidence/</code></a>,
 <strong>ready</strong> when the verifier is proven and no runs are published.</p>
 <table>
 <thead>
@@ -309,7 +336,7 @@ success, and Fisher&#39;s exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
 small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.</p>
 <h2 id="evidence">Evidence</h2>
-<p><a href="../evidence"><code>evidence/</code></a> holds every bench cited in the README: <code>bench.json</code>
+<p><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/evidence/"><code>evidence/</code></a> holds every bench cited in the README: <code>bench.json</code>
 with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. The comparison folder holds the paired result.
@@ -338,7 +365,7 @@ that is what a Solari snapshot isolates and a fork resets: LibreOffice and
 other desktop applications, PDFs and files, local web tools served from the
 VM, multi-application workflows across the three templates, custom templates,
 benches of 50+ runs, and controlled comparisons of prompts on one snapshot.
-Every result in <a href="../evidence"><code>evidence/</code></a> is one of these.</p>
+Every result in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/evidence/"><code>evidence/</code></a> is one of these.</p>
 <p><strong>Experimental.</strong> Written but not exercised: the Claude agent loop (no working
 key during development). Architecturally supported but not demonstrated:
 comparing two models on one snapshot. Likely to work with care: longer

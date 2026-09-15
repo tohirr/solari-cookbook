@@ -36,6 +36,11 @@ function map(href: string, src: string, out: string): string {
   const repoRel = path.posix.normalize(path.posix.join(path.posix.dirname(src), file));
   const page = PAGES.find((p) => p.src === repoRel);
   const target = page ? page.out : repoRel === "evidence/README.md" ? "evidence/index.html" : repoRel;
+  // Source files (action.yml, a workflow, a task) are not pages: send those to GitHub, where they render.
+  if (!page && !/\.(html|jpe?g|png|gif|svg)$/i.test(target)) {
+    const inRepo = target.startsWith("../") ? target.slice(3) : `passk/${target}`;
+    return `https://github.com/tohirr/solari-cookbook/blob/main/${inRepo}${frag ? `#${frag}` : ""}`;
+  }
   const rel = path.posix.relative(path.posix.dirname(out), target) || ".";
   return `${rel}${frag ? `#${frag}` : ""}`;
 }

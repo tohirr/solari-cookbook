@@ -1,50 +1,28 @@
-# passk — does your computer-use agent pass twice?
+# passk — reliability CI for computer-use agents
 
-An agent that passes a demo once tells you nothing about the tenth try.
-passk snapshots one [Solari](https://getsolari.com) desktop, forks it *k*
-times, runs the same agent on every fork, grades the outcome **inside the
-VM** after the agent stops, and reports pass@k and pass^k with honest
-intervals. Nothing the agent says about its own success counts.
+Your agent passed the demo. Will it pass the tenth time? passk forks one
+[Solari](https://getsolari.com) desktop snapshot *k* times, runs your agent
+on every fork, grades each run **inside the VM** after the agent stops, and
+fails the build unless the pass rate clears the bar. Nothing the agent says
+about its own success counts.
 
-passk exists for one question: when your agent works, how often does it
-work? A single pass is one draw from a distribution. Solari's snapshot and
-fork make the rest of the draws cheap: every attempt starts from a
-byte-identical desktop, so fifty runs of a task cost about a dollar on a
-budget model, and the spread you measure is the agent's, not the
-environment's.
+```yaml
+- uses: tohirr/solari-cookbook/passk@main
+  with:
+    task: tasks/ticket-queue.yaml
+    k: 10
+    require-lower: 0.7       # fail unless the 95% lower bound on the pass rate clears 70%
+  env:
+    SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}    # or ANTHROPIC_API_KEY
+```
 
-What a bench reports, and what a comparison adds:
-
-- **pass@1 with a 95% interval, and pass^k**, the chance that *k* attempts in
-  a row all succeed, which is the number a user feels.
-- **A verifier proven before any agent runs.** The checks must fail on the
-  untouched snapshot and pass after the task's golden steps, or no bench.
-- **Per check, how often each rule was met**, so a pass rate becomes a diagnosis.
-- **For each failure**, the first step where it parted from a passing run and
-  a hypothesis for why.
-- **Runs lost to infrastructure**, listed and never scored against the agent.
-- **`compare`**: two conditions on one snapshot, what was held fixed, what
-  changed, the per-check deltas, and Fisher's exact p, so you learn whether a
-  change moved anything or the sample was too small to say.
-
-<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
-
-**[An example comparison](https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html)
-· [Every bench and screenshot](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
-· [How it works](passk/docs/TASKS.md#what-run-does)
-· [The method](passk/docs/METHOD.md)
-· [Notes for Solari's team](passk/docs/SOLARI-NOTES.md)**
-
-The benches published so far were run while building the tool, on one budget
-model at small *k*. They are there to show what the pages contain, not as
-findings about any model, and they will be re-run. Every number on them links
-to its bench file, the checks as run, and the screenshots.
-
-The question is from Gonzalez-Pumariega et al., [*On the Reliability of
-Computer Use Agents*](https://arxiv.org/abs/2604.17849) (2026), which
-measures it on OSWorld. passk measures it on *your* workflow, and Solari's
-snapshot-and-fork is what makes every attempt start byte-identical and
-fifty runs cost about a dollar.
+The runner needs no display: the desktops are Solari's, booted from one
+snapshot in about a second each, so every attempt starts byte-identical and
+ten runs cost cents on a budget model. What comes back: pass@1 with a 95%
+interval, pass^k (the chance *k* attempts in a row all succeed), how often
+each check was met, the step where each failure parted from a passing run,
+and every screenshot, in the job summary and the artifact.
 
 No keys, forty seconds, the whole pipeline on in-memory desktops:
 
@@ -53,8 +31,21 @@ git clone https://github.com/tohirr/solari-cookbook.git && cd solari-cookbook/pa
 PASSK_PROVIDER=scripted npm run passk run tasks/fake.yaml -- --k 10
 ```
 
-The real thing needs a Solari key and an OpenAI or Anthropic key; start at
-[`passk/README.md`](passk/README.md).
+<p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/compare-ticket-routing-prompt/compare.html"><img src="passk/docs/compare-ticket-routing.jpg" alt="A passk comparison page: one task under two prompts on the same snapshot, the outcome dots for each side, the deltas in passes, effort and cost, and a by-check table showing which rules moved" width="100%"></a></p>
+
+**[passk/README.md](passk/README.md)
+· [Ten things learned about Solari](passk/docs/SOLARI-NOTES.md)
+· [A worked example](https://tohirr.github.io/solari-cookbook/passk/evidence/index.html)
+· [The manual](passk/docs/TASKS.md)
+· [The method](passk/docs/METHOD.md)**
+
+The bench is the instrument and `compare` is the point: two conditions on
+one snapshot, what was held fixed, what changed, the delta per check, and
+Fisher's exact p. The example above was run while building the tool, on one
+budget model at small *k*; it shows what the pages contain and is not a
+finding. The question is from Gonzalez-Pumariega et al.,
+[*On the Reliability of Computer Use Agents*](https://arxiv.org/abs/2604.17849)
+(2026), which measures it on OSWorld; passk measures it on your workflow.
 
 ---
 

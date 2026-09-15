@@ -41,6 +41,38 @@ committed copies live in [`evidence/`](../evidence/).
 The Claude agent loop is written but was not exercised during development
 for want of a working key; every published result came from the OpenAI loop.
 
+## In CI
+
+The GitHub Action runs `passk run` on a runner with no display; the desktops
+are Solari's. Secrets arrive as `env`, never as inputs.
+
+```yaml
+- uses: tohirr/solari-cookbook/passk@main
+  with:
+    task: tasks/ticket-queue.yaml     # path in your repo
+    k: 10
+    require-lower: 0.7                # or require: 0.9 for the observed rate
+    provider: openai                  # anthropic | openai | scripted; default picks from the keys present
+    concurrency: 2                    # match your Solari plan
+    budget: 1                         # stop launching runs at $1 of model spend
+    snapshot: snap_…                  # optional: fork this snapshot instead of preparing one
+    classify: "false"                 # a cause hypothesis per failed run costs model calls
+  env:
+    SOLARI_API_KEY: ${{ secrets.SOLARI_API_KEY }}
+    OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+```
+
+The step writes the verdict, every run as a glyph, the interval, pass^5,
+the checks that missed and the failed runs to the job summary, sets
+`passed`, `n`, `pass-at-1`, `pass-at-1-lower`, `pass-pow-5`, `cost-usd`,
+`bench-dir` and `exit-code` as outputs, uploads the bench directory as an
+artifact whatever happened, and only then raises the gate: exit 0 met, 2
+missed, 1 crashed. Without a `snapshot` the action prepares one on every
+run, which costs a desktop boot and the task's setup; pass the id from a
+first run to skip that and keep every run on one environment. The
+scripted provider needs no keys and no Solari, which is how this repo's
+own workflow tests the action.
+
 ## Task status
 
 Every task carries a `golden` block, the recipe for a correct outcome with

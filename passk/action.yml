@@ -90,7 +90,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v7
       with:
         node-version: "20"
     - name: install passk
@@ -132,7 +132,7 @@ runs:
         set -e
         echo "code=$code" >> "$GITHUB_OUTPUT"
         "$TSX" "$GITHUB_ACTION_PATH/scripts/ci-summary.ts" "$PASSK_RUNS_DIR" "$code"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v7
       if: ${{ always() && inputs.upload == 'true' }}
       with:
         name: ${{ inputs.artifact-name }}
@@ -140,4 +140,11 @@ runs:
         if-no-files-found: ignore
     - name: gate
       shell: bash
-      run: exit "${{ steps.bench.outputs.code }}"
+      run: |
+        code="${{ steps.bench.outputs.code }}"
+        case "$code" in
+          0) echo "::notice title=passk::gate met: ${{ steps.bench.outputs.passed }}/${{ steps.bench.outputs.n }} passed" ;;
+          2) echo "::error title=passk::gate missed: ${{ steps.bench.outputs.passed }}/${{ steps.bench.outputs.n }} passed, 95% lower bound ${{ steps.bench.outputs.pass_at_1_lower }}. The job summary has the checks and the failed runs; the artifact has the report." ;;
+          *) echo "::error title=passk::the bench did not complete (exit $code). See the step log." ;;
+        esac
+        exit "$code"
