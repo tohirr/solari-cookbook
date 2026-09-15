@@ -1,0 +1,22 @@
+# Setup include: the template's Chrome, relaunched on a page, with a DevTools
+# port and its "Can't update Chrome" bubble clicked shut.
+#
+#   setup_from:
+#     - file: bookmarx-lite/chrome.yaml
+#       with: { url: "http://127.0.0.1:8080/box" }
+#
+# Every part of this line was paid for on a live VM: the environment has to be
+# read out of the running browser's /proc entry (a fresh google-chrome-stable
+# inherits no DISPLAY), the old process has to die before a new one can take
+# the profile, the update bubble swallows the first click of the run, and the
+# DevTools port is what the checks read the app's state through. It was pasted
+# verbatim into eight task files before it lived here; `${url}` is the only
+# thing that ever differed.
+#
+# Note for anyone editing this file: `${name}` is a passk placeholder and must
+# be supplied under `with:`. Shell variables in an included step are written
+# $NAME, never ${NAME}.
+- exec: sh
+  args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 '${url}' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
+# Let the window manager settle before the snapshot is taken.
+- wait: 3

@@ -208,7 +208,8 @@ what is out of scope are in <a href="docs/tasks.html">the manual</a>.</p>
 <li><strong>For each failure</strong>, the first step where it diverged from a passing run, and a cause hypothesis.</li>
 <li><strong>Steps, seconds and model spend</strong> per run, and cost per success with the failed attempts counted.</li>
 <li><strong>Runs lost to infrastructure</strong>, listed and never scored against the agent.</li>
-<li><strong>Every screenshot, every action, the checks as run</strong>, and a hash of the task, so the number is auditable.</li>
+<li><strong>Runs that stopped early</strong>, marked when a run stops by itself far under the bench&#39;s typical effort: not the same failure as working to the step cap and getting it wrong.</li>
+<li><strong>Every screenshot, every action, the checks as run</strong>, and a hash of the task, so the number is auditable — plus any file the task names as <code>evidence</code>, copied out of each fork before it is killed.</li>
 </ul>
 <p align="center"><a href="https://tohirr.github.io/solari-cookbook/passk/evidence/index.html"><img src="docs/failure-ticket-routing.jpg" alt="Failure evidence: a passing run and a failing run of the routing task on one time axis, the first divergent step, the agent's claim of success, and the checker's MISMATCH from inside the VM" width="100%"></a></p>
 

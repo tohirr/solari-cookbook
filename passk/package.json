@@ -10,6 +10,11 @@
   "bin": {
     "passk": "./src/cli.ts"
   },
+  "exports": {
+    "./agent-types": { "types": "./agent-types/index.d.ts" },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "passk": "tsx src/cli.ts",
     "prepare-task": "tsx src/cli.ts prepare",

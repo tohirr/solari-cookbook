@@ -41,3 +41,16 @@ test("PASSK_AGENT: a module without the export, or a missing file, says so", asy
   await assert.rejects(loadCustomAgent("test/fixtures/not-an-agent.ts"), /must export runAgent\(opts\) or a default function; exports: version/);
   await assert.rejects(loadCustomAgent("test/fixtures/nope.ts"), /could not load/);
 });
+
+test("the agent contract is published as a types-only entry, and the fixture uses it", () => {
+  const pkg = JSON.parse(fs.readFileSync("package.json", "utf8")) as { exports: Record<string, { types?: string }> };
+  const entry = pkg.exports["./agent-types"];
+  assert.ok(entry?.types && fs.existsSync(entry.types), `package.json should export ./agent-types (${entry?.types})`);
+  const dts = fs.readFileSync(entry.types!, "utf8");
+  for (const name of ["AgentRunOptions", "AgentRunOutput", "TraceStep", "Desktop"]) {
+    assert.match(dts, new RegExp(`export (interface|type) ${name}\\b`), `${name} should be published`);
+  }
+  assert.ok(!fs.existsSync("agent-types/index.js"), "types only: there is nothing to import at run time");
+  // src/agent/published-contract.ts fails `npm run typecheck` if this drifts from the real loop.
+  assert.match(fs.readFileSync("test/fixtures/custom-agent.ts", "utf8"), /from "passk\/agent-types"/);
+});

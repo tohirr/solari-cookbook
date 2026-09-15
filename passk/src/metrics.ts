@@ -62,6 +62,39 @@ export function lostKind(r: RunResult): "solari" | "provider" | "verifier" | nul
   return r.steps.length === 0 ? "solari" : null;
 }
 
+/**
+ * The fraction of a bench's median effort below which a self-stopped failure
+ * reads as "stopped early" rather than "tried and was wrong".
+ */
+export const EARLY_QUIT_FRACTION = 0.25;
+
+/**
+ * The step count at or below which a scored run that stopped of its own
+ * accord counts as an early quit — a quarter of the bench's median effort.
+ * 0 (the test does not apply) when there are too few runs to have a typical
+ * effort, or when the typical run is so short that a fraction of it means
+ * nothing.
+ */
+export function earlyQuitThreshold(scored: RunResult[]): number {
+  if (scored.length < 3) return 0;
+  const median = percentile(scored.map((r) => r.steps.length).sort((a, b) => a - b), 0.5);
+  if (median < 8) return 0;
+  return Math.max(1, Math.floor(median * EARLY_QUIT_FRACTION));
+}
+
+/**
+ * Runs that ended cleanly, far below the bench's typical effort, and did not
+ * pass. A run that worked to the step cap and a run that stopped after two
+ * actions with the work untouched are both "failed", and they are not the
+ * same failure, and the second is worth naming the way a lost run is named.
+ * Named for what happened, not why: an agent that gave up and one that
+ * believed it was done look identical here.
+ */
+export function earlyQuits(scored: RunResult[], threshold = earlyQuitThreshold(scored)): number[] {
+  if (!threshold) return [];
+  return scored.filter((r) => r.status !== "passed" && r.stoppedBy === "end_turn" && r.steps.length <= threshold).map((r) => r.runIndex);
+}
+
 export function computeMetrics(allRuns: RunResult[], requested = allRuns.length): BenchMetrics {
   const lost = { solari: 0, provider: 0, verifier: 0 };
   for (const r of allRuns) { const k = lostKind(r); if (k) lost[k]++; }
@@ -86,6 +119,8 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
   // before the tenth pass are not free. Lost runs (infra) are excluded here
   // and in n, and their spend is only in totalCostUsd.
   const costScored = runs.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0);
+  const totalCost = allRuns.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0);
+  const quitThreshold = earlyQuitThreshold(runs);
   // Per check, across the scored runs: which rule fails, not just how often runs do.
   const checkCount = Math.max(0, ...runs.map((r) => r.checks.length));
   const checks: CheckStat[] = Array.from({ length: checkCount }, (_, i) => {
@@ -115,10 +150,12 @@ export function computeMetrics(allRuns: RunResult[], requested = allRuns.length)
     meanDurationMs: n ? durations.reduce((a, b) => a + b, 0) / n : 0,
     medianDurationMs: percentile(durations, 0.5),
     p95DurationMs: percentile(durations, 0.95),
-    totalCostUsd: allRuns.reduce((s, r) => s + (r.usage.costUsd ?? 0), 0),
+    totalCostUsd: totalCost,
     costPerSuccessUsd: passedRuns.length ? costScored / passedRuns.length : null,
     costPerPassingRunUsd: passedRuns.length ? costPassed / passedRuns.length : null,
     checks,
+    earlyQuits: earlyQuits(runs, quitThreshold),
+    earlyQuitSteps: quitThreshold,
   };
 }
 

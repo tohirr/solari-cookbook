@@ -9,11 +9,31 @@ import { bootDesktop, destroyDesktop, sleep, snapshotDesktop } from "./desktop.j
 import { writeSnapshot } from "./config.js";
 import type { SetupStep, Task } from "./types.js";
 
+/**
+ * Boot with one retry. This is the only Solari call in a whole `run` that
+ * nothing else guards: a fork that never comes up is already retried once and
+ * otherwise written off as a lost run, but a transient failure here — a 401
+ * from the API that the identical command survives a minute later, a host
+ * hiccup during create — takes the command down before there is anything to
+ * resume. One retry, then the error stands.
+ */
+async function bootWithRetry(task: Task): Promise<Desktop> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await bootDesktop({ template: task.template, resolution: task.resolution, metadata: { task: task.id, role: "golden" } });
+    } catch (err) {
+      if (attempt > 1) throw err;
+      console.warn(`boot failed (${(err as Error).message}); retrying once in 5s`);
+      await sleep(5000);
+    }
+  }
+}
+
 export async function prepareTask(task: Task): Promise<string> {
   let desktop: Desktop | undefined;
   try {
     console.log(`booting ${task.template} desktop at ${task.resolution} …`);
-    desktop = await bootDesktop({ template: task.template, resolution: task.resolution, metadata: { task: task.id, role: "golden" } });
+    desktop = await bootWithRetry(task);
     console.log(`desktop ${desktop.id}  watch: ${desktop.streamUrl}`);
 
     for (const step of task.setup ?? []) await runSetupStep(desktop, step);

@@ -60,6 +60,8 @@ jobs:
           test "${{ steps.pass.outputs.passed }}" = "10"
           test "${{ steps.pass.outputs.n }}" = "10"
           test "${{ steps.pass.outputs.exit-code }}" = "0"
+      # passk:… names a task inside the action's own checkout, so a consumer
+      # can bench one of passk's tasks without checking passk out themselves.
       - name: an 8/10 agent is refused by --require 0.9 through the action
         id: miss
         uses: ./passk
@@ -67,7 +69,7 @@ jobs:
         env:
           PASSK_SCRIPT: "pass*6,fail,pass,claim_only,pass"
         with:
-          task: passk/tasks/fake.yaml
+          task: passk:tasks/fake.yaml
           provider: scripted
           k: 10
           concurrency: 4

@@ -5,7 +5,9 @@
  * fixture is written for tasks/fake.yaml. A real agent would drive the
  * desktop from the prompt with a model of its choosing.
  */
-import type { AgentRunOptions, AgentRunOutput } from "../../src/agent/index.js";
+// The published contract, the way a consumer in their own repo imports it:
+// types only, no runtime, no Solari SDK needed to type-check this file.
+import type { AgentRunOptions, AgentRunOutput } from "passk/agent-types";
 
 export async function runAgent(opts: AgentRunOptions): Promise<AgentRunOutput> {
   if ("checks" in opts) throw new Error("a custom agent must never receive the checks");

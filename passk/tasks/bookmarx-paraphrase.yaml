@@ -10,10 +10,11 @@ id: bookmarx-paraphrase
 name: Find a saved post from a long paraphrase
 template: default
 resolution: 1280x720
-setup:
-  - exec: sh
-    args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'https://www.bookmarx.space/api/demo' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
-  - wait: 3
+# Setup is one shared step: the template's Chrome, relaunched on the live
+# site with a DevTools port. The line lives in tasks/bookmarx-lite/chrome.yaml.
+setup_from:
+  - file: bookmarx-lite/chrome.yaml
+    with: { url: "https://www.bookmarx.space/api/demo" }
 prompt: >
   bookmarx is open in the browser: a search over my saved posts. Find the post
   I mean: "some guy that said his mother understood him after he made her watch a scene with him". Search for it, pick the result that matches, and open the

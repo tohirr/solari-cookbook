@@ -3,10 +3,13 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { parse } from "yaml";
 import { Ajv, type ErrorObject } from "ajv";
-import type { Task } from "./types.js";
+import type { SetupStep, Task } from "./types.js";
 
 const require = createRequire(import.meta.url);
-const validateTaskFile = new Ajv({ allErrors: true }).compile(require("../schema/task.schema.json"));
+const taskSchema = require("../schema/task.schema.json") as { properties: { setup: { items: object } } };
+const validateTaskFile = new Ajv({ allErrors: true }).compile(taskSchema);
+/** The setup-step branch of the same schema, on its own, so an include is refused for the same reasons a task would be. */
+const validateSteps = new Ajv({ allErrors: true }).compile({ type: "array", items: taskSchema.properties.setup.items });
 
 function loadDotenv(): void {
   const p = path.resolve(".env");
@@ -97,17 +100,64 @@ function schemaProblems(errors: ErrorObject[], raw: unknown): string[] {
   return [...out];
 }
 
+/** One `setup_from` entry: a file of steps, and values for the `${name}` placeholders in it. */
+type Include = string | { file: string; with?: Record<string, string> };
+
+/**
+ * Read a setup include: a YAML list of steps, or a document with a `setup:`
+ * list. The steps are validated against the same schema branch as a task's
+ * own, so a typo in a shared file fails at load, not on a booted desktop.
+ */
+function readInclude(file: string): SetupStep[] {
+  const doc = parse(fs.readFileSync(file, "utf8")) as unknown;
+  const steps = Array.isArray(doc) ? doc : (doc as { setup?: unknown } | null)?.setup;
+  if (!Array.isArray(steps)) throw new Error(`${file} is not a setup include: expected a list of steps, or a document with a \`setup:\` list`);
+  if (!validateSteps(steps)) throw new Error(`${file} is not a valid setup include:\n${(validateSteps.errors ?? []).map((e) => `  ${e.instancePath || "/"} ${e.message}`).join("\n")}`);
+  return steps as SetupStep[];
+}
+
+/**
+ * Fill an include's `${name}` placeholders from its `with:` block. Every
+ * placeholder must be given a value: an unresolved one would reach the guest
+ * as literal text and fail somewhere far less obvious. Shell expansions in an
+ * included step must therefore be written `$NAME`, not `${NAME}`.
+ */
+function substitute<T>(node: T, vars: Record<string, string>, file: string): T {
+  if (typeof node === "string") {
+    return node.replace(/\$\{([A-Za-z0-9_]+)\}/g, (_m, name: string) => {
+      if (!(name in vars)) throw new Error(`${file}: nothing supplies \${${name}}; add it under \`with:\` in the task's setup_from`);
+      return vars[name];
+    }) as T;
+  }
+  if (Array.isArray(node)) return node.map((v) => substitute(v, vars, file)) as T;
+  if (node && typeof node === "object") {
+    return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, substitute(v, vars, file)])) as T;
+  }
+  return node;
+}
+
 /**
  * Parse a task file and refuse it before anything billable if it does not
  * match schema/task.schema.json: the same schema the editor uses, so what
- * completes in VS Code is what runs.
+ * completes in VS Code is what runs. `setup_from` includes are resolved here,
+ * against the task file's directory, so everything downstream — the snapshot,
+ * the task hash, the bench's own record of what it ran — sees one flat list
+ * of steps and never has to know a file was shared.
  */
 export function loadTask(file: string): Task {
-  const raw = parse(fs.readFileSync(file, "utf8")) as Task;
+  const raw = parse(fs.readFileSync(file, "utf8")) as Task & { setup_from?: Include | Include[] };
   if (!validateTaskFile(raw)) {
     throw new Error(`${file} is not a valid passk task:\n${schemaProblems(validateTaskFile.errors ?? [], raw).join("\n")}`);
   }
-  return { template: "default", resolution: "1280x720", max_steps: 40, ...raw };
+  const { setup_from, ...task } = raw;
+  const includes = setup_from === undefined ? [] : Array.isArray(setup_from) ? setup_from : [setup_from];
+  const shared = includes.flatMap((inc) => {
+    const spec = typeof inc === "string" ? { file: inc, with: {} } : inc;
+    const p = path.resolve(path.dirname(file), spec.file);
+    return substitute(readInclude(p), spec.with ?? {}, p);
+  });
+  const setup = shared.length ? [...shared, ...(task.setup ?? [])] : task.setup;
+  return { template: "default", resolution: "1280x720", max_steps: 40, ...task, ...(setup ? { setup } : {}) };
 }
 
 /** Snapshot ids are remembered per task so `run` can fork without re-preparing. */

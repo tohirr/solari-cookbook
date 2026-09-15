@@ -192,7 +192,7 @@ for want of a working key; every published result came from the OpenAI loop.</p>
 are Solari&#39;s. Secrets arrive as <code>env</code>, never as inputs.</p>
 <pre><code class="language-yaml">- uses: tohirr/solari-cookbook/passk@v0.2
   with:
-    task: tasks/ticket-queue.yaml     # path in your repo
+    task: tasks/ticket-queue.yaml     # path in your repo, or passk:tasks/… for one of passk&#39;s own
     k: 10
     require-lower: 0.7                # or require: 0.9 for the observed rate
     provider: openai                  # anthropic | openai | scripted; default picks from the keys present
@@ -215,6 +215,10 @@ run, which costs a desktop boot and the task&#39;s setup; pass the id from a
 first run to skip that and keep every run on one environment. The
 scripted provider needs no keys and no Solari, which is how this repo&#39;s
 own workflow tests the action.</p>
+<p>A <code>task:</code> starting with <code>passk:</code> (<code>passk:tasks/ticket-queue.yaml</code>) is one of
+the tasks that ship with the action, resolved inside the action&#39;s own checkout
+and run from there, so its uploads and check scripts are found without a second
+checkout in your workflow. Everything else resolves against your workspace.</p>
 <h2 id="task-status">Task status</h2>
 <p>Every task carries a <code>golden</code> block, the recipe for a correct outcome with
 no agent involved, so <code>passk validate</code> can prove its checks fail before and
@@ -241,7 +245,40 @@ checks:                     # evaluated INSIDE the desktop after the agent stops
 <p>Setup steps: <code>exec</code> (argv, no shell), <code>open</code> (launch a GUI app by name),
 <code>write</code> (text to a guest path), <code>upload</code> (local file to a guest path), <code>click</code>
 (x, y), <code>press</code> (a key or &quot;+&quot;-joined chord), <code>type</code> (literal text), <code>wait</code>
-(seconds). Everything runs once, before the snapshot, so forks pay none of it.</p>
+(seconds). Everything runs once, before the snapshot, so forks pay none of it.
+An <code>upload</code> goes over the control channel as one base64 frame: the largest this
+project has sent is the 8.6 MB bookmarx tarball, which went through without
+complaint. The SDK documents no ceiling, and nothing here has probed for one;
+if you are uploading tens of megabytes, expect to find the limit yourself, and
+fetch it inside the VM with <code>exec</code> instead.</p>
+<p><strong>Setup steps a task shares.</strong> A line that took an afternoon to get right
+belongs in one file. <code>setup_from</code> pulls a list of steps in ahead of the task&#39;s
+own, resolved against the task file&#39;s directory, with <code>${name}</code> placeholders
+filled from <code>with</code>:</p>
+<pre><code class="language-yaml">setup_from:
+  - bookmarx-lite/box.yaml                  # the app, served inside the VM
+  - file: bookmarx-lite/chrome.yaml         # the browser, on a page of it
+    with: { url: &quot;http://127.0.0.1:8080/box&quot; }
+</code></pre>
+<p>The include is a plain list of setup steps (or a document with a <code>setup:</code>
+list), validated against the same schema as a task&#39;s own steps, so a typo in a
+shared file fails at load rather than on a booted desktop. Every placeholder
+must be supplied; a shell variable inside an included step is therefore written
+<code>$NAME</code>, never <code>${NAME}</code>. Includes are flattened before anything else sees the
+task, so the snapshot, the bench&#39;s recorded task and the task hash are exactly
+what they would have been with the steps pasted in — the eight bookmarx tasks
+moved to <code>tasks/bookmarx-lite/chrome.yaml</code> without a single hash changing.</p>
+<p><strong>Evidence a run keeps.</strong> A check answers yes or no; the file behind the answer
+explains it. <code>evidence</code> names guest paths that every run copies out after
+grading, into <code>&lt;run dir&gt;/evidence/</code>:</p>
+<pre><code class="language-yaml">evidence:
+  - /root/app/state.json     # the whole decisions map, not just which check missed
+</code></pre>
+<p>They are copied after the checks and before the desktop is killed, appear on
+each run in the report, survive <code>passk export</code>, and are skipped with a note if
+a file is missing or over 2 MB. Declaring one cannot change an outcome, so it
+is left out of the task hash: a bench that starts keeping a state file is still
+comparable with the one before it.</p>
 <p>Check types: <code>file_exists</code>, <code>file_contains</code>, <code>file_equals</code>, <code>exec</code> (exit code +
 stdout), <code>screenshot_judge</code> (the model grades the final screen against a rubric).
 Prefer several checks that each grade one fact over one script that grades
@@ -261,6 +298,13 @@ check changes neither grading nor the task hash.</p>
   bench      fork ×k from the snapshot, agent loop on each, checks inside the VM, kill
   report     pass@1 with its interval, pass^k, divergence and cause per failure, report.html
 </code></pre>
+<p>The report marks a run that stopped by itself at or under a quarter of the
+bench&#39;s median effort without passing: a run that stopped after two steps
+and one that worked to the step cap and got it wrong are both failures, and
+they are not the same failure. The mark says what happened; whether the agent
+gave up or believed it was done is left to the hypotheses. With classification switched off, the report,
+the terminal summary and the job summary all say so where the hypotheses would
+have been, so an empty failure section is never read as &quot;nothing to explain&quot;.</p>
 <p>Every step of that is also a command on its own (<code>prepare</code>, <code>validate</code>,
 <code>report</code>, <code>classify</code>), for when you want one piece: <code>--prepare</code> forces a fresh
 snapshot, <code>--no-validate</code> skips the verifier check while you iterate on a task,
@@ -300,6 +344,24 @@ extension in VS Code you get completion and validation from
 <td>The same tool, simpler: five tickets, one closed row that must not be touched. The task to start from.</td>
 </tr>
 <tr>
+<td><code>bookmarx-triage</code> / <code>-keep</code></td>
+<td>default</td>
+<td>ready</td>
+<td>bookmarx, run <em>inside</em> the desktop as static files plus a stdlib server over a 269-post slice of its demo library (<code>tasks/bookmarx-lite/</code>). The review queue before a public demo: seventeen posts, nine the rules say to remove and eight guards that look risky and are clean. Nineteen checks, one fact each, named by category and never by post. A prompt pair: the bare rules vs the rules plus &quot;when unsure, keep&quot;, for over-deletion against under-deletion per check.</td>
+</tr>
+<tr>
+<td><code>bookmarx-box-lookup</code> / <code>-paraphrase</code> / <code>-deep</code></td>
+<td>default</td>
+<td>ready</td>
+<td>The three search memories, on the boxed bookmarx: graded from the click the app records inside the VM.</td>
+</tr>
+<tr>
+<td><code>bookmarx-lookup</code> / <code>-paraphrase</code> / <code>-scroll</code></td>
+<td>default</td>
+<td>ready</td>
+<td>The same memories against the live site through Chrome&#39;s DevTools port; read-only, so the live database is safe.</td>
+</tr>
+<tr>
 <td><code>notes</code></td>
 <td>default</td>
 <td>ready</td>
@@ -335,14 +397,23 @@ passk compare runs/ticket-routing-2*/ runs/ticket-routing-reload-*/
 (prompt, environment), the observed delta in passes, steps, time and cost per
 success, and Fisher&#39;s exact p-value for the pass/fail split. It refuses to
 attribute a difference when more than one thing changed. Note how little
-small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.</p>
+small samples can prove: 4/10 against 9/10 looks decisive and is p = 0.057.
+The by-check table holds itself to the same standard — every row carries each
+side&#39;s 95% interval and its own Fisher p, because a row is a sample of the same
+size as the bench, and 5/10 against 2/10 is a thirty-point delta between two
+intervals that almost entirely overlap. Read each p on its own row and do not
+count them: the rows are not independent, since one wrong action commonly
+fails several checks at once, so a handful of rows under 0.05 is one finding
+with several names, not several findings.</p>
 <h2 id="evidence">Evidence</h2>
 <p><a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/evidence/"><code>evidence/</code></a> holds every bench cited in the README: <code>bench.json</code>
 with every action, check, provenance record and task hash; the report page;
 the final screenshot of every run; and every screenshot of every failed run
 and of the shortest passing run. The comparison folder holds the paired result.
 <code>passk export runs/&lt;dir&gt; evidence/&lt;name&gt;</code> copies a bench with only the
-screenshots that carry proof. <code>passk export-inspect runs/&lt;dir&gt; [out dir]</code>
+screenshots that carry proof, plus every evidence file the task declared.
+(In <code>bench.json</code>, spend per run is <code>usage.costUsd</code> and spend for the bench is
+<code>metrics.totalCostUsd</code>; there is no <code>metrics.costUsd</code>.) <code>passk export-inspect runs/&lt;dir&gt; [out dir]</code>
 writes the bench as an <a href="https://inspect.aisi.org.uk/">Inspect AI</a> eval log:
 one task, one sample, each run an epoch, the checks as the scorer, lost runs
 unscored, every step a tool call, so <code>inspect view</code> opens it beside whatever
@@ -351,15 +422,89 @@ whole directory from <code>runs/</code>. <code>npm run assets</code> redraws the
 in <code>docs/</code> (failure evidence, how it works) from the same bench files.
 <code>docs/demo.tape</code> records the no-key demo as a GIF with
 <a href="https://github.com/charmbracelet/vhs">vhs</a>: <code>vhs docs/demo.tape</code>.</p>
+<h2 id="reading-benchjson">Reading bench.json</h2>
+<p>Every page, summary and action output is rendered from one file:
+<code>runs/&lt;task&gt;-&lt;timestamp&gt;/bench.json</code>. Anyone who needs a number rather than a
+page reads that file; <code>report.html</code> embeds the same JSON in a
+<code>&lt;script id=&quot;bench&quot;&gt;</code> tag, so a report is self-describing too.</p>
+<pre><code class="language-bash">jq &#39;.metrics | {passed, n, passAt1, passAt1Lower, passAt1Upper, medianSteps, totalCostUsd, earlyQuits}&#39; runs/&lt;dir&gt;/bench.json
+jq &#39;.runs[] | {runIndex, status, stoppedBy, steps: (.steps | length), evidence}&#39;   runs/&lt;dir&gt;/bench.json
+jq &#39;.metrics.checks | sort_by(.passed / .n)&#39;                                        runs/&lt;dir&gt;/bench.json
+</code></pre>
+<p>Top level: <code>status</code> (<code>running</code> until finalised), <code>taskId</code>, <code>taskName</code>,
+<code>prompt</code>, <code>model</code>, <code>snapshotId</code>, <code>k</code>, <code>startedAt</code>, <code>finishedAt</code>, <code>runs</code>,
+<code>metrics</code>, <code>failures</code> (one hypothesis per failed run, empty when
+<code>classified</code> is false), <code>provenance</code> (the task as run, its hash, versions,
+commit, system-prompt hash), and <code>validation</code> (what the verifier check proved
+before the bench).</p>
+<p><code>metrics</code>, all computed from <code>runs</code>, so <code>passk report</code> can recompute them
+under a newer definition:</p>
+<table>
+<thead>
+<tr>
+<th>field</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>requested</code>, <code>n</code>, <code>passed</code></td>
+<td>runs asked for; runs scored (attempted, not lost); runs whose every check passed</td>
+</tr>
+<tr>
+<td><code>errored</code>, <code>lost.{solari,provider,verifier}</code>, <code>skipped</code></td>
+<td>runs not scored against the agent, by cause; runs never started for budget</td>
+</tr>
+<tr>
+<td><code>passAt1</code>, <code>passAt1Lower</code>, <code>passAt1Upper</code></td>
+<td><code>passed / n</code> and its 95% Wilson interval</td>
+</tr>
+<tr>
+<td><code>endToEnd</code></td>
+<td><code>passed / requested</code>: what the user actually got, losses included</td>
+</tr>
+<tr>
+<td><code>passPowK[k]</code>, <code>passPowKLower[k]</code>, <code>passAtK[k]</code></td>
+<td>all-of-k, its lower bound, and any-of-k, for every k up to n</td>
+</tr>
+<tr>
+<td><code>meanSteps</code>, <code>medianSteps</code>, <code>p95Steps</code>, <code>minSteps</code>, <code>maxSteps</code></td>
+<td>effort, over scored runs; the same five for <code>…DurationMs</code></td>
+</tr>
+<tr>
+<td><code>totalCostUsd</code>, <code>costPerSuccessUsd</code>, <code>costPerPassingRunUsd</code></td>
+<td>spend over all runs; scored spend ÷ passes; mean spend of passing runs</td>
+</tr>
+<tr>
+<td><code>checks[]</code></td>
+<td>per check in task order: <code>label</code>, <code>invariant</code>, <code>passed</code>, <code>n</code></td>
+</tr>
+<tr>
+<td><code>earlyQuits[]</code>, <code>earlyQuitSteps</code></td>
+<td>runs that stopped by themselves at or under the threshold without passing; the threshold (0 when not applicable)</td>
+</tr>
+</tbody></table>
+<p>Each of <code>runs[]</code>: <code>runIndex</code>, <code>sessionId</code>, <code>status</code> (<code>passed</code> / <code>failed</code> /
+<code>errored</code>), <code>stoppedBy</code> (<code>end_turn</code>, <code>max_steps</code>, <code>refusal</code>, <code>error</code>,
+<code>safety_check</code>), <code>errorKind</code> (<code>agent</code>, <code>provider</code>, <code>solari</code>, <code>verifier</code>),
+<code>steps[]</code> (every action with its input, timing and screenshot path),
+<code>checks[]</code> (each check with <code>passed</code>, <code>detail</code>, and <code>errored</code> when the check
+itself could not run), <code>finalScreenshot</code>, <code>finalMessage</code> (recorded, never
+graded), <code>usage.{inputTokens,outputTokens,costUsd}</code>, <code>evidence[]</code>
+(<code>path</code>, <code>file</code>, <code>bytes</code>, or <code>error</code>), and <code>error</code>.</p>
+<p>The type definitions in <a href="https://github.com/tohirr/solari-cookbook/blob/main/passk/src/types.ts"><code>src/types.ts</code></a> are the reference;
+the comments there say why each field exists. In CI the headline values also
+arrive as step outputs, so a workflow never has to parse the file.</p>
 <h2 id="benching-your-own-agent">Benching your own agent</h2>
 <p>The bundled loops are one Claude loop and one OpenAI loop, chosen by
 <code>PASSK_PROVIDER</code>. To bench your own agent, point <code>PASSK_AGENT</code> at a module
 in your repo (or pass <code>agent:</code> to the action):</p>
 <pre><code class="language-bash">PASSK_AGENT=src/my-agent.ts npm run passk run tasks/ticket-queue.yaml -- --k 10
 </code></pre>
-<p>The module exports <code>runAgent</code>, or a default export, with the signature in
-<code>src/agent/index.ts</code>:</p>
-<pre><code class="language-ts">import type { AgentRunOptions, AgentRunOutput } from &quot;passk/src/agent/index.js&quot;;
+<p>The module exports <code>runAgent</code>, or a default export, with the signature
+published as <code>passk/agent-types</code> — a types-only entry, no runtime and no
+dependency on the Solari SDK, so your repo type-checks against the contract
+instead of restating it:</p>
+<pre><code class="language-ts">import type { AgentRunOptions, AgentRunOutput } from &quot;passk/agent-types&quot;;
 
 export async function runAgent(opts: AgentRunOptions): Promise&lt;AgentRunOutput&gt; {
   // opts.desktop  a live Solari Desktop handle: screenshot(), mouse, keyboard, fs, exec
@@ -368,7 +513,12 @@ export async function runAgent(opts: AgentRunOptions): Promise&lt;AgentRunOutput
   // return { steps, finalMessage, usage: { inputTokens, outputTokens }, stoppedBy }
 }
 </code></pre>
-<p>It resolves against the working directory and imports from your repo&#39;s
+<p><code>AgentRunOptions</code>, <code>AgentRunOutput</code>, <code>TraceStep</code>, <code>StoppedBy</code>, <code>ErrorKind</code> and
+the slice of <code>Desktop</code> an agent drives all come from there; passk&#39;s own
+<code>src/agent/published-contract.ts</code> fails the typecheck if that entry ever stops
+describing the real loop. If your repo already depends on <code>@solarisdk/sdk</code>, its
+<code>Desktop</code> is assignable to the published one and you can use either.</p>
+<p>The module resolves against the working directory and imports from your repo&#39;s
 <code>node_modules</code>, so install your repo before the bench. Any model or none:
 the bench&#39;s <code>model</code> is <code>PASSK_MODEL</code> if set, else <code>custom</code>, and cost is
 estimated only when a price is known for it. Two rules make the bench

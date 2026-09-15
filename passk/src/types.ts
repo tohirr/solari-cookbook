@@ -56,6 +56,24 @@ export interface Task {
    * cannot pass at all, is a broken test, not a hard one.
    */
   golden?: SetupStep[];
+  /**
+   * Guest paths copied out of every fork after grading, into
+   * `<run dir>/evidence/`. A check answers yes or no; the evidence file is the
+   * diagnosis — the whole decisions map rather than "the hateful target is
+   * still present". Without it that state dies with the VM.
+   */
+  evidence?: string[];
+}
+
+/** One file copied out of a fork after grading. `file` and `bytes` are absent when the copy failed. */
+export interface EvidenceFile {
+  /** The guest path the task asked for. */
+  path: string;
+  /** Where it landed, relative to the run directory. */
+  file?: string;
+  bytes?: number;
+  /** Why nothing was copied: missing, unreadable, or over the size cap. */
+  error?: string;
 }
 
 export interface TraceStep {
@@ -113,6 +131,8 @@ export interface RunResult {
   /** The agent's final text message. */
   finalMessage?: string;
   usage: { inputTokens: number; outputTokens: number; costUsd?: number };
+  /** The task's `evidence` paths as copied out of this fork. Absent on benches run before the field existed. */
+  evidence?: EvidenceFile[];
   error?: string;
 }
 
@@ -252,4 +272,14 @@ export interface BenchMetrics {
   costPerPassingRunUsd: number | null;
   /** Pass count per check, in task order. Turns a pass rate into which rule fails. */
   checks: CheckStat[];
+  /**
+   * Runs that stopped of their own accord far below the bench's typical
+   * effort and did not pass. A distinct failure shape from one that worked to
+   * the step cap, and worth marking the way a lost run is; whether the agent
+   * gave up or believed it was done is the classifier's question, not this
+   * field's.
+   */
+  earlyQuits: number[];
+  /** Step count at or below which a self-stopped failure counts as an early quit. 0 when the sample is too small or too short to support the test. */
+  earlyQuitSteps: number;
 }

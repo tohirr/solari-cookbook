@@ -11,7 +11,7 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { backfillCosts, computeMetrics, regrade } from "./metrics.js";
+import { backfillCosts, computeMetrics, regrade, wilson } from "./metrics.js";
 import { unlabelled } from "./provenance.js";
 import type { BenchMetrics, BenchResult } from "./types.js";
 
@@ -33,8 +33,26 @@ export interface Comparison {
   };
   /** Two-sided Fisher exact test on passed/failed counts. */
   fisherP: number;
-  /** Per check, when the checks were held fixed: what an intervention fixed and what it did not. Worst on side A first. */
-  checks?: { label: string; invariant: boolean; a: { passed: number; n: number }; b: { passed: number; n: number }; delta: number }[];
+  /**
+   * Per check, when the checks were held fixed: what an intervention fixed and
+   * what it did not. Worst on side A first. Each side carries its own 95%
+   * Wilson interval and each row its own Fisher exact p, because a row is a
+   * ten-run sample like any other: 5/10 against 2/10 is a 30-point delta whose
+   * intervals overlap almost entirely, and a table without them invites the
+   * reader to believe the check moved.
+   */
+  checks?: CheckComparison[];
+}
+
+/** One check under two conditions. `lower`/`upper` are the 95% Wilson bounds on that side's pass rate for this check. */
+export interface CheckComparison {
+  label: string;
+  invariant: boolean;
+  a: { passed: number; n: number; lower: number; upper: number };
+  b: { passed: number; n: number; lower: number; upper: number };
+  delta: number;
+  /** Two-sided Fisher exact p for this row alone. */
+  fisherP: number;
 }
 
 interface Side {
@@ -100,10 +118,17 @@ export function compareBenches(dirA: string, dirB: string): Comparison {
     },
     fisherP: fisherExact(m.passed, m.n - m.passed, n.passed, n.n - n.passed),
     ...(A.checks === B.checks && A.checks !== "null" && m.checks?.length > 1 && m.checks.length === n.checks?.length
-      ? { checks: m.checks.map((ca, i) => {
+      ? { checks: m.checks.map((ca, i): CheckComparison => {
           const cb = n.checks[i];
           const ra = ca.n ? ca.passed / ca.n : 1, rb = cb.n ? cb.passed / cb.n : 1;
-          return { label: ca.label, invariant: ca.invariant, a: { passed: ca.passed, n: ca.n }, b: { passed: cb.passed, n: cb.n }, delta: rb - ra };
+          const wa = wilson(ca.passed, ca.n), wb = wilson(cb.passed, cb.n);
+          return {
+            label: ca.label, invariant: ca.invariant,
+            a: { passed: ca.passed, n: ca.n, lower: wa.lower, upper: wa.upper },
+            b: { passed: cb.passed, n: cb.n, lower: wb.lower, upper: wb.upper },
+            delta: rb - ra,
+            fisherP: fisherExact(ca.passed, ca.n - ca.passed, cb.passed, cb.n - cb.passed),
+          };
         }).sort((x, y) => (x.a.n ? x.a.passed / x.a.n : 1) - (y.a.n ? y.a.passed / y.a.n : 1)) }
       : {}),
   };
@@ -147,7 +172,9 @@ export function formatComparison(c: Comparison): string {
     row("p95 steps", String(m.p95Steps), String(n.p95Steps), sign(c.delta.p95Steps)),
     row("median time", `${(m.medianDurationMs / 1000).toFixed(0)}s`, `${(n.medianDurationMs / 1000).toFixed(0)}s`, sign(Math.round(c.delta.medianDurationMs / 1000), "s")),
     row("cost / success", m.costPerSuccessUsd === null ? "—" : `$${m.costPerSuccessUsd.toFixed(3)}`, n.costPerSuccessUsd === null ? "—" : `$${n.costPerSuccessUsd.toFixed(3)}`, c.delta.costPerSuccessUsd === null ? "" : sign(Number(c.delta.costPerSuccessUsd.toFixed(3)), "")),
-    ...(c.checks ? [``, `by check, where either side missed (A · B · Δ):`, ...c.checks.filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) => `  ${`${x.a.passed}/${x.a.n}`.padEnd(8)}${`${x.b.passed}/${x.b.n}`.padEnd(8)}${sign(Math.round(x.delta * 100), " pts").padEnd(10)}${x.label}${x.invariant ? "  (guard)" : ""}`)] : []),
+    ...(c.checks ? [``, `by check, where either side missed (A and B with 95% intervals, Δ, and this row's own Fisher p; rows are not independent, so read each p alone and do not count them):`,
+      ...c.checks.filter((x) => x.a.passed < x.a.n || x.b.passed < x.b.n).map((x) =>
+        `  ${`${x.a.passed}/${x.a.n} (${pct(x.a.lower)}–${pct(x.a.upper)})`.padEnd(20)}${`${x.b.passed}/${x.b.n} (${pct(x.b.lower)}–${pct(x.b.upper)})`.padEnd(20)}${sign(Math.round(x.delta * 100), " pts").padEnd(9)}${`p=${x.fisherP.toFixed(2)}`.padEnd(8)}${x.label}${x.invariant ? "  (guard)" : ""}`)] : []),
     ``,
     `Fisher exact p = ${c.fisherP.toFixed(3)} for the pass/fail split${c.fisherP < 0.05 ? " (unlikely to be noise)" : " (consistent with noise at this sample size; the step and cost columns may still be informative)"}`,
   ];

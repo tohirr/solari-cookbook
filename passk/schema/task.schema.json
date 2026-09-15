@@ -29,6 +29,27 @@
         ]
       }
     },
+    "setup_from": {
+      "description": "Setup steps included from another YAML file (a list of steps, or a document with a `setup:` list), inserted before this task's own `setup`. Paths resolve against the task file. The object form supplies values for the include's ${name} placeholders, e.g. the URL a shared Chrome launch line opens.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "object", "required": ["file"], "additionalProperties": false, "properties": { "file": { "type": "string" }, "with": { "type": "object", "additionalProperties": { "type": "string" } } } },
+        {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "object", "required": ["file"], "additionalProperties": false, "properties": { "file": { "type": "string" }, "with": { "type": "object", "additionalProperties": { "type": "string" } } } }
+            ]
+          }
+        }
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Guest paths copied out of every fork after grading, into `<run dir>/evidence/`. The file that explains a verdict — an app's state, a log — instead of it dying with the VM. Files over 2 MB are recorded as skipped.",
+      "items": { "type": "string" }
+    },
     "golden": {
       "type": "array",
       "description": "Steps that produce the correct end state without an agent. `passk validate` proves the checks fail before them and pass after them.",

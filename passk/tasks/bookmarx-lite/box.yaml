@@ -1,0 +1,27 @@
+# Setup include: bookmarx in a box.
+#
+# Pulled in with `setup_from: bookmarx-lite/box.yaml`. It puts the product
+# inside the desktop — the real UI as static files, its retrieval
+# reimplemented in a stdlib Python server over a 269-post slice of the demo
+# library — and leaves it serving on 127.0.0.1:8080. Every task that grades
+# the boxed app shares this file, so the recipe is proven in one place.
+#
+# `upload` paths resolve against the working directory (the passk/ folder),
+# the same as in a task file; a shared file does not change that.
+- exec: sh
+  args: ["-c", "mkdir -p /root/app"]
+# One upload: the export from `pnpm demo:export` in bookmarx (the two
+# prerendered pages, the static chunks, every picture, the seed). Built
+# locally and never committed; see tasks/bookmarx-lite/README.md.
+- upload: tasks/bookmarx-lite/bookmarx-box.tar.gz
+  to: /root/app/box.tar.gz
+- upload: tasks/bookmarx-lite/server.py
+  to: /root/app/server.py
+- upload: tasks/bookmarx-lite/check.py
+  to: /root/app/check.py
+- upload: tasks/bookmarx-lite/golden.py
+  to: /root/app/golden.py
+- exec: sh
+  args: ["-c", "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"]
+- exec: sh
+  args: ["-c", "cd /root/app && nohup python3 server.py 8080 /root/app/box >/root/app/server.log 2>&1 & sleep 3; curl -sf http://127.0.0.1:8080/api/state >/dev/null"]

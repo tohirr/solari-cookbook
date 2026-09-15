@@ -42,3 +42,16 @@ Everything below was found on a live VM while building passk, and cost an aftern
   passk treats a fork whose first action never returns as a lost run, not an
   agent failure; a short readiness probe after `fromSnapshot`, or a status
   field on the snapshot, would let it retry the fork instead.
+- **`createDesktop` can answer `Unauthorized` on a key that works.** One boot
+  failed with a 401 and the identical command, same key, same minute-old
+  process, succeeded on the next try. A fork that never comes up was already
+  written off as a lost run and retried; the boot in `prepare` now gets the
+  same single retry, because a transient 401 there takes down the whole command
+  before there is anything to resume.
+- **`fs.write` carried 8.6 MB in one frame, and no limit is documented.** The
+  boxed bookmarx tarball goes into the guest as a single base64 JSON-RPC
+  message over the control channel and arrives intact; nothing in the SDK's
+  types says how far that goes. There is a chunked `files.upload` on the
+  session handle, but it is not exposed on `desktop.fs`, so a task's `upload`
+  step is a plain `fs.write`. If you need tens of megabytes, either probe the
+  ceiling yourself or fetch the bytes from inside the VM with `exec`.

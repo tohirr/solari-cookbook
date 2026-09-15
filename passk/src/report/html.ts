@@ -8,6 +8,7 @@
  * each. Provenance closes it.
  */
 import { checkLabel, checkRaw } from "../checker.js";
+import { fileSize } from "../evidence.js";
 import { lostKind, percentile } from "../metrics.js";
 import type { BenchResult, RunResult } from "../types.js";
 import { CSS, FONTS, TIP_JS, dotsHtml, esc, pct, secs, stripHtml, tailStat, usd } from "./theme.js";
@@ -36,6 +37,22 @@ function stoppedPill(r: RunResult): string {
   return `<span class="pill neutral">${esc(text)}</span>`;
 }
 
+/** Marked on the run, not inferred by the reader: this run stopped by itself far below the bench's typical effort. The mark says what happened, not why; the classifier argues about why. */
+function quitPill(b: BenchResult, r: RunResult): string {
+  if (!b.metrics.earlyQuits?.includes(r.runIndex)) return "";
+  return `<span class="pill neutral" data-tip="stopped on its own after ${r.steps.length} steps, at or under ${b.metrics.earlyQuitSteps} — a quarter of this bench's median effort">stopped early</span>`;
+}
+
+/** The files this run's task declared as evidence, copied out of the fork before it was killed. */
+function evidenceHtml(r: RunResult): string {
+  if (!r.evidence?.length) return "";
+  const one = (f: NonNullable<RunResult["evidence"]>[number]) =>
+    f.file
+      ? `<a href="${runDir(r.runIndex)}/${f.file}" target="_blank">${esc(f.file.split("/").pop() ?? f.file)}</a> <span style="color:var(--ink-3)">${esc(f.path)}${f.bytes !== undefined ? `, ${fileSize(f.bytes)}` : ""}</span>`
+      : `<span class="bad">${esc(f.path)}</span> <span style="color:var(--ink-3)">${esc(f.error ?? "not copied")}</span>`;
+  return `<div class="note">evidence from inside the VM: ${r.evidence.map(one).join(" · ")}</div>`;
+}
+
 function runCard(b: BenchResult, r: RunResult, id: boolean): string {
   const f = b.failures.find((x) => x.runIndex === r.runIndex);
   const shots = r.steps.filter((s) => s.screenshot);
@@ -50,11 +67,12 @@ function runCard(b: BenchResult, r: RunResult, id: boolean): string {
     return `<div><span class="${c.passed ? "ok" : "bad"}">${c.passed ? "✓" : "✗"}</span> ${label}${named}${c.detail ? `<div class="detail">${esc(c.detail.slice(0, 500))}</div>` : ""}</div>`;
   }).join("");
   return `<div class="card run"${id ? ` id="run-${r.runIndex}"` : ""}>
-    <div class="id"><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stoppedPill(r)}<div style="margin-top:8px">${r.steps.length} steps · ${secs(r.durationMs)}${r.usage.costUsd !== undefined ? ` · ${usd(r.usage.costUsd)}` : ""}</div></div>
+    <div class="id"><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stoppedPill(r)}${quitPill(b, r)}<div style="margin-top:8px">${r.steps.length} steps · ${secs(r.durationMs)}${r.usage.costUsd !== undefined ? ` · ${usd(r.usage.costUsd)}` : ""}</div></div>
     <div>
       <div class="checks">${checks}${r.error ? `<div class="bad">${esc(r.error)}</div>` : ""}</div>
       ${film ? `<div class="film">${film}</div>` : ""}
       <div class="acts">${esc(actionSummary(r))}</div>
+      ${evidenceHtml(r)}
       ${f ? `<div class="hyp"><b>Hypothesis: ${esc(f.cause.replace(/_/g, " "))}</b> · ${esc(f.confidence)} confidence${f.divergenceStep !== null ? ` · diverges from the passing reference at step ${f.divergenceStep}` : f.referencePassed ? "" : " · no passing run to compare against"}<div style="margin-top:4px">${esc(f.explanation)}</div></div>` : ""}
       ${r.finalMessage ? `<div class="note">Agent's own claim: “${esc(r.finalMessage.slice(0, 200))}” — not used for grading.</div>` : ""}
       <details><summary>trace (${r.steps.length} actions)</summary><pre>${esc(r.steps.map((s) => `${String(s.index).padStart(2)}  ${s.name.padEnd(16)} ${JSON.stringify(s.input)}${s.error ? "   !! " + s.error : ""}`).join("\n"))}</pre></details>
@@ -64,7 +82,7 @@ function runCard(b: BenchResult, r: RunResult, id: boolean): string {
 
 /** A passed run folded to one line; the full card (screenshots, checks, trace) opens on demand or when a dot links here. */
 function runRow(b: BenchResult, r: RunResult): string {
-  return `<details class="runrow" id="run-${r.runIndex}"><summary><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stoppedPill(r)}<span>${r.steps.length} steps</span><span>${secs(r.durationMs)}</span>${r.usage.costUsd !== undefined ? `<span>${usd(r.usage.costUsd)}</span>` : ""}<span class="more">screenshots, checks, trace</span></summary>${runCard(b, r, false)}</details>`;
+  return `<details class="runrow" id="run-${r.runIndex}"><summary><b>Run ${r.runIndex}</b><span class="pill ${r.status}">${r.status}</span> ${stoppedPill(r)}${quitPill(b, r)}<span>${r.steps.length} steps</span><span>${secs(r.durationMs)}</span>${r.usage.costUsd !== undefined ? `<span>${usd(r.usage.costUsd)}</span>` : ""}<span class="more">screenshots, checks, trace</span></summary>${runCard(b, r, false)}</details>`;
 }
 
 function runsSection(b: BenchResult): string {
@@ -142,6 +160,7 @@ export function renderReport(b: BenchResult): string {
 <div class="meta"><code>${esc(b.model)}</code> · k=${b.k} · snapshot <code>${esc(b.snapshotId)}</code> · ${esc(b.startedAt.slice(0, 16).replace("T", " "))} UTC</div>
 <blockquote class="prompt">${esc(b.prompt.trim())}</blockquote>
 <p class="verdict">${verdict(b)}</p>
+${b.classified === false && b.runs.some((r) => r.status === "failed") ? `<div class="note">Classification was switched off for this bench, so the failures below carry no hypothesis and the absence of one means nothing. <code>passk classify &lt;bench dir&gt;</code> adds one to each failed run.</div>` : ""}
 
 <div class="card">
   <div class="headline"><b>${m.passed}/${m.n} passed</b><span>pass@1 ${pct(m.passAt1)} · 95% interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}${m.errored ? ` · ${m.errored} of ${m.requested} requested runs lost before they could be scored` : ""}</span></div>
@@ -150,6 +169,8 @@ export function renderReport(b: BenchResult): string {
   <div class="range" data-tip="observed ${pct(m.passAt1)}, 95% Wilson interval ${pct(m.passAt1Lower)}–${pct(m.passAt1Upper)}"><i style="left:${m.passAt1Lower * 100}%;right:${100 - m.passAt1Upper * 100}%"></i><b style="left:${m.passAt1 * 100}%"></b></div>
   <div class="range-labels"><span>0%</span><span>where the true pass rate plausibly sits (95% Wilson interval)</span><span>100%</span></div>
 </div>
+
+${m.earlyQuits?.length ? `<div class="note">${m.earlyQuits.length === 1 ? `Run ${m.earlyQuits[0]} stopped` : `Runs ${m.earlyQuits.slice(0, -1).join(", ")} and ${m.earlyQuits[m.earlyQuits.length - 1]} stopped`} of ${m.earlyQuits.length === 1 ? "its" : "their"} own accord at or under ${m.earlyQuitSteps} steps — a quarter of this bench's median effort — without passing. A run that stops by itself with the work untouched is not the same failure as one that works to the step cap and gets it wrong — whether it gave up or believed it was done is a question for the hypotheses below.</div>` : ""}
 
 <h2>Numbers</h2>
 <div class="kpis">
@@ -170,7 +191,6 @@ ${checksSection(b, scorable)}
   <div class="note">Every point is one run from the same snapshot. A wide spread on a task that always passes is behavior variability: same result, different routes, different cost.</div>
 </div>
 
-${b.classified === false && b.runs.some((r) => r.status === "failed") ? `<div class="note" style="margin:24px 0 -20px">Failures in this bench carry no hypothesis: classification was switched off for the run. <code>passk classify &lt;bench dir&gt;</code> adds one to each failed run.</div>` : ""}
 ${runsSection(b)}
 
 <div class="foot">

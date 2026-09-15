@@ -80,3 +80,19 @@ test("cost estimate uses the price table and env override", () => {
   assert.ok(Math.abs((estimateCostUsd("made-up-model", 1_000_000, 1_000_000) ?? 0) - 3) < 1e-9);
   delete process.env.PASSK_PRICE_IN; delete process.env.PASSK_PRICE_OUT;
 });
+
+test("an early quit is a self-stopped failure far under the median", () => {
+  const quit = (i: number): RunResult => ({ ...run("failed", 3), runIndex: i, stoppedBy: "end_turn" });
+  const worked = (i: number): RunResult => ({ ...run("passed", 40), runIndex: i, stoppedBy: "end_turn" });
+  const capped = (i: number): RunResult => ({ ...run("failed", 40), runIndex: i, stoppedBy: "max_steps" });
+  const m = computeMetrics([worked(0), worked(1), worked(2), capped(3), quit(4)]);
+  assert.equal(m.earlyQuitSteps, 10);              // a quarter of a median of 40
+  assert.deepEqual(m.earlyQuits, [4]);             // not run 3: it worked to the cap and was wrong
+
+  // A run that passes in two steps found a shortcut, not a reason to complain.
+  assert.deepEqual(computeMetrics([worked(0), worked(1), { ...run("passed", 2), runIndex: 2, stoppedBy: "end_turn" }]).earlyQuits, []);
+  // Short tasks have no "far too early": a quarter of six steps means nothing.
+  assert.equal(computeMetrics([run("passed", 6), run("passed", 6), run("failed", 1)]).earlyQuitSteps, 0);
+  // Neither do three runs' worth of nothing.
+  assert.equal(computeMetrics([run("passed", 40), run("failed", 1)]).earlyQuitSteps, 0);
+});

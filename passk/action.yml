@@ -23,7 +23,10 @@ branding:
   color: green
 inputs:
   task:
-    description: Path to the task file, relative to the workspace.
+    description: >-
+      Path to the task file, relative to the workspace. Prefix it with `passk:`
+      (e.g. `passk:tasks/ticket-queue.yaml`) to use a task that ships with this
+      action instead, with no second checkout in your workflow.
     required: true
   k:
     description: Runs to fork from the snapshot.
@@ -127,7 +130,16 @@ runs:
         [ -n "$PASSK_MODEL" ] || unset PASSK_MODEL
         if [ -n "$IN_AGENT" ]; then case "$IN_AGENT" in /*) export PASSK_AGENT="$IN_AGENT" ;; *) export PASSK_AGENT="$GITHUB_WORKSPACE/$IN_AGENT" ;; esac; fi
         TSX="$GITHUB_ACTION_PATH/node_modules/.bin/tsx"
-        case "$IN_TASK" in /*) TASK="$IN_TASK" ;; *) TASK="$GITHUB_WORKSPACE/$IN_TASK" ;; esac
+        # passk:… is a task shipped with the action; its uploads and check
+        # scripts sit beside it, and a task's relative paths resolve against
+        # the working directory, so that case runs from the action instead of
+        # the workspace. Anything else belongs to the caller's repo.
+        case "$IN_TASK" in
+          passk:*) TASK="$GITHUB_ACTION_PATH/${IN_TASK#passk:}"; cd "$GITHUB_ACTION_PATH" ;;
+          /*)      TASK="$IN_TASK" ;;
+          *)       TASK="$GITHUB_WORKSPACE/$IN_TASK" ;;
+        esac
+        [ -f "$TASK" ] || { echo "::error title=passk::task file not found: $TASK (from task: $IN_TASK)"; exit 1; }
         args=(run "$TASK" --k "$IN_K" --concurrency "$IN_CONCURRENCY")
         [ -n "$IN_REQUIRE" ] && args+=(--require "$IN_REQUIRE")
         [ -n "$IN_REQUIRE_LOWER" ] && args+=(--require-lower "$IN_REQUIRE_LOWER")

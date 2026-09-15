@@ -61,8 +61,14 @@ if (checks.length > 1) {
   lines.push("", missed.length ? `**Checks:** ${missed.length} of ${checks.length} failed in at least one run, worst first.` : `**Checks:** all ${checks.length} passed in every scored run.`, "", "| check | passed |", "|---|---|");
   for (const c of (missed.length ? missed : checks).slice(0, 12)) lines.push(`| ${c.label}${c.invariant ? " (guard)" : ""} | ${c.passed}/${c.n} |`);
 }
+if ((m.earlyQuits ?? []).length) {
+  // A clean end_turn after two steps is not the same failure as working to the
+  // cap and getting it wrong; the pass rate alone cannot tell them apart.
+  lines.push("", `**Stopped early:** run${m.earlyQuits.length === 1 ? "" : "s"} ${m.earlyQuits.join(", ")} stopped on ${m.earlyQuits.length === 1 ? "its" : "their"} own at or under ${m.earlyQuitSteps} steps — a quarter of this bench's median effort — without passing.`);
+}
 if (failures.length) {
   lines.push("", `**Failed runs:** ${failures.map((r) => `run ${r.runIndex}`).join(", ")}.`);
+  if (b.classified === false) lines.push("", `_No cause hypotheses: classification was off for this bench (\`classify: "false"\`). \`passk classify ${dir}\` adds one per failed run._`);
   for (const r of failures.slice(0, 5)) {
     const bad = r.checks.filter((c) => !c.passed).map((c) => checkLabel(c.check));
     const h = hyp(r.runIndex);

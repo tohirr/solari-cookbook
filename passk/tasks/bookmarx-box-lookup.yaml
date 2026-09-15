@@ -12,30 +12,12 @@ id: bookmarx-box-lookup
 name: Find a saved post from a short memory, in the box
 template: default
 resolution: 1280x720
-setup:
-  - exec: sh
-    args: ["-c", "mkdir -p /root/app"]
-  # One upload: the export from `pnpm demo:export` in bookmarx (the two
-  # prerendered pages, the static chunks, every picture, the seed). Built
-  # locally and never committed; see tasks/bookmarx-lite/README.md.
-  - upload: tasks/bookmarx-lite/bookmarx-box.tar.gz
-    to: /root/app/box.tar.gz
-  - upload: tasks/bookmarx-lite/server.py
-    to: /root/app/server.py
-  - upload: tasks/bookmarx-lite/check.py
-    to: /root/app/check.py
-  - upload: tasks/bookmarx-lite/golden.py
-    to: /root/app/golden.py
-  - exec: sh
-    args: ["-c", "cd /root/app && tar xzf box.tar.gz && rm box.tar.gz && test -f box/seed.json"]
-  - exec: sh
-    args: ["-c", "cd /root/app && nohup python3 server.py 8080 /root/app/box >/root/app/server.log 2>&1 & sleep 3; curl -sf http://127.0.0.1:8080/api/state >/dev/null"]
-  # The template's Chrome, relaunched with a DevTools port and its "Can't
-  # update Chrome" bubble clicked shut — the line proven on the live-site
-  # tasks, verbatim but for the URL.
-  - exec: sh
-    args: ["-c", "export $(tr '\\0' '\\n' < /proc/$(pgrep -f '^/usr/bin/google-chrome-stable' | head -1)/environ | grep -E '^(DISPLAY|XAUTHORITY)=' | tr '\\n' ' '); pkill -f '^/usr/bin/google-chrome-stable'; sleep 2; nohup google-chrome-stable --no-first-run --no-default-browser-check --window-size=1100,680 --window-position=120,40 --disable-gpu --password-store=basic --no-sandbox --disable-component-update --disable-background-networking --disable-features=OutdatedBuildDetector,ChromeWhatsNewUI --user-data-dir=/home/desktop/.config/google-chrome --remote-debugging-port=9222 'http://127.0.0.1:8080/box' >/tmp/chrome.log 2>&1 & sleep 12; xdotool mousemove 1180 152 click 1; sleep 1; curl -sf http://127.0.0.1:9222/json/version >/dev/null"]
-  - wait: 3
+# Setup is shared, because it was proven once: the app in a box, then the
+# template's Chrome relaunched on it with a DevTools port.
+setup_from:
+  - bookmarx-lite/box.yaml
+  - file: bookmarx-lite/chrome.yaml
+    with: { url: "http://127.0.0.1:8080/box" }
 prompt: >
   bookmarx is open in the browser: a search over my saved posts. Find the post
   I mean: "winter soldier best fight scene". Search for it, pick the result that matches, and open the
@@ -51,3 +33,7 @@ checks:
     args: ["/root/app/check.py", "clicked", "1890154497357611360"]
     stdout_contains: "PASS"
 max_steps: 40
+# What the app recorded, kept per run: which query was searched and which
+# card was clicked, not just whether the right one was.
+evidence:
+  - /root/app/state.json

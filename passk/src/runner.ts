@@ -16,6 +16,7 @@ import { runChecks } from "./checker.js";
 import { classifyFailures } from "./classify.js";
 import { config, readSnapshots } from "./config.js";
 import { destroyDesktop, forkDesktop, isFake, solari, withReconnect } from "./desktop.js";
+import { collectEvidence, evidenceSummary } from "./evidence.js";
 import { computeMetrics, estimateCostUsd } from "./metrics.js";
 import { collectProvenance } from "./provenance.js";
 import { renderReport } from "./report/html.js";
@@ -186,6 +187,10 @@ async function runOneAttempt(task: Task, snapshotId: string, runIndex: number, b
     const finalPng = await withReconnect(live, () => live.screenshot({ format: "png" }));
     fs.writeFileSync(path.join(outDir, "final.png"), finalPng);
     const checks = await runChecks(desktop, task.checks, finalPng);
+    // After grading, and before the VM is killed: the files the task says
+    // explain its verdicts. Best-effort — a missing file is recorded, not raised.
+    const evidence = await collectEvidence(desktop, task.evidence, outDir);
+    if (evidence.length) console.log(`${tag} evidence: ${evidenceSummary(evidence)}`);
     // Outcome is judged by the checks alone. Whether the agent stopped on its
     // own, hit the cap, or crashed is recorded separately: it is a behavior
     // signal, not a verdict.
@@ -206,6 +211,7 @@ async function runOneAttempt(task: Task, snapshotId: string, runIndex: number, b
       runIndex, sessionId: desktop.id, status, startedAt: new Date(started).toISOString(),
       finishedAt: new Date().toISOString(), durationMs: Date.now() - started, steps: agent.steps, checks,
       finalScreenshot: "final.png", finalMessage: agent.finalMessage, error: agent.error, stoppedBy: agent.stoppedBy, errorKind,
+      ...(evidence.length ? { evidence } : {}),
       usage: { ...agent.usage, costUsd: estimateCostUsd(config.model, agent.usage.inputTokens, agent.usage.outputTokens) },
     };
     fs.writeFileSync(path.join(outDir, "run.json"), JSON.stringify(result, null, 2));

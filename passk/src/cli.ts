@@ -82,7 +82,7 @@ async function main() {
         // experiment holds the environment fixed while the prompt changes.
         snapshotId: flag("snapshot"),
       });
-      printSummary(bench, k);
+      printSummary(bench, k, dir);
       console.log(`\nreport: ${path.join(dir, "report.html")}`);
       process.exitCode = enforce(bench);
       return;
@@ -123,8 +123,8 @@ async function main() {
     case "export": {
       const out = process.argv[4];
       if (!out) { console.error("export needs a source bench dir and a destination dir"); process.exit(1); }
-      const { bench, files, bytes } = exportBench(must(target), out);
-      console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${files} screenshots, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
+      const { bench, files, evidence, bytes } = exportBench(must(target), out);
+      console.log(`${bench.taskId}: ${bench.metrics.passed}/${bench.metrics.n} → ${out} (${files} screenshots${evidence ? `, ${evidence} evidence files` : ""}, ${(bytes / 1e6).toFixed(1)} MB before compression)`);
       return;
     }
     case "export-inspect": {
@@ -151,7 +151,7 @@ async function main() {
       regrade(bench.runs);
       backfillCosts(bench.runs, bench.model);
       bench.metrics = computeMetrics(bench.runs, bench.k);
-      printSummary(bench, bench.k);
+      printSummary(bench, bench.k, target);
       process.exitCode = enforce(bench);
       return;
     }
@@ -231,7 +231,7 @@ function feasibility(k: number, requireLower: number | undefined): void {
   }
 }
 
-function printSummary(bench: BenchResult, k: number): void {
+function printSummary(bench: BenchResult, k: number, dir?: string): void {
   const m = bench.metrics;
   const pct = (x: number) => `${(x * 100).toFixed(0)}%`;
   // pass^k for the k people actually ask about, not for k=n (which is 0 whenever anything failed).
@@ -242,7 +242,14 @@ function printSummary(bench: BenchResult, k: number): void {
   if (m.errored || m.skipped) console.log(`end-to-end ${m.passed}/${m.requested} (lost: ${m.lost.solari} desktop, ${m.lost.provider} provider, ${m.lost.verifier} verifier; ${m.skipped} skipped for budget)`);
   console.log(`steps     median ${m.medianSteps}, p95 ${m.p95Steps}, range ${m.minSteps}–${m.maxSteps}`);
   console.log(`cost      $${m.totalCostUsd.toFixed(2)} total${m.costPerSuccessUsd !== null ? `, $${m.costPerSuccessUsd.toFixed(3)} per success` : ""}`);
+  // A run that stopped by itself in a fraction of the usual effort is its own
+  // failure shape, and a clean end_turn hides it inside the pass rate.
+  if (m.earlyQuits?.length) console.log(`stopped   run${m.earlyQuits.length === 1 ? "" : "s"} ${m.earlyQuits.join(", ")} stopped on ${m.earlyQuits.length === 1 ? "its" : "their"} own at or under ${m.earlyQuitSteps} steps (a quarter of the median) without passing`);
   for (const f of bench.failures) console.log(`  run ${f.runIndex}: ${f.cause} (${f.confidence} confidence${f.divergenceStep !== null ? `, diverges @${f.divergenceStep}` : ""}) — ${f.explanation}`);
+  // An empty failure section means "nothing was asked", not "nothing to explain".
+  if (bench.classified === false && bench.runs.some((r) => r.status === "failed")) {
+    console.log(`\nno failure hypotheses: classification was off for this bench. \`passk classify ${dir ?? "<bench dir>"}\` adds one per failed run.`);
+  }
 }
 
 /** Threshold gate. Returns the process exit code. */

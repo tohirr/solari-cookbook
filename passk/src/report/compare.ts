@@ -113,10 +113,10 @@ ${tail && tailA !== null && tailB !== null
 
 ${c.checks ? `<h2>By check</h2>
 <div class="card" style="padding:0;overflow-x:auto"><table>
-<tr><th>check</th><th class="num">A</th><th class="num">B</th><th class="num">Δ B − A</th></tr>
-${c.checks.map((x) => `<tr><td>${esc(x.label)}${x.invariant ? ` <span class="pill inv">guard</span>` : ""}</td><td class="num">${x.a.passed}/${x.a.n}</td><td class="num">${x.b.passed}/${x.b.n}</td><td class="num">${delta(Math.round(x.delta * 100), "up", (v) => `${v} pts`)}</td></tr>`).join("\n")}
+<tr><th>check</th><th class="num">A</th><th class="num">B</th><th class="num">Δ B − A</th><th class="num">p</th></tr>
+${c.checks.map((x) => `<tr><td>${esc(x.label)}${x.invariant ? ` <span class="pill inv">guard</span>` : ""}</td><td class="num">${x.a.passed}/${x.a.n}<span style="color:var(--ink-3)"> ${pct(x.a.lower)}–${pct(x.a.upper)}</span></td><td class="num">${x.b.passed}/${x.b.n}<span style="color:var(--ink-3)"> ${pct(x.b.lower)}–${pct(x.b.upper)}</span></td><td class="num">${delta(Math.round(x.delta * 100), "up", (v) => `${v} pts`)}</td><td class="num"${x.fisherP < 0.05 ? "" : ' style="color:var(--ink-3)"'}>${x.fisherP.toFixed(2)}</td></tr>`).join("\n")}
 </table></div>
-<div class="note" style="margin-top:8px">Same checks on both sides, so each row is one rule under two conditions: what the change fixed, and what it did not touch.</div>` : ""}
+<div class="note" style="margin-top:8px">Same checks on both sides, so each row is one rule under two conditions: what the change fixed, and what it did not touch. Each count carries its own 95% interval and its own Fisher exact p, on the same footing as the overall split: a row is a sample of the same size as the bench, so a ten-point delta between two overlapping intervals is not yet a result. The rows are not independent — one wrong action commonly fails several checks at once — so read each p on its own row and do not count them: several rows under 0.05 are usually one finding with several names.</div>` : ""}
 
 ${repA.length || repB.length ? `<h2>What the desktop looked like when each side stopped</h2>
 <div class="two">

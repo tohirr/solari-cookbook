@@ -12,9 +12,16 @@ import type { Check, Provenance, Task } from "./types.js";
 
 const require = createRequire(import.meta.url);
 
-/** Stable hash of a task: keys sorted, so formatting changes don't count; check names dropped, so labelling a check doesn't either. */
+/**
+ * Stable hash of a task: keys sorted, so formatting changes don't count; check
+ * names dropped, so labelling a check doesn't either; and `evidence` dropped,
+ * because those files are copied out after grading and cannot change an
+ * outcome. What the hash covers is what the agent faced and what judged it, so
+ * two benches stay comparable when a task starts keeping a state file.
+ */
 export function taskHash(task: Task): string {
-  return createHash("sha256").update(canonical({ ...task, checks: unlabelled(task.checks) })).digest("hex").slice(0, 16);
+  const { evidence: _evidence, ...graded } = task;
+  return createHash("sha256").update(canonical({ ...graded, checks: unlabelled(task.checks) })).digest("hex").slice(0, 16);
 }
 
 /** Checks without their display names: what grading actually depends on. */
